@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "ASCharacter.generated.h"
 
+class UASGlobalWidget;
+class UASHealthComponent;
 class UASEventWorldSubSystem;
 class UInputMappingContext;
 class UInputAction;
@@ -35,6 +37,19 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Camera", meta = (DisplayName = "FirstPersonCameraComponent"))
 	UCameraComponent* m_FirstPersonCameraComponent;
 
+	/** Health Component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Health", meta = (DisplayName = "HealthComponent"))
+	UASHealthComponent* m_HealthComponent;
+
+	/** Player Widget */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Widget", meta = (DisplayName = "PlayerWidget"))
+	UASGlobalWidget* M_PlayerWidget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASCharacter|Widget", meta = (DisplayName = "PlayerWidget"))
+	TSubclassOf<UASGlobalWidget> M_PlayerWidgetClass;
+	
+
+	/** Event World SubSystem */
 	UPROPERTY()
 	TObjectPtr<UASEventWorldSubSystem> m_EventWorldSubSystem;
 	
@@ -67,6 +82,13 @@ public:
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION(Exec)
+	void DebugDamage(float amount);
+	
+	UFUNCTION(Exec)
+	void DebugHealing(float amount);
+	
+
 protected:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
@@ -81,4 +103,7 @@ protected:
 	void GetAllSubsystem();
 	void AddDefaultMappingContext();
 	void RemoveDefaultMappingContext();
+
+public:
+	UASGlobalWidget* GetPlayerWidget() const { return M_PlayerWidget; }
 };
