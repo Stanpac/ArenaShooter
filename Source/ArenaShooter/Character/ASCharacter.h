@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "ASCharacter.generated.h"
 
+class UASEventWorldSubSystem;
 class UInputMappingContext;
 class UInputAction;
 class UCameraComponent;
@@ -14,9 +15,8 @@ struct FInputActionValue;
 
 /**
  * Base Class for all Characters in the game (Player and AI)
- * TODO :  Bind Input Actions to Functions
- * TODO :  Implement jump, Sprint ? Crouch ?
- * TODO :  Implement Death
+ * TODO :  Move input In component ?
+ * TODO :  Implement Sprint ? 
  * TODO :  Implement Health -> Component 
  * 
  */
@@ -35,6 +35,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Camera", meta = (DisplayName = "FirstPersonCameraComponent"))
 	UCameraComponent* m_FirstPersonCameraComponent;
 
+	UPROPERTY()
+	TObjectPtr<UASEventWorldSubSystem> m_EventWorldSubSystem;
+	
+	/* ---------------------- Input To move in component -------------------------------*/
+	
 	/** Default MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta=(DisplayName = "DefaultMappingContext"))
 	UInputMappingContext* m_DefaultMappingContext;
@@ -62,7 +67,13 @@ protected:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 
-	void AddDefaultMappingContext();
+	UFUNCTION()
+	virtual void OnStartDeath();
 
+	UFUNCTION()
+	virtual void OnEndDeath();
+
+	void GetAllSubsystem();
+	void AddDefaultMappingContext();
 	void RemoveDefaultMappingContext();
 };

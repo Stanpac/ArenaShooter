@@ -4,6 +4,7 @@
 #include "ArenaShooter/Character/ASCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "ArenaShooter/SubSystem/ASEventWorldSubSystem.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -21,6 +22,8 @@ AASCharacter::AASCharacter()
 	USkeletalMeshComponent* MeshComp = GetMesh();
 	check(MeshComp);
 	MeshComp->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));  // Rotate mesh to be X forward since it is exported as Y forward.
+	MeshComp->SetRelativeLocation(FVector(0, 0, -90));
+	MeshComp->SetupAttachment(GetCapsuleComponent());
 
 	// Character Movement (Lyra Params)
 	UCharacterMovementComponent* MoveComp = CastChecked<UCharacterMovementComponent>(GetCharacterMovement());
@@ -39,17 +42,10 @@ AASCharacter::AASCharacter()
 	MoveComp->SetCrouchedHalfHeight(65.0f);
 
 	m_FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-	m_FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
-	m_FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
+	m_FirstPersonCameraComponent->SetupAttachment(MeshComp, TEXT("head"));
+	m_FirstPersonCameraComponent->SetRelativeLocation(FVector(0, 10.f, 0));
+	m_FirstPersonCameraComponent->SetRelativeRotation(FRotator(-90, 0, 90));
 	m_FirstPersonCameraComponent->bUsePawnControlRotation = true;
-	
-	MeshComp->SetupAttachment(m_FirstPersonCameraComponent);
-}
-
-void AASCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-	AddDefaultMappingContext();
 }
 
 void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -71,16 +67,30 @@ void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	}
 }
 
+void AASCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	AddDefaultMappingContext();
+	GetAllSubsystem();
+}
+
+void AASCharacter::GetAllSubsystem()
+{
+	m_EventWorldSubSystem = GetWorld()->GetSubsystem<UASEventWorldSubSystem>();
+}
+
 void AASCharacter::Move(const FInputActionValue& Value)
 {
-	
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
 	if (Controller != nullptr) {
-		
-		// add movement 
-		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
-		AddMovementInput(GetActorRightVector(), MovementVector.X);
+		if (MovementVector.X != 0.0f) {
+			AddMovementInput(GetActorRightVector(), MovementVector.X);
+		}
+
+		if (MovementVector.Y != 0.0f) {
+			AddMovementInput(GetActorForwardVector(), MovementVector.Y);
+		}
 	}
 }
 
@@ -89,11 +99,46 @@ void AASCharacter::Look(const FInputActionValue& Value)
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
 	if (Controller != nullptr) {
-		
-		// add yaw and pitch input to controller
-		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
+		if (LookAxisVector.X != 0.0f) {
+			AddControllerYawInput(LookAxisVector.X);
+		}
+
+		if (LookAxisVector.Y != 0.0f) {
+			AddControllerPitchInput(LookAxisVector.Y);
+		}
 	}
+}
+
+void AASCharacter::OnStartDeath()
+{
+	//TODO : Should be moved In a Player Class if there is
+	if (m_EventWorldSubSystem) {
+		m_EventWorldSubSystem->BroadcastPlayerStartDeath();
+	}
+	//end
+	if (Controller) {
+		Controller->SetIgnoreMoveInput(true);
+	}
+	
+	UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
+	check(CapsuleComp);
+	CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+	UCharacterMovementComponent* LyraMoveComp = GetCharacterMovement();
+	LyraMoveComp->StopMovementImmediately();
+	LyraMoveComp->DisableMovement();
+}
+
+void AASCharacter::OnEndDeath()
+{
+	//TODO : Should be moved In a Player Class if there is
+	if (m_EventWorldSubSystem) {
+		m_EventWorldSubSystem->BroadcastPlayerEndDeath();
+	}
+	//end
+	SetLifeSpan(0.1f);
+	SetActorHiddenInGame(true);
 }
 
 void AASCharacter::AddDefaultMappingContext()
