@@ -61,6 +61,9 @@ void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 		// Looking
 		EnhancedInputComponent->BindAction(m_LookAction, ETriggerEvent::Triggered, this, &AASCharacter::Look);
+
+		// Shooting
+		EnhancedInputComponent->BindAction(m_ShootAction, ETriggerEvent::Triggered, this, &AASCharacter::Shoot);
 		
 	} else {
 		UE_LOG(LogTemp, Error, TEXT("'%s' Don't Find EnhancedInputComponent."), *GetNameSafe(this));
@@ -107,6 +110,11 @@ void AASCharacter::Look(const FInputActionValue& Value)
 			AddControllerPitchInput(LookAxisVector.Y);
 		}
 	}
+}
+
+void AASCharacter::Shoot(const FInputActionValue& Value)
+{
+	//Shoot system
 }
 
 void AASCharacter::OnStartDeath()

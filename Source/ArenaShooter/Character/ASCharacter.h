@@ -56,6 +56,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "LookAction"))
 	UInputAction* m_LookAction;
 	
+	/** Look Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "ShootAction"))
+	UInputAction* m_ShootAction;
+	
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
 	AASCharacter();
@@ -66,6 +70,7 @@ public:
 protected:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void Shoot(const FInputActionValue& Value);
 
 	UFUNCTION()
 	virtual void OnStartDeath();
