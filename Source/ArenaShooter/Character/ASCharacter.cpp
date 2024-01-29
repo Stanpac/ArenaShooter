@@ -4,9 +4,12 @@
 #include "ArenaShooter/Character/ASCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "ArenaShooter/Components/ASHealthComponent.h"
 #include "ArenaShooter/SubSystem/ASEventWorldSubSystem.h"
+#include "ArenaShooter/Widget/ASGlobalWidget.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 
@@ -46,6 +49,8 @@ AASCharacter::AASCharacter()
 	m_FirstPersonCameraComponent->SetRelativeLocation(FVector(0, 10.f, 0));
 	m_FirstPersonCameraComponent->SetRelativeRotation(FRotator(-90, 0, 90));
 	m_FirstPersonCameraComponent->bUsePawnControlRotation = true;
+
+	m_HealthComponent = CreateDefaultSubobject<UASHealthComponent>(TEXT("HealthComponent"));
 }
 
 void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -70,11 +75,30 @@ void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	}
 }
 
+void AASCharacter::DebugDamage(float amount)
+{
+	if (m_HealthComponent) {
+		m_HealthComponent->Damage(amount);
+	}
+}
+
+void AASCharacter::DebugHealing(float amount)
+{
+	if (m_HealthComponent) {
+		m_HealthComponent->healing(amount);
+	}
+}
+
 void AASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	AddDefaultMappingContext();
 	GetAllSubsystem();
+	
+	M_PlayerWidget = CreateWidget<UASGlobalWidget>(GetWorld(), M_PlayerWidgetClass);
+	if (M_PlayerWidget) {
+		M_PlayerWidget->AddToViewport();
+	}
 }
 
 void AASCharacter::GetAllSubsystem()
