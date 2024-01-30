@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "NinjaCharacter.h"
 #include "GameFramework/Character.h"
 #include "ASCharacter.generated.h"
 
@@ -24,7 +25,7 @@ struct FInputActionValue;
  */
 
 UCLASS()
-class ARENASHOOTER_API AASCharacter : public ACharacter
+class ARENASHOOTER_API AASCharacter : public ANinjaCharacter
 {
 	GENERATED_BODY()
 	/* ---------------------------------- MEMBERS --------------------------------------*/
@@ -48,7 +49,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASCharacter|Widget", meta = (DisplayName = "PlayerWidget"))
 	TSubclassOf<UASGlobalWidget> M_PlayerWidgetClass;
 	
-
 	/** Event World SubSystem */
 	UPROPERTY()
 	TObjectPtr<UASEventWorldSubSystem> m_EventWorldSubSystem;
@@ -77,7 +77,7 @@ protected:
 	
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
-	AASCharacter();
+	AASCharacter(const FObjectInitializer& ObjectInitializer);
 	
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -87,7 +87,6 @@ public:
 	
 	UFUNCTION(Exec)
 	void DebugHealing(float amount);
-	
 
 protected:
 	void Move(const FInputActionValue& Value);

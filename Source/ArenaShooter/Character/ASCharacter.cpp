@@ -13,7 +13,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 
-AASCharacter::AASCharacter()
+AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = false;
 	PrimaryActorTick.bStartWithTickEnabled = false;
