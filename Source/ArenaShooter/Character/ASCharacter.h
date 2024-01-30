@@ -4,9 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "NinjaCharacter.h"
-#include "ArenaShooter/Components/WeaponComponent.h"
+#include "ArenaShooter/Components/ASWeaponComponent.h"
 #include "InputActionValue.h"
-#include "GameFramework/Character.h"
 #include "ASCharacter.generated.h"
 
 class UASGlobalWidget;
@@ -21,10 +20,6 @@ struct FInputActionValue;
 
 /**
  * Base Class for all Characters in the game (Player and AI)
- * TODO :  Move input In component ?
- * TODO :  Implement Sprint ? 
- * TODO :  Implement Health -> Component 
- * 
  */
 
 UCLASS()
