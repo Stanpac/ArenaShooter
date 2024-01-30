@@ -4,8 +4,8 @@
 #include "ArenaShooter/Character/ASCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "NinjaCharacterMovementComponent.h"
 #include "ArenaShooter/Components/ASHealthComponent.h"
+#include "ArenaShooter/Components/ASWeaponComponent.h"
 #include "ArenaShooter/SubSystem/ASEventWorldSubSystem.h"
 #include "ArenaShooter/Widget/ASGlobalWidget.h"
 #include "Camera/CameraComponent.h"
@@ -14,7 +14,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 
-AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+AASCharacter::AASCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	PrimaryActorTick.bStartWithTickEnabled = false;
@@ -45,12 +45,6 @@ AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(
 	MoveComp->bCanWalkOffLedgesWhenCrouching = true;
 	MoveComp->SetCrouchedHalfHeight(65.0f);
 
-	// Ninja Component (Temp)
-	UNinjaCharacterMovementComponent* NinjaMoveComp = CastChecked<UNinjaCharacterMovementComponent>(GetCharacterMovement());
-	NinjaMoveComp->SetAlignGravityToBase(true);
-	NinjaMoveComp->SetAlignComponentToGravity(true);
-	NinjaMoveComp->bAlwaysRotateAroundCenter = true;
-
 	m_FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	m_FirstPersonCameraComponent->SetupAttachment(MeshComp, TEXT("head"));
 	m_FirstPersonCameraComponent->SetRelativeLocation(FVector(0, 10.f, 0));
@@ -58,6 +52,8 @@ AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(
 	m_FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
 	m_HealthComponent = CreateDefaultSubobject<UASHealthComponent>(TEXT("HealthComponent"));
+
+	m_WeaponComponent = CreateDefaultSubobject<UASWeaponComponent>(TEXT("WeaponComponent"));
 }
 
 void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -76,6 +72,12 @@ void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 		// Shooting
 		EnhancedInputComponent->BindAction(m_ShootAction, ETriggerEvent::Triggered, this, &AASCharacter::Shoot);
+
+		// Reload
+		EnhancedInputComponent->BindAction(m_ReloadAction, ETriggerEvent::Triggered, this, &AASCharacter::Reload);
+		
+		// Switching Weapon
+		//EnhancedInputComponent->BindAction(m_switchWeaponAction, ETriggerEvent::Triggered, this, &AASCharacter::SwitchWeapon);
 		
 	} else {
 		UE_LOG(LogTemp, Error, TEXT("'%s' Don't Find EnhancedInputComponent."), *GetNameSafe(this));
@@ -106,6 +108,8 @@ void AASCharacter::BeginPlay()
 	if (M_PlayerWidget) {
 		M_PlayerWidget->AddToViewport();
 	}
+
+	m_WeaponComponent->InitializeWeapon();
 }
 
 void AASCharacter::GetAllSubsystem()
@@ -145,7 +149,18 @@ void AASCharacter::Look(const FInputActionValue& Value)
 
 void AASCharacter::Shoot(const FInputActionValue& Value)
 {
-	//Shoot system
+	//TODO Take into account if the weapon allows maintaining the input or not
+	m_WeaponComponent->Fire(m_FirstPersonCameraComponent->GetComponentLocation(), m_FirstPersonCameraComponent->GetForwardVector());
+}
+
+void AASCharacter::Reload(const FInputActionValue& Value)
+{
+	m_WeaponComponent->Reload();
+}
+
+void AASCharacter::Switch(const FInputActionValue& Value) const
+{
+	m_WeaponComponent->SwitchWeapon();		
 }
 
 void AASCharacter::OnStartDeath()
