@@ -28,7 +28,9 @@ void UASGlobalWidget::UpdatehealthBar(float percent)
 void UASGlobalWidget::ChangeCursorVisibility(bool visible)
 {
 	// Manage the visibility of the cursor
-	m_CursorImage->SetVisibility(visible ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	if (m_CursorImage) {
+		m_CursorImage->SetVisibility(visible ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	}
 }
 
 void UASGlobalWidget::SethealthBarPercent(float percent)
