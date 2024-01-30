@@ -4,6 +4,7 @@
 #include "ArenaShooter/Character/ASCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "NinjaCharacterMovementComponent.h"
 #include "ArenaShooter/Components/ASHealthComponent.h"
 #include "ArenaShooter/SubSystem/ASEventWorldSubSystem.h"
 #include "ArenaShooter/Widget/ASGlobalWidget.h"
@@ -43,6 +44,12 @@ AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(
 	MoveComp->GetNavAgentPropertiesRef().bCanCrouch = true;
 	MoveComp->bCanWalkOffLedgesWhenCrouching = true;
 	MoveComp->SetCrouchedHalfHeight(65.0f);
+
+	// Ninja Component (Temp)
+	UNinjaCharacterMovementComponent* NinjaMoveComp = CastChecked<UNinjaCharacterMovementComponent>(GetCharacterMovement());
+	NinjaMoveComp->SetAlignGravityToBase(true);
+	NinjaMoveComp->SetAlignComponentToGravity(true);
+	NinjaMoveComp->bAlwaysRotateAroundCenter = true;
 
 	m_FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	m_FirstPersonCameraComponent->SetupAttachment(MeshComp, TEXT("head"));

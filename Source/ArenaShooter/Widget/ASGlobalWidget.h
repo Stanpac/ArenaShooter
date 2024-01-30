@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "ASGlobalWidget.generated.h"
 
+class UImage;
 class UCanvasPanel;
 class UProgressBar;
 
@@ -25,6 +26,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
 	TObjectPtr<UProgressBar> m_HealthBar;
+
+	UPROPERTY(editanywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
+	TObjectPtr<UImage> m_CursorImage;
 	
 	/* ---------------------------------- FUNCTIOns --------------------------------------*/
 public:
@@ -34,8 +38,9 @@ public:
 
 	void UpdatehealthBar(float percent);
 
+	void ChangeCursorVisibility(bool visible);
+
 protected:
 	void SethealthBarPercent(float percent);
-	
 };
 
