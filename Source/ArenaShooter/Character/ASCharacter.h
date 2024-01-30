@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "NinjaCharacter.h"
+#include "ArenaShooter/Components/WeaponComponent.h"
 #include "GameFramework/Character.h"
 #include "ASCharacter.generated.h"
 
@@ -48,6 +49,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASCharacter|Widget", meta = (DisplayName = "PlayerWidget"))
 	TSubclassOf<UASGlobalWidget> M_PlayerWidgetClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Widget", meta = (DisplayName = "Weapon"))
+	EWeaponType m_WeaponType;
+
+	UPROPERTY()
+	UWeaponComponent* m_Weapon;
 	
 	/** Event World SubSystem */
 	UPROPERTY()
