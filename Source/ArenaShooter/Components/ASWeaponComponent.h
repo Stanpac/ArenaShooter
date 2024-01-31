@@ -25,6 +25,18 @@ public:
 	/** Blueprint reference to the secondary weapon */
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Gameplay")
 	//TSubclassOf<AASWeapon> m_secondaryWeaponBlueprint;
+
+	/** Weapon position offset (Especially useful when there is no socket) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Gameplay")
+	FVector m_PositionOffset;
+
+	/** Weapon scale offset (Especially useful when there is no socket) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Gameplay")
+	FVector m_ScaleOffset;
+
+	/** Weapon rotation offset (Especially useful when there is no socket) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Gameplay")
+	FVector m_RotationOffset;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Gameplay")
 	bool m_isPrimaryWeaponEquiped;
