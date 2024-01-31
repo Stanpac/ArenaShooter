@@ -41,7 +41,6 @@ void UASWeaponComponent::SwitchWeapon()
 void UASWeaponComponent::InitializeWeapon()
 {
 	Super::InitializeComponent();
-	USceneComponent* parent = CastChecked<ACharacter>(GetOwner())->GetMesh();
 	
 	FActorSpawnParameters params;
 	params.ObjectFlags |= RF_Transient;
@@ -55,8 +54,20 @@ void UASWeaponComponent::InitializeWeapon()
 		if(IsValid(m_PrimaryWeapon))
 		{
 			//m_PrimaryWeapon->SetHidden(true);
-			m_PrimaryWeapon->Owner = parent->GetAttachmentRootActor();
-			m_PrimaryWeapon->AttachToComponent(parent, AttachmentRules, TEXT("WeaponSocket"));
+			if(GetOwner()->IsA<ACharacter>())
+			{
+				USceneComponent* parent = CastChecked<ACharacter>(GetOwner())->GetMesh();
+				m_PrimaryWeapon->Owner = parent->GetAttachmentRootActor();
+				m_PrimaryWeapon->AttachToComponent(parent, AttachmentRules, TEXT("WeaponSocket"));
+			}
+			else
+			{
+				m_PrimaryWeapon->Owner = GetOwner();
+				m_PrimaryWeapon->AttachToActor(GetOwner(), AttachmentRules);
+				m_PrimaryWeapon->SetActorScale3D(m_ScaleOffset);
+				m_PrimaryWeapon->SetActorRotation(FRotator::MakeFromEuler(m_RotationOffset));
+				m_PrimaryWeapon->SetActorLocation(GetOwner()->GetActorLocation() + m_PositionOffset);
+			}
 			m_CurrentEquipedWeapon = m_PrimaryWeapon;
 		}
 		else
