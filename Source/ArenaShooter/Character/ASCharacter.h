@@ -94,7 +94,7 @@ public:
 	
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+	
 	UFUNCTION(Exec)
 	void DebugDamage(float amount);
 	
@@ -109,10 +109,13 @@ protected:
 	void Switch(const FInputActionValue& Value) const;
 	
 	UFUNCTION()
-	virtual void OnStartDeath();
+	virtual void OnStartDeath(AActor* OwningActor);
 
 	UFUNCTION()
 	virtual void OnEndDeath();
+
+	UFUNCTION()
+	void OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer);
 
 	void GetAllSubsystem();
 	void AddDefaultMappingContext();
