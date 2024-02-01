@@ -26,7 +26,7 @@ void AASWeapon_PlayerPrimary::Fire(FVector FireOrigin, FVector FireDirection)
 			
 			UASHealthComponent* HealthComponent = UASHealthComponent::FindHealthComponent(HitActor);
 			if(HealthComponent != nullptr) {
-				HealthComponent->Damage(10);
+				HealthComponent->Damage(10, GetOwner());
 				GEngine->AddOnScreenDebugMessage(1, 2, FColor::Red, TEXT("Target Hit"));
 			}
 		} else {
