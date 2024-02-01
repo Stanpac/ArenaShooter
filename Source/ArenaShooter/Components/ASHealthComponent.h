@@ -6,9 +6,14 @@
 #include "Components/ActorComponent.h"
 #include "ASHealthComponent.generated.h"
 
-
 class AASCharacter;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHealthComponent_DeathEvent, AActor*, OwningActor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FHealthComponent_HealthChangeEvent, float, Oldvalue, float, NewValue, float, MaxHealth, AActor*, DamageDealer);
+
+/**
+ * Actor Component that manage the health of an actor
+ */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARENASHOOTER_API UASHealthComponent : public UActorComponent
 {
@@ -20,6 +25,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Health")
 	float m_MaxHealth;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Health")
+	float m_MinhHealth;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Healing")
 	uint8 m_UseMultiplicator : 1 = 0;
@@ -53,15 +61,21 @@ public:
 	void healing(float amount);
 	
 	UFUNCTION()
-	void Damage(float amount);
+	void Damage(float amount, AActor* DamageDealer);
 
 	UFUNCTION()
 	void Death();
 	
+	// Delegate call when the Death Start
+	UPROPERTY(BlueprintAssignable)
+	FHealthComponent_DeathEvent OnDeathStarted;
+
+	// Delegate call when the Health Change
+	UPROPERTY(BlueprintAssignable)
+	FHealthComponent_HealthChangeEvent OnHealthChanged;
+	
 protected:
 	virtual void BeginPlay() override;
-
-	void UpdateWidget();
 
 public:
 	float GetHealth() const { return m_Health; }
