@@ -5,6 +5,7 @@
 
 #include "Components/Image.h"
 #include "Components/ProgressBar.h"
+#include "Components/TextBlock.h"
 
 UASGlobalWidget::UASGlobalWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -37,6 +38,13 @@ void UASGlobalWidget::ChangeCursorVisibility(bool visible)
 	// Manage the visibility of the cursor
 	if (m_CursorImage) {
 		m_CursorImage->SetVisibility(visible ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	}
+}
+
+void UASGlobalWidget::SetSpeedProfile(int profile)
+{
+	if (m_SpeedProfile) {
+		m_SpeedProfile->SetText(FText::FromString(FString::FromInt(profile)));
 	}
 }
 

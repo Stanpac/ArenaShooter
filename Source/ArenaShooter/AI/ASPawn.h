@@ -12,6 +12,7 @@ class UASHealthComponent;
 class UStaticMeshComponent;
 class UWidgetComponent;
 class UUserWidget;
+class UASEventWorldSubSystem;
 
 
 UCLASS()
@@ -38,7 +39,15 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASPawn|Widget", meta = (DisplayName = "HealthBarWidgetClass"))
 	TSubclassOf<UUserWidget> m_HealthBarWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASPawn|Temp", meta = (DisplayName = "Copy"))
+	TSubclassOf<AASPawn> m_TurretCopy;
 	
+	/** Event World SubSystem */
+	UPROPERTY()
+	TObjectPtr<UASEventWorldSubSystem> m_EventWorldSubSystem;
+	
+	// Timer
 	FTimerHandle m_HealthBarTimerHandle;
 	
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/

@@ -94,13 +94,14 @@ protected:
 	/** Reload Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "Reload Action"))
 	UInputAction* m_ReloadAction;
-
+	
 	/** Close Combat Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "Close Combat Action"))
 	UInputAction* m_CloseCombatAction;
-	
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "SwitchAction"))
-	//UInputAction* m_SwitchAction;
+
+	/** CheatSpeed bool */
+	bool SpeedCheatAllowed;
+
 	
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
@@ -114,6 +115,9 @@ public:
 	
 	UFUNCTION(Exec)
 	void DebugHealing(float amount);
+
+	UFUNCTION(Exec)
+	void CheatSpeed(bool Cheat);
 
 protected:
 	void Move(const FInputActionValue& Value);
@@ -131,6 +135,12 @@ protected:
 
 	UFUNCTION()
 	void OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer);
+
+	UFUNCTION()
+	void OnSpeedProfileChanged(int SpeedProfile);
+
+	UFUNCTION()
+	void OnSpeedChanged(float NewSpeed, float MaxSpeed);
 
 	void GetAllSubsystem();
 	void AddDefaultMappingContext();

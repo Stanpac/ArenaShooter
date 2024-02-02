@@ -16,8 +16,9 @@ UASSpeedComponent::UASSpeedComponent()
 void UASSpeedComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	UpdateSpeedProfile(0);
 	m_EventWorldSubSystem = GetWorld()->GetSubsystem<UASEventWorldSubSystem>();
+	m_EventWorldSubSystem->OnEnemyDeath.AddDynamic(this, &UASSpeedComponent::OnEnemyDeath);
+	UpdateSpeedProfile(0);
 }
 
 void UASSpeedComponent::TickComponent(float DeltaTime, ELevelTick TickType,FActorComponentTickFunction* ThisTickFunction)
@@ -48,25 +49,32 @@ void UASSpeedComponent::UpdateSpeedProfile(int SpeedProfile)
 		m_SpeedBarDecreasRate = profile.m_SpeedBarDecreasRate;
 	}
 
-	m_EventWorldSubSystem->BroadcastSpeedChange(m_CurrentSpeedProfile);
+	OnUpdateSpeedProfile.Broadcast(m_CurrentSpeedProfile);
+	m_EventWorldSubSystem->BroadcastSpeedProfileChange(m_CurrentSpeedProfile);
 }
 
 void UASSpeedComponent::UpdateSpeedBarValue(float Value)
 {
 	float temp = FMath::Clamp(m_SpeedBarValue + Value, 0.0f, m_SpeedBarMaxValue);
 	if (temp >=  m_SpeedBarMaxValue) {
-		temp = 0.0f;
 		UpdateSpeedProfile(m_CurrentSpeedProfile + 1);
+		temp = m_SpeedBarMaxValue/2.0f;
 	} else if (temp <= 0.0f) {
 		UpdateSpeedProfile(m_CurrentSpeedProfile - 1);
-		temp = m_SpeedBarMaxValue;
+		temp = m_SpeedBarMaxValue/2.0f;
 	}
 	m_SpeedBarValue = temp;
+	OnUpdateSpeed.Broadcast(m_SpeedBarValue, m_SpeedBarMaxValue);
 }
 
 void UASSpeedComponent::UpdateSpeedBarMaxValue(float Value)
 {
 	m_SpeedBarMaxValue = Value;
+}
+
+void UASSpeedComponent::OnEnemyDeath()
+{
+	UpdateSpeedBarValue(m_EnemyDeathSpeedBarValueIncrease);
 }
 
 

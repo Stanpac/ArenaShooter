@@ -149,9 +149,7 @@ bool UASAI_CharacterDetectionPathfinder::IsNextPointValid(int32 x, int32 y, int3
 	const bool condition1 = x + previousPoint.X < 0 || x + previousPoint.X >= m_dataAsset->m_Rows;
 	const bool condition2= y + previousPoint.Y < 0 || y + previousPoint.Y >= m_dataAsset->m_Columns;
 	const bool condition3 = z + previousPoint.Z < 0 || z + previousPoint.Z >= m_dataAsset->m_Steps;
-	if(condition1 || condition2 || condition3 ) return false;
-	else
-	{
+	if(condition1 || condition2 || condition3 ) return false; {
 		FHitResult OutHit;
 		FCollisionQueryParams QueryParams;
 		const FInt32Vector NextPoint = FInt32Vector(x + previousPoint.X, y + previousPoint.Y, z + previousPoint.Z);

@@ -18,7 +18,7 @@ void UASEventWorldSubSystem::BroadcastEnemyDeath()
 	OnEnemyDeath.Broadcast();
 }
 
-void UASEventWorldSubSystem::BroadcastSpeedChange(int SpeedProfile)
+void UASEventWorldSubSystem::BroadcastSpeedProfileChange(int SpeedProfile)
 {
 	OnSpeedChange.Broadcast(SpeedProfile);
 }

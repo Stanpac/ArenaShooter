@@ -50,6 +50,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Audio", meta = (DisplayName = "Audio On Hit trigger"))
 	USoundBase* m_Sound_Hit;
 	
+public:
+	// Delegate call when the Death Start
+	UPROPERTY(BlueprintAssignable)
+	FHealthComponent_DeathEvent OnDeathStarted;
+	
+	// Delegate call when the Health Change
+	UPROPERTY(BlueprintAssignable)
+	FHealthComponent_HealthChangeEvent OnHealthChanged;
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
 	UASHealthComponent();
@@ -65,14 +73,6 @@ public:
 
 	UFUNCTION()
 	void Death();
-	
-	// Delegate call when the Death Start
-	UPROPERTY(BlueprintAssignable)
-	FHealthComponent_DeathEvent OnDeathStarted;
-
-	// Delegate call when the Health Change
-	UPROPERTY(BlueprintAssignable)
-	FHealthComponent_HealthChangeEvent OnHealthChanged;
 	
 protected:
 	virtual void BeginPlay() override;

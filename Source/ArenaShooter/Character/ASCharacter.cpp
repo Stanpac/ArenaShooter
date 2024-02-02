@@ -115,6 +115,11 @@ void AASCharacter::DebugHealing(float amount)
 	}
 }
 
+void AASCharacter::CheatSpeed(bool Cheat)
+{
+	SpeedCheatAllowed = Cheat;
+}
+
 void AASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -126,9 +131,12 @@ void AASCharacter::BeginPlay()
 		M_PlayerWidget->AddToViewport();
 	}
 
+	m_SpeedComponent->OnUpdateSpeedProfile.AddDynamic(this, &AASCharacter::OnSpeedProfileChanged);
+	m_SpeedComponent->OnUpdateSpeed.AddDynamic(this, &AASCharacter::OnSpeedChanged);
 
 	m_HealthComponent->OnDeathStarted.AddDynamic(this, &AASCharacter::OnStartDeath);
 	m_HealthComponent->OnHealthChanged.AddDynamic(this, &AASCharacter::OnHealthChanged);
+	
 	m_WeaponComponent->InitializeWeapon();
 }
 
@@ -169,6 +177,12 @@ void AASCharacter::Look(const FInputActionValue& Value)
 
 void AASCharacter::Shoot(const FInputActionValue& Value)
 {
+	// Temp : Should not be here, just For testing
+	if (SpeedCheatAllowed) {
+		m_EventWorldSubSystem->BroadcastEnemyDeath();
+	}
+	//end
+	
 	//TODO Take into account if the weapon allows maintaining the input or not
 	m_WeaponComponent->Fire(m_FirstPersonCameraComponent->GetComponentLocation(), m_FirstPersonCameraComponent->GetForwardVector());
 }
@@ -223,7 +237,17 @@ void AASCharacter::OnEndDeath()
 
 void AASCharacter::OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth,AActor* DamageDealer)
 {
-	GetPlayerWidget()->UpdatehealthBar(CurrentHealth / MaxHealth);
+	GetPlayerWidget()->SethealthBarPercent(CurrentHealth / MaxHealth);
+}
+
+void AASCharacter::OnSpeedProfileChanged(int SpeedProfile)
+{
+	GetPlayerWidget()->SetSpeedProfile(SpeedProfile);
+}
+
+void AASCharacter::OnSpeedChanged(float NewSpeed, float MaxSpeed)
+{
+	GetPlayerWidget()->SetSpeedBarPercent(NewSpeed / MaxSpeed);
 }
 
 void AASCharacter::AddDefaultMappingContext()

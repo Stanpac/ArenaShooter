@@ -7,23 +7,42 @@
 #include "Components/ActorComponent.h"
 #include "ASSpeedComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpeedComponent_UpdateSpeedProfileEvent, int, SpeedProfile);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSpeedComponent_UpdateSpeedEvent, float, NewSpeed, float, MaxSpeed);
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FSpeedProfile
 {
-	GENERATED_BODY()
+	GENERATED_USTRUCT_BODY()
 
-	UPROPERTY(meta = (DisplayName = "Speed Profile", ClampMin = 0, ClampMax = 3));
+	UPROPERTY(EditAnywhere,meta = (DisplayName = "Speed Profile", ClampMin = 0, ClampMax = 3));
 	int m_SpeedProfile;
 
+	UPROPERTY(EditAnywhere, meta = (DisplayName = "Max Acceleration"));
 	float m_MaxAcceleration = 0.0f;
+
+	UPROPERTY(EditAnywhere, meta = (DisplayName = "Max Walk Speed"));
 	float m_MaxWalkSpeed = 0.0f;
+	
+	UPROPERTY(EditAnywhere, meta = (DisplayName = "Mass"));
 	float m_Mass = 0.0f;
+	
+	UPROPERTY(EditAnywhere, meta = (DisplayName = "Gravity"));
 	float m_Gravity = 0.0f;
+	
+	UPROPERTY(EditAnywhere, meta = (DisplayName = "Jump Z"));
     float m_JumpZ = 0.0f;
+	
+	UPROPERTY(EditAnywhere, meta = (DisplayName = "Air Control"));
 	float m_AirControl = 0.0f;
+	
+	UPROPERTY(EditAnywhere, meta = (DisplayName = "Breaking Deceleration Falling"));
 	float m_BreakingDecelerationFalling = 0.0f;
+
+	UPROPERTY(EditAnywhere, meta = (DisplayName = "SpeedBar Value Max"));
 	float m_SpeedBarValueMax = 0.0f;
+
+	UPROPERTY(EditAnywhere, meta = (DisplayName = "SpeedBarDecreasRated"));
 	float m_SpeedBarDecreasRate = 0.0f;
 };
 
@@ -46,13 +65,25 @@ protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "ASSpeedComponent|Speed", meta = (DisplayName = "SpeedBarMaxValue"))
 	float m_SpeedBarMaxValue;
 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "ASSpeedComponent|Speed", meta = (DisplayName = "EnemyDeathSpeedBarValueIncrease"))
+	float m_EnemyDeathSpeedBarValueIncrease = 30.0f;
+	
 	/** Speed Bar Amount of loss per Second */
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASSpeedComponent|Speed", meta = (DisplayName = "SpeedBarDecreasRate"))
 	float m_SpeedBarDecreasRate = 10.0f;
 	
 	/** Event World SubSystem */
 	UPROPERTY()
 	UASEventWorldSubSystem* m_EventWorldSubSystem;
+
+public :
+	/** Event that will be broadcasted when the speed profile is updated */
+	UPROPERTY(BlueprintAssignable)
+	FSpeedComponent_UpdateSpeedProfileEvent OnUpdateSpeedProfile;
+
+	/** Event that will be broadcasted when the speed is updated */
+	UPROPERTY(BlueprintAssignable)
+	FSpeedComponent_UpdateSpeedEvent OnUpdateSpeed;
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:	
 	UASSpeedComponent();
@@ -64,7 +95,11 @@ protected:
 
 	void UpdateSpeedProfile(int SpeedProfile);
 
+	UFUNCTION()
 	void UpdateSpeedBarValue(float Value);
 
 	void UpdateSpeedBarMaxValue(float Value);
+
+	UFUNCTION()
+	void OnEnemyDeath();
 };

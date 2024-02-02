@@ -52,6 +52,6 @@ public :
 	void BroadcastEnemyDeath();
 
 	UFUNCTION(BlueprintCallable)
-	void BroadcastSpeedChange(int SpeedProfile);
+	void BroadcastSpeedProfileChange(int SpeedProfile);
 	
 };
