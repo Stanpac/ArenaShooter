@@ -27,7 +27,6 @@ void UASHealthComponent::BeginPlay()
 	OnHealthChanged.Broadcast(0, m_Health, m_MaxHealth, GetOwner());
 }
 
-
 void UASHealthComponent::healing(float amount)
 {
 	// previous health can be Use Later For Lerp maybe ?

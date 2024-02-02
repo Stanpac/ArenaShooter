@@ -8,6 +8,7 @@
 #include "InputActionValue.h"
 #include "ASCharacter.generated.h"
 
+class UASSpeedComponent;
 class UASGlobalWidget;
 class UASHealthComponent;
 class UASEventWorldSubSystem;
@@ -15,6 +16,7 @@ class UInputMappingContext;
 class UInputAction;
 class UCameraComponent;
 class UASWeaponComponent;
+class UASCloseCombatComponent;
 class USkeletalMeshComponent;
 struct FInputActionValue;
 
@@ -33,22 +35,30 @@ protected:
 	USkeletalMeshComponent* m_SkeletalMeshComponent;
 
 	/** First person camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Camera", meta = (DisplayName = "FirstPersonCameraComponent"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Camera", meta = (DisplayName = "First Person Camera Component"))
 	UCameraComponent* m_FirstPersonCameraComponent;
 
 	/** Health Component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Health", meta = (DisplayName = "HealthComponent"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Health", meta = (DisplayName = "Health Component"))
 	UASHealthComponent* m_HealthComponent;
 
 	/** Weapon Component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Weapon", meta = (DisplayName = "WeaponComponent"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Weapon", meta = (DisplayName = "Weapon Component"))
 	UASWeaponComponent* m_WeaponComponent;
+	
+	/** Close Combat Component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Weapon", meta = (DisplayName = "Close Combat Component"))
+	UASCloseCombatComponent* m_CloseCombatComponent;
+
+	/** Speed Component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Speed", meta = (DisplayName = "SpeedComponent"))
+	UASSpeedComponent* m_SpeedComponent;
 
 	/** Player Widget */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Widget", meta = (DisplayName = "PlayerWidget"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Widget", meta = (DisplayName = "Player Widget"))
 	UASGlobalWidget* M_PlayerWidget;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASCharacter|Widget", meta = (DisplayName = "PlayerWidget"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASCharacter|Widget", meta = (DisplayName = "Player Widget"))
 	TSubclassOf<UASGlobalWidget> M_PlayerWidgetClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Widget", meta = (DisplayName = "Weapon"))
@@ -62,31 +72,36 @@ protected:
 	/* ---------------------- Input To move in component -------------------------------*/
 	
 	/** Default MappingContext */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta=(DisplayName = "DefaultMappingContext"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta=(DisplayName = "Default Mapping Context"))
 	UInputMappingContext* m_DefaultMappingContext;
 
 	/** Jump Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta=(DisplayName = "JumpAction"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta=(DisplayName = "Jump Action"))
 	UInputAction* m_JumpAction;
 
 	/** Move Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta=(DisplayName = "MoveAction"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta=(DisplayName = "Move Action"))
 	UInputAction* m_MoveAction;
 
 	/** Look Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "LookAction"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "Look Action"))
 	UInputAction* m_LookAction;
 	
 	/** Shoot Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "ShootAction"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "Shoot Action"))
 	UInputAction* m_ShootAction;
 
 	/** Reload Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "ReloadAction"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "Reload Action"))
 	UInputAction* m_ReloadAction;
 	
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "SwitchAction"))
-	//UInputAction* m_SwitchAction;
+	/** Close Combat Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "Close Combat Action"))
+	UInputAction* m_CloseCombatAction;
+
+	/** CheatSpeed bool */
+	bool SpeedCheatAllowed;
+
 	
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
@@ -101,12 +116,16 @@ public:
 	UFUNCTION(Exec)
 	void DebugHealing(float amount);
 
+	UFUNCTION(Exec)
+	void CheatSpeed(bool Cheat);
+
 protected:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Shoot(const FInputActionValue& Value);
 	void Reload(const FInputActionValue& Value);
 	void Switch(const FInputActionValue& Value) const;
+	void CloseCombat(const FInputActionValue& Value);
 	
 	UFUNCTION()
 	virtual void OnStartDeath(AActor* OwningActor);
@@ -116,6 +135,12 @@ protected:
 
 	UFUNCTION()
 	void OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer);
+
+	UFUNCTION()
+	void OnSpeedProfileChanged(int SpeedProfile);
+
+	UFUNCTION()
+	void OnSpeedChanged(float NewSpeed, float MaxSpeed);
 
 	void GetAllSubsystem();
 	void AddDefaultMappingContext();

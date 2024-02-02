@@ -15,6 +15,8 @@ Etc...
 
 // Player
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerDeathEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEnemyDeathEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSPeedChangeEvent, int, SpeedProfile);
 
 /**
  *  CLass that will be used to broadcast events to the world 
@@ -31,6 +33,12 @@ public :
 
 	UPROPERTY(BlueprintAssignable)
 	FPlayerDeathEvent OnPlayerEndDeath;
+
+	UPROPERTY(BlueprintAssignable)
+	FEnemyDeathEvent OnEnemyDeath;
+
+	UPROPERTY(BlueprintAssignable)
+	FSPeedChangeEvent OnSpeedChange;
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public :
 	
@@ -39,4 +47,11 @@ public :
 
 	UFUNCTION(BlueprintCallable)
 	void BroadcastPlayerEndDeath();
+
+	UFUNCTION(BlueprintCallable)
+	void BroadcastEnemyDeath();
+
+	UFUNCTION(BlueprintCallable)
+	void BroadcastSpeedProfileChange(int SpeedProfile);
+	
 };
