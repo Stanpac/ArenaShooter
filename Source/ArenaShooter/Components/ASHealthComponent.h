@@ -62,7 +62,7 @@ public:
 	
 	UFUNCTION()
 	void Damage(float amount, AActor* DamageDealer);
-	
+
 	UFUNCTION()
 	void Death();
 	
