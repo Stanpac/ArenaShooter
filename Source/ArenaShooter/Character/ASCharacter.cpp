@@ -5,6 +5,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "NinjaCharacterMovementComponent.h"
+#include "ArenaShooter/Components/ASCloseCombatComponent.h"
 #include "ArenaShooter/Components/ASHealthComponent.h"
 #include "ArenaShooter/Components/ASWeaponComponent.h"
 #include "ArenaShooter/SubSystem/ASEventWorldSubSystem.h"
@@ -61,6 +62,8 @@ AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(
 	m_HealthComponent = CreateDefaultSubobject<UASHealthComponent>(TEXT("HealthComponent"));
 
 	m_WeaponComponent = CreateDefaultSubobject<UASWeaponComponent>(TEXT("WeaponComponent"));
+
+	m_CloseCombatComponent = CreateDefaultSubobject<UASCloseCombatComponent>(TEXT("CloseCombatComponent"));
 }
 
 void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -82,6 +85,9 @@ void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 		// Reload
 		EnhancedInputComponent->BindAction(m_ReloadAction, ETriggerEvent::Triggered, this, &AASCharacter::Reload);
+
+		// CloseCombat
+		EnhancedInputComponent->BindAction(m_CloseCombatAction, ETriggerEvent::Triggered, this, &AASCharacter::CloseCombat);
 		
 		// Switching Weapon
 		//EnhancedInputComponent->BindAction(m_switchWeaponAction, ETriggerEvent::Triggered, this, &AASCharacter::SwitchWeapon);
@@ -171,6 +177,12 @@ void AASCharacter::Reload(const FInputActionValue& Value)
 void AASCharacter::Switch(const FInputActionValue& Value) const
 {
 	m_WeaponComponent->SwitchWeapon();		
+}
+
+void AASCharacter::CloseCombat(const FInputActionValue& Value)
+{
+	if(m_CloseCombatComponent->m_CanAttack)
+		m_CloseCombatComponent->StartCloseCombatAttack();
 }
 
 void AASCharacter::OnStartDeath(AActor* OwningActor)
