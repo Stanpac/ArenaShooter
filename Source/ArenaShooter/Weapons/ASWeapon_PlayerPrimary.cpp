@@ -1,5 +1,6 @@
 #include "ASWeapon_PlayerPrimary.h"
 #include "ArenaShooter/Components/ASHealthComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 void AASWeapon_PlayerPrimary::Fire(FVector FireOrigin, FVector FireDirection)
 {
@@ -10,7 +11,13 @@ void AASWeapon_PlayerPrimary::Fire(FVector FireOrigin, FVector FireDirection)
 	CollisionParams.AddIgnoredActor(GetOwner());
 	
 	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Black, TEXT("Fire triggered"));
-	
+	if(m_Sound_ShotFired)
+		{
+			UGameplayStatics::PlaySoundAtLocation(
+			GetWorld(),
+			m_Sound_ShotFired,
+			GetOwner()->GetActorLocation());
+		}
 	if (bool bHit = GetWorld()->LineTraceSingleByChannel(
 		HitResult,
 		FireOrigin,
@@ -26,7 +33,8 @@ void AASWeapon_PlayerPrimary::Fire(FVector FireOrigin, FVector FireDirection)
 			
 			UASHealthComponent* HealthComponent = UASHealthComponent::FindHealthComponent(HitActor);
 			if(HealthComponent != nullptr) {
-				HealthComponent->Damage(10);
+				HealthComponent->Damage(m_DamageByBullet);
+				UE_LOG(LogTemp, Warning, TEXT("Shot Hit"));
 				GEngine->AddOnScreenDebugMessage(1, 2, FColor::Red, TEXT("Target Hit"));
 			}
 		} else {
