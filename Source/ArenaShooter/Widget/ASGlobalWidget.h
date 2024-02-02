@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "ASGlobalWidget.generated.h"
 
+class UTextBlock;
 class UImage;
 class UCanvasPanel;
 class UProgressBar;
@@ -27,20 +28,27 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
 	TObjectPtr<UProgressBar> m_HealthBar;
 
-	UPROPERTY(editanywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
-	TObjectPtr<UImage> m_CursorImage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
+	TObjectPtr<UProgressBar> m_SpeedBar;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
+	TObjectPtr<UImage> m_CursorImage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
+	TObjectPtr<UTextBlock> m_SpeedProfile;
 	/* ---------------------------------- FUNCTIOns --------------------------------------*/
 public:
 	UASGlobalWidget(const FObjectInitializer& ObjectInitializer);
 
 	virtual bool Initialize() override;
 
-	void UpdatehealthBar(float percent);
+	void SethealthBarPercent(float percent);
+
+	void SetSpeedBarPercent(float percent);
 
 	void ChangeCursorVisibility(bool visible);
 
+	void SetSpeedProfile(int profile);
 protected:
-	void SethealthBarPercent(float percent);
 };
 

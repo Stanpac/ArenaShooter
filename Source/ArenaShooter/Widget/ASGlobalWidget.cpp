@@ -5,6 +5,7 @@
 
 #include "Components/Image.h"
 #include "Components/ProgressBar.h"
+#include "Components/TextBlock.h"
 
 UASGlobalWidget::UASGlobalWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -18,11 +19,18 @@ bool UASGlobalWidget::Initialize()
 	return Super::Initialize();
 }
 
-void UASGlobalWidget::UpdatehealthBar(float percent)
+void UASGlobalWidget::SetSpeedBarPercent(float percent)
 {
-	// Manage the update of the health bar
-	// Maybe Add a timer with Lerp ?
-	SethealthBarPercent(percent);
+	if (m_SpeedBar) {
+		m_SpeedBar->SetPercent(percent);
+	}
+}
+
+void UASGlobalWidget::SethealthBarPercent(float percent)
+{
+	if (m_HealthBar) {
+		m_HealthBar->SetPercent(percent);
+	}
 }
 
 void UASGlobalWidget::ChangeCursorVisibility(bool visible)
@@ -33,9 +41,10 @@ void UASGlobalWidget::ChangeCursorVisibility(bool visible)
 	}
 }
 
-void UASGlobalWidget::SethealthBarPercent(float percent)
+void UASGlobalWidget::SetSpeedProfile(int profile)
 {
-	if (m_HealthBar) {
-		m_HealthBar->SetPercent(percent);
+	if (m_SpeedProfile) {
+		m_SpeedProfile->SetText(FText::FromString(FString::FromInt(profile)));
 	}
 }
+

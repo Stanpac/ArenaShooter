@@ -8,6 +8,7 @@
 #include "InputActionValue.h"
 #include "ASCharacter.generated.h"
 
+class UASSpeedComponent;
 class UASGlobalWidget;
 class UASHealthComponent;
 class UASEventWorldSubSystem;
@@ -44,10 +45,14 @@ protected:
 	/** Weapon Component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Weapon", meta = (DisplayName = "Weapon Component"))
 	UASWeaponComponent* m_WeaponComponent;
-
+	
 	/** Close Combat Component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Weapon", meta = (DisplayName = "Close Combat Component"))
 	UASCloseCombatComponent* m_CloseCombatComponent;
+
+	/** Speed Component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Speed", meta = (DisplayName = "SpeedComponent"))
+	UASSpeedComponent* m_SpeedComponent;
 
 	/** Player Widget */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Widget", meta = (DisplayName = "Player Widget"))
@@ -89,13 +94,14 @@ protected:
 	/** Reload Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "Reload Action"))
 	UInputAction* m_ReloadAction;
-
+	
 	/** Close Combat Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "Close Combat Action"))
 	UInputAction* m_CloseCombatAction;
-	
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "SwitchAction"))
-	//UInputAction* m_SwitchAction;
+
+	/** CheatSpeed bool */
+	bool SpeedCheatAllowed;
+
 	
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
@@ -109,6 +115,9 @@ public:
 	
 	UFUNCTION(Exec)
 	void DebugHealing(float amount);
+
+	UFUNCTION(Exec)
+	void CheatSpeed(bool Cheat);
 
 protected:
 	void Move(const FInputActionValue& Value);
@@ -126,6 +135,12 @@ protected:
 
 	UFUNCTION()
 	void OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer);
+
+	UFUNCTION()
+	void OnSpeedProfileChanged(int SpeedProfile);
+
+	UFUNCTION()
+	void OnSpeedChanged(float NewSpeed, float MaxSpeed);
 
 	void GetAllSubsystem();
 	void AddDefaultMappingContext();
