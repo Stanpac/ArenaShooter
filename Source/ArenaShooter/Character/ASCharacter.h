@@ -8,6 +8,7 @@
 #include "InputActionValue.h"
 #include "ASCharacter.generated.h"
 
+class UASSpeedComponent;
 class UASGlobalWidget;
 class UASHealthComponent;
 class UASEventWorldSubSystem;
@@ -44,10 +45,14 @@ protected:
 	/** Weapon Component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Weapon", meta = (DisplayName = "Weapon Component"))
 	UASWeaponComponent* m_WeaponComponent;
-
+	
 	/** Close Combat Component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Weapon", meta = (DisplayName = "Close Combat Component"))
 	UASCloseCombatComponent* m_CloseCombatComponent;
+
+	/** Speed Component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Speed", meta = (DisplayName = "SpeedComponent"))
+	UASSpeedComponent* m_SpeedComponent;
 
 	/** Player Widget */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Widget", meta = (DisplayName = "Player Widget"))

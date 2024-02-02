@@ -7,6 +7,7 @@
 #include "NinjaCharacterMovementComponent.h"
 #include "ArenaShooter/Components/ASCloseCombatComponent.h"
 #include "ArenaShooter/Components/ASHealthComponent.h"
+#include "ArenaShooter/Components/ASSpeedComponent.h"
 #include "ArenaShooter/Components/ASWeaponComponent.h"
 #include "ArenaShooter/SubSystem/ASEventWorldSubSystem.h"
 #include "ArenaShooter/Widget/ASGlobalWidget.h"
@@ -62,8 +63,11 @@ AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(
 	m_HealthComponent = CreateDefaultSubobject<UASHealthComponent>(TEXT("HealthComponent"));
 
 	m_WeaponComponent = CreateDefaultSubobject<UASWeaponComponent>(TEXT("WeaponComponent"));
-
+	
 	m_CloseCombatComponent = CreateDefaultSubobject<UASCloseCombatComponent>(TEXT("CloseCombatComponent"));
+
+	m_SpeedComponent = CreateDefaultSubobject<UASSpeedComponent>(TEXT("SpeedComponent"));
+
 }
 
 void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

@@ -17,6 +17,7 @@ void UASSpeedComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	UpdateSpeedProfile(0);
+	m_EventWorldSubSystem = GetWorld()->GetSubsystem<UASEventWorldSubSystem>();
 }
 
 void UASSpeedComponent::TickComponent(float DeltaTime, ELevelTick TickType,FActorComponentTickFunction* ThisTickFunction)
@@ -46,6 +47,8 @@ void UASSpeedComponent::UpdateSpeedProfile(int SpeedProfile)
 		UpdateSpeedBarMaxValue(profile.m_SpeedBarValueMax);
 		m_SpeedBarDecreasRate = profile.m_SpeedBarDecreasRate;
 	}
+
+	m_EventWorldSubSystem->BroadcastSpeedChange(m_CurrentSpeedProfile);
 }
 
 void UASSpeedComponent::UpdateSpeedBarValue(float Value)

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ArenaShooter/SubSystem/ASEventWorldSubSystem.h"
 #include "Components/ActorComponent.h"
 #include "ASSpeedComponent.generated.h"
 
@@ -45,9 +46,13 @@ protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "ASSpeedComponent|Speed", meta = (DisplayName = "SpeedBarMaxValue"))
 	float m_SpeedBarMaxValue;
 
-	/** Speed Bar Amouns of loss per Second */
+	/** Speed Bar Amount of loss per Second */
 	UPROPERTY(EditAnywhere)
 	float m_SpeedBarDecreasRate = 10.0f;
+	
+	/** Event World SubSystem */
+	UPROPERTY()
+	UASEventWorldSubSystem* m_EventWorldSubSystem;
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:	
 	UASSpeedComponent();
