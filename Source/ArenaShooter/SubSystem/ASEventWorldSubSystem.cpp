@@ -12,3 +12,13 @@ void UASEventWorldSubSystem::BroadcastPlayerEndDeath()
 {
 	OnPlayerEndDeath.Broadcast();
 }
+
+void UASEventWorldSubSystem::BroadcastEnemyDeath()
+{
+	OnEnemyDeath.Broadcast();
+}
+
+void UASEventWorldSubSystem::BroadcastSpeedChange(int SpeedProfile)
+{
+	OnSpeedChange.Broadcast(SpeedProfile);
+}

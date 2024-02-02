@@ -18,11 +18,18 @@ bool UASGlobalWidget::Initialize()
 	return Super::Initialize();
 }
 
-void UASGlobalWidget::UpdatehealthBar(float percent)
+void UASGlobalWidget::SetSpeedBarPercent(float percent)
 {
-	// Manage the update of the health bar
-	// Maybe Add a timer with Lerp ?
-	SethealthBarPercent(percent);
+	if (m_SpeedBar) {
+		m_SpeedBar->SetPercent(percent);
+	}
+}
+
+void UASGlobalWidget::SethealthBarPercent(float percent)
+{
+	if (m_HealthBar) {
+		m_HealthBar->SetPercent(percent);
+	}
 }
 
 void UASGlobalWidget::ChangeCursorVisibility(bool visible)
@@ -33,9 +40,3 @@ void UASGlobalWidget::ChangeCursorVisibility(bool visible)
 	}
 }
 
-void UASGlobalWidget::SethealthBarPercent(float percent)
-{
-	if (m_HealthBar) {
-		m_HealthBar->SetPercent(percent);
-	}
-}
