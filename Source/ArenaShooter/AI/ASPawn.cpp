@@ -24,9 +24,6 @@ AASPawn::AASPawn()
 	m_HealthVisibilitySphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("HealthVisibilitySphereComponent"));
 	m_HealthVisibilitySphereComponent->SetupAttachment(m_CapsuleComponent);
 	m_HealthVisibilitySphereComponent->SetSphereRadius(1000.0f);
-
-	m_HealthVisibilitySphereComponent->OnComponentBeginOverlap.AddDynamic(this, &AASPawn::OnHealthVisibilitySphereComponentBeginOverlap);
-	m_HealthVisibilitySphereComponent->OnComponentEndOverlap.AddDynamic(this, &AASPawn::OnHealthVisibilitySphereComponentEndOverlap);
 	
 	m_HealthBarWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBarWidgetComponent"));
 	m_HealthBarWidgetComponent->SetupAttachment(m_CapsuleComponent);
@@ -41,6 +38,9 @@ void AASPawn::BeginPlay()
 	m_HealthBarWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
 	
 	SetWidgetVisibility(false);
+	
+	m_HealthVisibilitySphereComponent->OnComponentBeginOverlap.AddDynamic(this, &AASPawn::OnHealthVisibilitySphereComponentBeginOverlap);
+	m_HealthVisibilitySphereComponent->OnComponentEndOverlap.AddDynamic(this, &AASPawn::OnHealthVisibilitySphereComponentEndOverlap);
 	
 	m_HealthComponent->OnHealthChanged.AddDynamic(this, &AASPawn::OnHealthChanged);
 	m_HealthComponent->OnDeathStarted.AddDynamic(this, &AASPawn::OnDeath);
