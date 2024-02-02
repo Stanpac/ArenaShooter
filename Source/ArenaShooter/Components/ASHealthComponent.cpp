@@ -5,6 +5,7 @@
 
 #include "ArenaShooter/Character/ASCharacter.h"
 #include "ArenaShooter/Widget/ASGlobalWidget.h"
+#include "Kismet/GameplayStatics.h"
 
 UASHealthComponent::UASHealthComponent()
 {
@@ -52,7 +53,16 @@ void UASHealthComponent::healing(float amount)
 void UASHealthComponent::Damage(float amount)
 {
 	// previous health can be Use Later For Lerp maybe ?
+	if(m_Sound_Hit)
+	{
+		UGameplayStatics::PlaySoundAtLocation(
+	GetWorld(),
+	m_Sound_Hit,
+	GetOwner()->GetActorLocation());
+	}
+		
 	float PreviousHealth = m_Health;
+	UE_LOG(LogTemp, Warning, TEXT("Ammount = %f"), amount);
 	float NewHealth = PreviousHealth - (amount * m_DamageMultiplicator);
 
 	if (NewHealth < 0.0f) {
@@ -61,6 +71,21 @@ void UASHealthComponent::Damage(float amount)
 
 	m_Health = NewHealth;
 	UpdateWidget();
+	if(m_Health == 0) Death();
+
+}
+
+void UASHealthComponent::Death()
+{
+	if(m_Sound_Hit)
+	{
+		UGameplayStatics::PlaySoundAtLocation(
+	GetWorld(),
+	m_Sound_Death,
+	GetOwner()->GetActorLocation());
+	}
+	if(IsValid(GetOwner()))
+	GetOwner()->Destroy();
 }
 
 
