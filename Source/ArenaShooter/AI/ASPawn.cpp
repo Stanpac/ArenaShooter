@@ -4,6 +4,7 @@
 #include "ArenaShooter/AI/ASPawn.h"
 
 #include "ArenaShooter/Components/ASHealthComponent.h"
+#include "ArenaShooter/SubSystem/ASEventWorldSubSystem.h"
 #include "ArenaShooter/Widget/ASEnemyWidget.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
@@ -34,6 +35,9 @@ AASPawn::AASPawn()
 void AASPawn::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	m_EventWorldSubSystem = GetWorld()->GetSubsystem<UASEventWorldSubSystem>();
+	
 	m_HealthBarWidgetComponent->SetWidgetClass(m_HealthBarWidgetClass);
 	m_HealthBarWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
 	
@@ -44,6 +48,7 @@ void AASPawn::BeginPlay()
 	
 	m_HealthComponent->OnHealthChanged.AddDynamic(this, &AASPawn::OnHealthChanged);
 	m_HealthComponent->OnDeathStarted.AddDynamic(this, &AASPawn::OnDeath);
+	
 }
 
 void AASPawn::OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer)
@@ -62,18 +67,30 @@ void AASPawn::OnHealthChanged(float PreviousHealth, float CurrentHealth, float M
 	}
 	
 	// TODO Spawn Decal of the Damage
-	
 }
 
 void AASPawn::OnDeath(AActor* DeathDealer)
 {
+	// Temporary
+	int randX = FMath::RandRange(-200, 200);
+	int randY = FMath::RandRange(-200, 200);
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	GetWorld()->SpawnActor<AActor>(m_TurretCopy,GetActorLocation() + FVector(randX,randY, 0),FRotator(0), SpawnParams);
+	
+	// end temporary
+	if (m_EventWorldSubSystem) {
+		m_EventWorldSubSystem->BroadcastEnemyDeath();
+	}
 	SetLifeSpan(0.1f);
+	SetActorHiddenInGame(true);
 }
 
 void AASPawn::SetWidgetVisibility(bool visible)
 {
 	if (m_HealthBarWidgetComponent) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, "Setvisibility");
+		GEngine->AddOnScreenDebugMessage(3, 2.0f, FColor::Green, "Setvisibility");
 		m_HealthBarWidgetComponent->SetVisibility(visible);
 	}
 }
@@ -81,14 +98,13 @@ void AASPawn::SetWidgetVisibility(bool visible)
 void AASPawn::SetWidgetVisibilityfalse()
 {
 	if (m_HealthBarWidgetComponent) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, "Setvisibilityfalse");
 		m_HealthBarWidgetComponent->SetVisibility(false);
 	}
 }
 
 void AASPawn::OnHealthVisibilitySphereComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent,AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,const FHitResult& SweepResult)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "OnHealthVisibilitySphereComponentBeginOverlap");
+	GEngine->AddOnScreenDebugMessage(4, 2.0f, FColor::Red, "OnHealthVisibilitySphereComponentBeginOverlap");
 	if (OtherActor == this) {
 		return;
 	}
@@ -97,7 +113,7 @@ void AASPawn::OnHealthVisibilitySphereComponentBeginOverlap(UPrimitiveComponent*
 
 void AASPawn::OnHealthVisibilitySphereComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "OnHealthVisibilitySphereComponentEndOverlap");
+	GEngine->AddOnScreenDebugMessage(5, 2.0f, FColor::Red, "OnHealthVisibilitySphereComponentEndOverlap");
 	if (OtherActor == this) {
 		return;
 	}
