@@ -30,9 +30,10 @@ class ARENASHOOTER_API AASCharacter : public ANinjaCharacter
 	GENERATED_BODY()
 	/* ---------------------------------- MEMBERS --------------------------------------*/
 protected:
-	/** Skeletal Mesh */
+
+	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
-	USkeletalMeshComponent* m_SkeletalMeshComponent;
+	USkeletalMeshComponent* m_Mesh1P;
 
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Camera", meta = (DisplayName = "First Person Camera Component"))
