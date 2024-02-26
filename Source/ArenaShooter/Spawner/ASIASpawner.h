@@ -8,6 +8,8 @@
 
 class UBoxComponent;
 class UArrowComponent;
+class UShapeComponent;
+class APawn;
 
 UENUM()
 enum ESpawnType
