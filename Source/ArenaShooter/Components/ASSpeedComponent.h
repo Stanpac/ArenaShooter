@@ -7,44 +7,10 @@
 #include "Components/ActorComponent.h"
 #include "ASSpeedComponent.generated.h"
 
+class USpeedProfilsData;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpeedComponent_UpdateSpeedProfileEvent, int, SpeedProfile);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSpeedComponent_UpdateSpeedEvent, float, NewSpeed, float, MaxSpeed);
-
-USTRUCT(BlueprintType)
-struct FSpeedProfile
-{
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY(EditAnywhere,meta = (DisplayName = "Speed Profile", ClampMin = 0, ClampMax = 3));
-	int m_SpeedProfile;
-
-	UPROPERTY(EditAnywhere, meta = (DisplayName = "Max Acceleration"));
-	float m_MaxAcceleration = 0.0f;
-
-	UPROPERTY(EditAnywhere, meta = (DisplayName = "Max Walk Speed"));
-	float m_MaxWalkSpeed = 0.0f;
-	
-	UPROPERTY(EditAnywhere, meta = (DisplayName = "Mass"));
-	float m_Mass = 0.0f;
-	
-	UPROPERTY(EditAnywhere, meta = (DisplayName = "Gravity"));
-	float m_Gravity = 0.0f;
-	
-	UPROPERTY(EditAnywhere, meta = (DisplayName = "Jump Z"));
-    float m_JumpZ = 0.0f;
-	
-	UPROPERTY(EditAnywhere, meta = (DisplayName = "Air Control"));
-	float m_AirControl = 0.0f;
-	
-	UPROPERTY(EditAnywhere, meta = (DisplayName = "Breaking Deceleration Falling"));
-	float m_BreakingDecelerationFalling = 0.0f;
-
-	UPROPERTY(EditAnywhere, meta = (DisplayName = "SpeedBar Value Max"));
-	float m_SpeedBarValueMax = 0.0f;
-
-	UPROPERTY(EditAnywhere, meta = (DisplayName = "SpeedBarDecreasRated"));
-	float m_SpeedBarDecreasRate = 0.0f;
-};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARENASHOOTER_API UASSpeedComponent : public UActorComponent
@@ -53,8 +19,8 @@ class ARENASHOOTER_API UASSpeedComponent : public UActorComponent
 	/* ---------------------------------- MEMBERS --------------------------------------*/
 protected:
 
-	UPROPERTY(EditAnywhere, Category = "ASSpeedComponent|Profile", meta = (DisplayName = "Speed Profile"))
-	TArray<FSpeedProfile> m_SpeedProfile;
+	UPROPERTY(EditAnywhere, Category = "ASSpeedComponent|Profile", meta = (DisplayName = "Speed Profile Data Asset"))
+	TSoftObjectPtr<USpeedProfilsData> m_speedProfilData;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASSpeedComponent|Profile", meta = (DisplayName = "Current Speed Profile", ClampMin = 0, ClampMax = 3))
 	int m_CurrentSpeedProfile;

@@ -26,12 +26,6 @@ AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(
 	check(CapsuleComp);
 	CapsuleComp->InitCapsuleSize(40.0f, 90.0f);
 
-	USkeletalMeshComponent* MeshComp = GetMesh();
-	check(MeshComp);
-	MeshComp->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));  // Rotate mesh to be X forward since it is exported as Y forward.
-	MeshComp->SetRelativeLocation(FVector(0, 0, -90));
-	MeshComp->SetupAttachment(GetCapsuleComponent());
-
 	// Character Movement (Lyra Params)
 	UCharacterMovementComponent* MoveComp = CastChecked<UCharacterMovementComponent>(GetCharacterMovement());
 	MoveComp->GravityScale = 1.0f;
@@ -47,7 +41,7 @@ AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(
 	MoveComp->GetNavAgentPropertiesRef().bCanCrouch = true;
 	MoveComp->bCanWalkOffLedgesWhenCrouching = true;
 	MoveComp->SetCrouchedHalfHeight(65.0f);
-
+	
 	// Ninja Component (Temp)
 	UNinjaCharacterMovementComponent* NinjaMoveComp = CastChecked<UNinjaCharacterMovementComponent>(GetCharacterMovement());
 	NinjaMoveComp->SetAlignGravityToBase(true);
@@ -55,17 +49,23 @@ AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(
 	NinjaMoveComp->bAlwaysRotateAroundCenter = true;
 
 	m_FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-	m_FirstPersonCameraComponent->SetupAttachment(MeshComp, TEXT("head"));
-	m_FirstPersonCameraComponent->SetRelativeLocation(FVector(0, 10.f, 0));
-	m_FirstPersonCameraComponent->SetRelativeRotation(FRotator(-90, 0, 90));
+	m_FirstPersonCameraComponent->SetupAttachment(CapsuleComp);
+	m_FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 40.f));
 	m_FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
-	m_HealthComponent = CreateDefaultSubobject<UASHealthComponent>(TEXT("HealthComponent"));
-
-	m_WeaponComponent = CreateDefaultSubobject<UASWeaponComponent>(TEXT("WeaponComponent"));
+	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
+	m_Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
+	m_Mesh1P->SetOnlyOwnerSee(true);
+	m_Mesh1P->SetupAttachment(m_FirstPersonCameraComponent);
+	m_Mesh1P->bCastDynamicShadow = false;
+	m_Mesh1P->CastShadow = false;
 	
-	m_CloseCombatComponent = CreateDefaultSubobject<UASCloseCombatComponent>(TEXT("CloseCombatComponent"));
+	m_Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
+	// Actor Components 
+	m_HealthComponent = CreateDefaultSubobject<UASHealthComponent>(TEXT("HealthComponent"));
+	m_WeaponComponent = CreateDefaultSubobject<UASWeaponComponent>(TEXT("WeaponComponent"));
+	m_CloseCombatComponent = CreateDefaultSubobject<UASCloseCombatComponent>(TEXT("CloseCombatComponent"));
 	m_SpeedComponent = CreateDefaultSubobject<UASSpeedComponent>(TEXT("SpeedComponent"));
 
 }
