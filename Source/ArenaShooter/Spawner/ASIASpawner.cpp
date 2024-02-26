@@ -63,7 +63,6 @@ void AASIASpawner::Tick(float DeltaSeconds)
 
 void AASIASpawner::ChangeSpawnZone()
 {
-	
 	if (m_SpawnZone == ESPawnZone::VE_Box) {
 		if (!m_SpawnZoneComponent->IsA<UBoxComponent>()) {
 			if (m_SpawnZoneComponent) m_SpawnZoneComponent->DestroyComponent();
@@ -85,7 +84,6 @@ void AASIASpawner::SpawnAI(FVector Location, FRotator Rotation)
 		UE_LOG(LogTemp, Warning, TEXT("AIPawnClassTOSpawn is NULL!"));
 		return;
 	}
-	
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
@@ -100,21 +98,40 @@ void AASIASpawner::SpawnAI(FVector Location, FRotator Rotation)
 void AASIASpawner::SpawnAIOnGround()
 {
 	// Find a random location in the zone of the m_SpawnZoneComponent and Start a Raycast, if the Raycast hit the ground, spawn the AI here and rotate it to the normal of the hit
+	FVector Location = GetActorLocation();
 	if (m_SpawnZoneComponent->IsA<UBoxComponent>()) {
-		// Cast a raycast from the center of the box to the ground
+		FVector BoxExtent = CastChecked<UBoxComponent>(m_SpawnZoneComponent)->GetScaledBoxExtent();
+		Location = GetActorLocation() + FVector(FMath::RandRange(-BoxExtent.X, BoxExtent.X), FMath::RandRange(-BoxExtent.Y, BoxExtent.Y), 0);
 	} else if (m_SpawnZoneComponent->IsA<USphereComponent>()) {
-		// Cast a raycast from the center of the sphere to the ground
+		// Get a random point in the sphere
+		FVector RandomPoint = FMath::VRand() * m_SphereRadius;
+		Location = GetActorLocation() + RandomPoint;
+	}
+
+	FHitResult Hit;
+	FVector Start = Location;
+	FVector End = Location - GetActorUpVector() * 1000;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+	if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, CollisionParams)) {
+		SpawnAI(Hit.Location, Hit.ImpactNormal.Rotation());
 	}
 }
 
 void AASIASpawner::SpawnAIInTheAir()
 {
 	// Find a random location in the zone of the m_SpawnZoneComponent and spawn the AI if
+	FVector Location = GetActorLocation();
 	if (m_SpawnZoneComponent->IsA<UBoxComponent>()) {
-		
+		FVector BoxExtent = CastChecked<UBoxComponent>(m_SpawnZoneComponent)->GetScaledBoxExtent();
+		Location = GetActorLocation() + FVector(FMath::RandRange(-BoxExtent.X, BoxExtent.X), FMath::RandRange(-BoxExtent.Y, BoxExtent.Y), 0);
 	} else if (m_SpawnZoneComponent->IsA<USphereComponent>()) {
-		
+		// Get a random point in the sphere
+		FVector RandomPoint = FMath::VRand() * m_SphereRadius;
+		Location = GetActorLocation() + RandomPoint;
 	}
+	
+	SpawnAI(Location, GetActorRotation());
 }
 
 void AASIASpawner::OnAIDestroyed(AActor* DestroyedActor)

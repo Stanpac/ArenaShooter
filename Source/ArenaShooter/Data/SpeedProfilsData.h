@@ -52,6 +52,7 @@ class ARENASHOOTER_API USpeedProfilsData : public UDataAsset
 	GENERATED_BODY()
 	
 private:
+	UPROPERTY(EditAnywhere)
 	TArray<FSpeedProfile> m_SpeedProfiles;
 
 public:
