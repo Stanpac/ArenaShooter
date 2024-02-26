@@ -65,6 +65,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Reload", meta=(DisplayName = "Is Reloading ?"))
 	bool m_IsReloading;
 
+	/** Sound when shot is fired **/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feedback", meta=(DisplayName = "Fire Sound"))
+	USoundBase* m_Sound_ShotFired;
+
+	/*/** Particle System when shot is fired *#1#
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feedback", meta=(DisplayName = "Fire Particle System"))
+	UNiagaraSystem* m_Niagara_ShotFired;*/
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

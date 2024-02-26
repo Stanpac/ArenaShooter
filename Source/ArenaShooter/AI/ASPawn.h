@@ -6,9 +6,12 @@
 #include "GameFramework/Pawn.h"
 #include "ASPawn.generated.h"
 
+class USphereComponent;
 class UCapsuleComponent;
 class UASHealthComponent;
 class UStaticMeshComponent;
+class UWidgetComponent;
+class UUserWidget;
 
 
 UCLASS()
@@ -26,8 +29,39 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASPawn|Components", meta = (DisplayName = "HealthComponent"))
 	UASHealthComponent* m_HealthComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASPawn|Components", meta = (DisplayName = "HealthVisibilitySphereComponent"))
+	USphereComponent* m_HealthVisibilitySphereComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASPawn|Components", meta = (DisplayName = "HealthBarWidgetComponent"))
+	UWidgetComponent* m_HealthBarWidgetComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASPawn|Widget", meta = (DisplayName = "HealthBarWidgetClass"))
+	TSubclassOf<UUserWidget> m_HealthBarWidgetClass;
+	
+	FTimerHandle m_HealthBarTimerHandle;
 	
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
 	AASPawn();
+	
+protected:
+	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer);
+
+	UFUNCTION()
+	void OnDeath(AActor* DeathDealer);
+
+	void SetWidgetVisibility(bool visible);
+
+	void SetWidgetVisibilityfalse();
+
+	UFUNCTION()
+	virtual void OnHealthVisibilitySphereComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	virtual void OnHealthVisibilitySphereComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,int32 OtherBodyIndex);
+	
 };

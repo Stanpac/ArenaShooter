@@ -94,7 +94,7 @@ void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 void AASCharacter::DebugDamage(float amount)
 {
 	if (m_HealthComponent) {
-		m_HealthComponent->Damage(amount);
+		m_HealthComponent->Damage(amount, GetOwner());
 	}
 }
 
@@ -116,6 +116,9 @@ void AASCharacter::BeginPlay()
 		M_PlayerWidget->AddToViewport();
 	}
 
+
+	m_HealthComponent->OnDeathStarted.AddDynamic(this, &AASCharacter::OnStartDeath);
+	m_HealthComponent->OnHealthChanged.AddDynamic(this, &AASCharacter::OnHealthChanged);
 	m_WeaponComponent->InitializeWeapon();
 }
 
@@ -170,7 +173,7 @@ void AASCharacter::Switch(const FInputActionValue& Value) const
 	m_WeaponComponent->SwitchWeapon();		
 }
 
-void AASCharacter::OnStartDeath()
+void AASCharacter::OnStartDeath(AActor* OwningActor)
 {
 	//TODO : Should be moved In a Player Class if there is
 	if (m_EventWorldSubSystem) {
@@ -200,6 +203,11 @@ void AASCharacter::OnEndDeath()
 	//end
 	SetLifeSpan(0.1f);
 	SetActorHiddenInGame(true);
+}
+
+void AASCharacter::OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth,AActor* DamageDealer)
+{
+	GetPlayerWidget()->UpdatehealthBar(CurrentHealth / MaxHealth);
 }
 
 void AASCharacter::AddDefaultMappingContext()
