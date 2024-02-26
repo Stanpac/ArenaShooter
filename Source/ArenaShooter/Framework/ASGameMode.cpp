@@ -3,7 +3,8 @@
 
 #include "ASGameMode.h"
 
-#include "ASAI_CharacterDetectionPathfinder.h"
+#include "ArenaShooter/ASAI_CharacterDetectionPathfinder.h"
+
 
 void AASGameMode::BeginPlay()
 {
