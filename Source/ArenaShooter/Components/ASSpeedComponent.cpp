@@ -4,6 +4,7 @@
 #include "ArenaShooter/Components/ASSpeedComponent.h"
 
 #include "ArenaShooter/Character/ASCharacter.h"
+#include "ArenaShooter/Data/SpeedProfilsData.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values for this component's properties
@@ -29,12 +30,12 @@ void UASSpeedComponent::TickComponent(float DeltaTime, ELevelTick TickType,FActo
 
 void UASSpeedComponent::UpdateSpeedProfile(int SpeedProfile)
 {
-	if (SpeedProfile < 0 || SpeedProfile >= m_SpeedProfile.Num()) {
+	if (SpeedProfile < 0 || SpeedProfile >= m_speedProfilData->GetSpeedProfileCount()) {
 		UE_LOG(LogTemp, Warning, TEXT("SpeedProfile out of range"));
 		return;
 	}
 	
-	FSpeedProfile profile = m_SpeedProfile[SpeedProfile];
+	FSpeedProfile profile = m_speedProfilData->GetSpeedProfile(SpeedProfile);
 	m_CurrentSpeedProfile = profile.m_SpeedProfile;
 	if (AASCharacter* character = CastChecked<AASCharacter>(GetOwner())) {
 		UCharacterMovementComponent* MoveComp = character->GetCharacterMovement();
