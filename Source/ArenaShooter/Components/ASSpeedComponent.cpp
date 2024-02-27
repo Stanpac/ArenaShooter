@@ -30,7 +30,12 @@ void UASSpeedComponent::TickComponent(float DeltaTime, ELevelTick TickType,FActo
 
 void UASSpeedComponent::UpdateSpeedProfile(int SpeedProfile)
 {
-	if (SpeedProfile < 0 || SpeedProfile >= m_speedProfilData->GetSpeedProfileCount()) {
+	if(!IsValid(m_speedProfilData))
+	{
+		return;
+	}
+	
+	if (SpeedProfile < 0 || SpeedProfile >= m_speedProfilData->->GetSpeedProfileCount()) {
 		UE_LOG(LogTemp, Warning, TEXT("SpeedProfile out of range"));
 		return;
 	}

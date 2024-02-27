@@ -32,19 +32,19 @@ void AASIASpawner::OnConstruction(const FTransform& Transform)
 	ChangeSpawnZone();
 }
 
-void AASIASpawner::PreEditChange(FProperty* PropertyAboutToChange)
+/*void AASIASpawner::PreEditChange(FProperty* PropertyAboutToChange)
 {
 	Super::PreEditChange(PropertyAboutToChange);
-}
+}*/
 
-void AASIASpawner::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+/*void AASIASpawner::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 	
 	if (PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(AASIASpawner, m_SpawnZone)) {
 		ChangeSpawnZone();
 	} 
-}
+}*/
 
 void AASIASpawner::Tick(float DeltaSeconds)
 {

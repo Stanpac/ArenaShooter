@@ -72,9 +72,9 @@ public:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-	virtual void PreEditChange(FProperty* PropertyAboutToChange) override;
+	//virtual void PreEditChange(FProperty* PropertyAboutToChange) override;
 
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	//virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 
 	virtual void Tick(float DeltaSeconds) override;
 

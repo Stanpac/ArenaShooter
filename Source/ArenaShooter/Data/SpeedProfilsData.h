@@ -43,16 +43,13 @@ struct FSpeedProfile
 
 };
 
-/**
- * 
- */
 UCLASS()
 class ARENASHOOTER_API USpeedProfilsData : public UDataAsset
 {
 	GENERATED_BODY()
 	
 private:
-	UPROPERTY(EditAnywhere, Category = "SpeedProfiles")
+	UPROPERTY(EditDefaultsOnly, Category = "SpeedProfiles")
 	TArray<FSpeedProfile> m_SpeedProfiles;
 
 public:
