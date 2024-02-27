@@ -7,22 +7,23 @@
 #include "ASIASpawner.generated.h"
 
 class UBoxComponent;
+class USphereComponent;
 class UArrowComponent;
 class UShapeComponent;
 class APawn;
 
-UENUM()
-enum ESpawnType
+UENUM(BlueprintType)
+enum class ESpawnType : uint8
 {
 	VE_SpawnOnGround UMETA(DisplayName = "Spawn On Ground"),
 	VE_SpawnInTheAir UMETA(DisplayName = "Spawn In The Air")
 };
 
-UENUM()
-enum ESPawnZone
+UENUM(BlueprintType)
+enum class ESPawnZone : uint8
 {
 	VE_Box UMETA(DisplayName = "Box"),
-	VE_Sphere UMETA(DisplayName = "Sphere"),
+	VE_Sphere UMETA(DisplayName = "Sphere")
 };
 
 UCLASS()
@@ -41,26 +42,28 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "ASIASpawner", meta = (DisplayName = "Spawn Method"))
 	TEnumAsByte<ESpawnType> m_SpawnType;
 
-	UPROPERTY(EditAnywhere, Category = "ASIASpawner|", meta = (DisplayName = "Spawn Zone"))
+	UPROPERTY(EditAnywhere, Category = "ASIASpawner", meta = (DisplayName = "Spawn Zone"))
 	TEnumAsByte<ESPawnZone> m_SpawnZone;
 
-	UPROPERTY(EditAnywhere, Category = "ASIASpawner|Settings", meta = (DisplayName = "Sphere Radius", EditCondition = "m_SpawnZone == ESPawnZone::VE_Sphere"))
+	UPROPERTY(EditAnywhere, Category = "ASIASpawner|Settings", meta = (DisplayName = "Sphere Radius" , EditCondition = "m_SpawnZone == ESPawnZone::VE_Sphere"))
 	int m_SphereRadius;
 
-	UPROPERTY(EditAnywhere, Category = "ASIASpawner|Settings", meta = (DisplayName = "Box Extend", EditCondition = "m_SpawnZone == ESPawnZone::VE_Box"))
+	UPROPERTY(EditAnywhere, Category = "ASIASpawner|Settings", meta = (DisplayName = "Box Extend" ,EditCondition = "m_SpawnZone == ESPawnZone::VE_Box"))
 	FVector m_BoxExtend;
 	
-	UPROPERTY(EditAnywhere, Category = "ASIASpawner|Settings", meta = (DisplayName = "Max Nbr Of AI Alive for this Spawner"))
+	UPROPERTY(EditAnywhere, Category = "ASIASpawner|Settings", meta = (DisplayName = "Max AI Alive for this Spawner"))
 	int m_SpawnedAIAliveMax;
 
-	UPROPERTY(EditAnywhere, Category = "ASIASpawner|Settings", meta = (DisplayName = "Nbr Of AI Alive for this Spawner", ClampMin = 0))
+	UPROPERTY(EditAnywhere, Category = "ASIASpawner|Settings", meta = (DisplayName = "AI Alive for this Spawner", ClampMin = 0))
 	int m_SpawnedAIAliveCount;
 	
 	UPROPERTY(VisibleAnywhere)
-	UShapeComponent* m_SpawnZoneComponent;
+	TObjectPtr<UShapeComponent> m_SpawnZoneComponent;
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<APawn*> m_SpawnedAI;
+
+	TObjectPtr<USceneComponent> m_RootComponent;
 
 #if WITH_EDITORONLY_DATA
 	/** Component shown in the editor only to indicate The Direction for the Raycast */
@@ -71,17 +74,19 @@ protected:
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
 	AASIASpawner();
-
+	
+	virtual void Tick(float DeltaSeconds) override;
+	
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 	//virtual void PreEditChange(FProperty* PropertyAboutToChange) override;
 
 	//virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 
-	virtual void Tick(float DeltaSeconds) override;
-
 private:
 	void ChangeSpawnZone();
+
+	void UpdateSpawnZoneValues();
 
 	UFUNCTION()
 	void OnAIDestroyed(AActor* DestroyedActor);

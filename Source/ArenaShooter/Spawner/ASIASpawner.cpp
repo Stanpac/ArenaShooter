@@ -13,10 +13,22 @@ AASIASpawner::AASIASpawner()
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
+	m_RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	RootComponent = m_RootComponent;
+
+	m_SpawnZoneComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("SpawnZone"));
+	if (m_SpawnZoneComponent) {
+		m_SpawnZoneComponent->SetupAttachment(RootComponent);
+		m_SpawnZoneComponent->SetSimulatePhysics(false);
+		m_SpawnZoneComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		m_SpawnZoneComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
+	}
+
 #if WITH_EDITORONLY_DATA
 	ArrowComponent = CreateEditorOnlyDefaultSubobject<UArrowComponent>(TEXT("Arrow"));
 	if (ArrowComponent)
 	{
+		ArrowComponent->SetupAttachment(RootComponent);
 		ArrowComponent->ArrowColor = FColor::Red;
 		ArrowComponent->bTreatAsASprite = true;
 		ArrowComponent->SetupAttachment(RootComponent);
@@ -32,19 +44,25 @@ void AASIASpawner::OnConstruction(const FTransform& Transform)
 	ChangeSpawnZone();
 }
 
-/*void AASIASpawner::PreEditChange(FProperty* PropertyAboutToChange)
+void AASIASpawner::PreEditChange(FProperty* PropertyAboutToChange)
 {
 	Super::PreEditChange(PropertyAboutToChange);
-}*/
+}
 
-/*void AASIASpawner::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+void AASIASpawner::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
-	Super::PostEditChangeProperty(PropertyChangedEvent);
+	UE_LOG(LogTemp, Warning, TEXT("PostEditChangeProperty"));
+	
+	if (PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(AASIASpawner, m_SphereRadius) || PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(AASIASpawner, m_BoxExtend)){
+		UpdateSpawnZoneValues();
+	}
 	
 	if (PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(AASIASpawner, m_SpawnZone)) {
 		ChangeSpawnZone();
-	} 
-}*/
+	}
+	
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+}
 
 void AASIASpawner::Tick(float DeltaSeconds)
 {
@@ -58,21 +76,35 @@ void AASIASpawner::Tick(float DeltaSeconds)
 	} else if (m_SpawnType == ESpawnType::VE_SpawnInTheAir) {
 		SpawnAIInTheAir();
 	}
-	
 }
 
 void AASIASpawner::ChangeSpawnZone()
 {
+	UE_LOG(LogTemp, Warning, TEXT("ChangeSpawnZone"));
 	if (m_SpawnZone == ESPawnZone::VE_Box) {
-		if (!m_SpawnZoneComponent->IsA<UBoxComponent>()) {
-			if (m_SpawnZoneComponent) m_SpawnZoneComponent->DestroyComponent();
+		if (IsValid(m_SpawnZoneComponent) && !m_SpawnZoneComponent->IsA<UBoxComponent>()) {
+			m_SpawnZoneComponent->DestroyComponent();
 			m_SpawnZoneComponent = NewObject<UBoxComponent>(this);
+			CastChecked<UBoxComponent>(m_SpawnZoneComponent)->SetBoxExtent(m_BoxExtend);
+		} 
+	} else if (m_SpawnZone == ESPawnZone::VE_Sphere) {
+		if (IsValid(m_SpawnZoneComponent) && !m_SpawnZoneComponent->IsA<USphereComponent>()) {
+			m_SpawnZoneComponent->DestroyComponent();
+			m_SpawnZoneComponent = NewObject<USphereComponent>(this);
+			CastChecked<USphereComponent>(m_SpawnZoneComponent)->SetSphereRadius(m_SphereRadius);
+		} 
+	}
+}
+
+void AASIASpawner::UpdateSpawnZoneValues()
+{
+	UE_LOG(LogTemp, Warning, TEXT("UpdateSpawnZoneValues"));
+	if (m_SpawnZone == ESPawnZone::VE_Box) {
+		if (IsValid(m_SpawnZoneComponent) && m_SpawnZoneComponent->IsA<UBoxComponent>()) {
 			CastChecked<UBoxComponent>(m_SpawnZoneComponent)->SetBoxExtent(m_BoxExtend);
 		}
 	} else if (m_SpawnZone == ESPawnZone::VE_Sphere) {
-		if (!m_SpawnZoneComponent->IsA<USphereComponent>()) {
-			if (m_SpawnZoneComponent) m_SpawnZoneComponent->DestroyComponent();
-			m_SpawnZoneComponent = NewObject<USphereComponent>(this);
+		if (IsValid(m_SpawnZoneComponent) && m_SpawnZoneComponent->IsA<USphereComponent>()) {
 			CastChecked<USphereComponent>(m_SpawnZoneComponent)->SetSphereRadius(m_SphereRadius);
 		}
 	}
