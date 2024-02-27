@@ -3,7 +3,6 @@
 
 #include "ASPlayerCameraManager.h"
 
-#include "IXRTrackingSystem.h"
 #include "NinjaCharacter.h"
 #include "Camera/CameraModifier.h"
 
@@ -56,14 +55,7 @@ void AASPlayerCameraManager::ProcessViewRotation(float DeltaTime, FRotator& OutV
 		// Consume delta rotation
 		OutDeltaRot = FRotator::ZeroRotator;
 	}
-
-	const bool bIsHeadTrackingAllowed = GEngine->XRSystem.IsValid() && (GetWorld() != nullptr ? GEngine->XRSystem->IsHeadTrackingAllowedForWorld(*GetWorld()) : GEngine->XRSystem->IsHeadTrackingAllowed());
-	
-	if (bIsHeadTrackingAllowed) {
-		// With HMD devices, we can't limit the view orientation, because it's bound to the player's head
-		OutViewRotation.Normalize();
-		
-	} else if (OutViewRotation != OldViewRotation) {
+	if (OutViewRotation != OldViewRotation) {
 		
 		if (!ViewPlaneZ.IsZero()) {
 			// Limit the player's view pitch only
