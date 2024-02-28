@@ -15,6 +15,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 
 
 AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -48,10 +49,19 @@ AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(
 	NinjaMoveComp->SetAlignComponentToGravity(true);
 	NinjaMoveComp->bAlwaysRotateAroundCenter = true;
 
+	m_SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
+	m_SpringArmComponent->SetupAttachment(CapsuleComp);
+	m_SpringArmComponent->bUsePawnControlRotation = true;
+	m_SpringArmComponent->TargetArmLength = 0.0f;
+	m_SpringArmComponent->SocketOffset = FVector(0.f, 0.f, 0.f);
+	m_SpringArmComponent->SetRelativeLocation(FVector(-10.f, 0.f, 40.f));
+	m_SpringArmComponent->bEnableCameraLag = false;
+	m_SpringArmComponent->bEnableCameraRotationLag = false;
+	
 	m_FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-	m_FirstPersonCameraComponent->SetupAttachment(CapsuleComp);
-	m_FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 40.f));
-	m_FirstPersonCameraComponent->bUsePawnControlRotation = true;
+	m_FirstPersonCameraComponent->SetupAttachment(m_SpringArmComponent);
+	//m_FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 40.f));
+	//m_FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
 	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
 	m_Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));

@@ -24,11 +24,23 @@ void AASPlayerCameraManager::ProcessViewRotation(float DeltaTime, FRotator& OutV
 	}
 
 	const APawn* Pawn = GetViewTargetPawn();
-	const ANinjaCharacter* Ninja = Cast<ANinjaCharacter>(Pawn);
-	const FVector ViewPlaneZ = (Pawn == nullptr) ? FVector::ZeroVector : ((Ninja != nullptr) ? Ninja->GetActorAxisZ() : Pawn->GetActorQuat().GetAxisZ());
+	//const ANinjaCharacter* Ninja = Cast<ANinjaCharacter>(Pawn);
+	//const FVector ViewPlaneZ = (Pawn == nullptr) ? FVector::ZeroVector : ((Ninja != nullptr) ? Ninja->GetActorAxisZ() : Pawn->GetActorQuat().GetAxisZ());
 
+	OutViewRotation += OutDeltaRot;
+	FQuat LocalViewRotation = Pawn->GetTransform().InverseTransformRotation(OutViewRotation.Quaternion());
+	FRotator LocalRotator = LocalViewRotation.Rotator();
+	LimitViewPitch(LocalRotator, ViewPitchMin, ViewPitchMax);
+	LimitViewYaw(LocalRotator, ViewYawMin, ViewYawMax);
+	LimitViewRoll(LocalRotator, ViewRollMin, ViewRollMax);
+	LocalViewRotation = LocalRotator.Quaternion();
+	FQuat WorldViewRotation = Pawn->GetTransform().TransformRotation(LocalViewRotation);
+	OutViewRotation = WorldViewRotation.Rotator();
+	OutDeltaRot = FRotator::ZeroRotator;
 	if (!OutDeltaRot.IsZero()) {
-		// Obtain current view orthonormal axes
+		
+		
+		/*// Obtain current view orthonormal axes
 		FVector ViewRotationX, ViewRotationY, ViewRotationZ;
 		FRotationMatrix(OutViewRotation).GetUnitAxes(ViewRotationX, ViewRotationY, ViewRotationZ);
 
@@ -50,6 +62,7 @@ void AASPlayerCameraManager::ProcessViewRotation(float DeltaTime, FRotator& OutV
 		if (OutDeltaRot.Roll != 0.0f) {
 			ViewRotation = FQuat(ViewRotationX, FMath::DegreesToRadians(OutDeltaRot.Roll)) * ViewRotation;
 		}
+		
 		OutViewRotation = ViewRotation.Rotator();
 
 		// Consume delta rotation
@@ -95,7 +108,7 @@ void AASPlayerCameraManager::ProcessViewRotation(float DeltaTime, FRotator& OutV
 			LimitViewPitch(OutViewRotation, ViewPitchMin, ViewPitchMax);
 			LimitViewYaw(OutViewRotation, ViewYawMin, ViewYawMax);
 			LimitViewRoll(OutViewRotation, ViewRollMin, ViewRollMax);
-		}
+		}*/
 	}
 	
 }
