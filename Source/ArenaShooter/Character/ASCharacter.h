@@ -8,6 +8,7 @@
 #include "InputActionValue.h"
 #include "ASCharacter.generated.h"
 
+class USpringArmComponent;
 class UASSpeedComponent;
 class UASGlobalWidget;
 class UASHealthComponent;
@@ -34,6 +35,9 @@ protected:
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
 	USkeletalMeshComponent* m_Mesh1P;
+
+	UPROPERTY(EditAnywhere)
+	USpringArmComponent* m_SpringArmComponent;
 
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Camera", meta = (DisplayName = "First Person Camera Component"))
