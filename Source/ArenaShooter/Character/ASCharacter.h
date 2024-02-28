@@ -36,9 +36,6 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
 	USkeletalMeshComponent* m_Mesh1P;
 
-	UPROPERTY(EditAnywhere)
-	USpringArmComponent* m_SpringArmComponent;
-
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Camera", meta = (DisplayName = "First Person Camera Component"))
 	UCameraComponent* m_FirstPersonCameraComponent;
