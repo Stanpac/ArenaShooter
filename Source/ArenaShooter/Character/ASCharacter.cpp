@@ -4,7 +4,6 @@
 #include "ArenaShooter/Character/ASCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "NinjaCharacterMovementComponent.h"
 #include "ArenaShooter/Components/ASCloseCombatComponent.h"
 #include "ArenaShooter/Components/ASHealthComponent.h"
 #include "ArenaShooter/Components/ASSpeedComponent.h"
@@ -17,7 +16,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 
-AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+AASCharacter::AASCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	PrimaryActorTick.bStartWithTickEnabled = false;
@@ -25,29 +24,20 @@ AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(
 	UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
 	check(CapsuleComp);
 	CapsuleComp->InitCapsuleSize(40.0f, 90.0f);
-
+	
 	// Character Movement (Lyra Params)
-	UCharacterMovementComponent* MoveComp = CastChecked<UCharacterMovementComponent>(GetCharacterMovement());
+	/*UCharacterMovementComponent* MoveComp = CastChecked<UCharacterMovementComponent>(GetCharacterMovement());
 	MoveComp->GravityScale = 1.0f;
 	MoveComp->MaxAcceleration = 2400.0f;
 	MoveComp->BrakingFrictionFactor = 1.0f;
 	MoveComp->BrakingFriction = 6.0f;
 	MoveComp->GroundFriction = 8.0f;
 	MoveComp->BrakingDecelerationWalking = 1400.0f;
-	MoveComp->bUseControllerDesiredRotation = false;
+	MoveComp->bUseControllerDesiredRotation = true;
 	MoveComp->bOrientRotationToMovement = false;
 	MoveComp->RotationRate = FRotator(0.0f, 720.0f, 0.0f);
-	MoveComp->bAllowPhysicsRotationDuringAnimRootMotion = false;
-	MoveComp->GetNavAgentPropertiesRef().bCanCrouch = true;
-	MoveComp->bCanWalkOffLedgesWhenCrouching = true;
-	MoveComp->SetCrouchedHalfHeight(65.0f);
+	MoveComp->bAllowPhysicsRotationDuringAnimRootMotion = false;*/
 	
-	// Ninja Component (Temp)
-	UNinjaCharacterMovementComponent* NinjaMoveComp = CastChecked<UNinjaCharacterMovementComponent>(GetCharacterMovement());
-	NinjaMoveComp->SetAlignGravityToBase(true);
-	NinjaMoveComp->SetAlignComponentToGravity(true);
-	NinjaMoveComp->bAlwaysRotateAroundCenter = true;
-
 	m_FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	m_FirstPersonCameraComponent->SetupAttachment(CapsuleComp);
 	m_FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 40.f));
@@ -92,6 +82,8 @@ void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 		// CloseCombat
 		EnhancedInputComponent->BindAction(m_CloseCombatAction, ETriggerEvent::Triggered, this, &AASCharacter::CloseCombat);
+		
+		EnhancedInputComponent->BindAction(m_switchGravityAction, ETriggerEvent::Triggered, this, &AASCharacter::SwitchGravity);
 		
 		// Switching Weapon
 		//EnhancedInputComponent->BindAction(m_switchWeaponAction, ETriggerEvent::Triggered, this, &AASCharacter::SwitchWeapon);
@@ -203,6 +195,13 @@ void AASCharacter::CloseCombat(const FInputActionValue& Value)
 		m_CloseCombatComponent->StartCloseCombatAttack();
 }
 
+void AASCharacter::SwitchGravity(const FInputActionValue& Value)
+{
+	if (bIsSwitchingGravity) return;
+	bIsSwitchingGravity = true;
+	GetCharacterMovement()->SetGravityDirection(-GetGravityDirection());
+}
+
 void AASCharacter::OnStartDeath(AActor* OwningActor)
 {
 	//TODO : Should be moved In a Player Class if there is
@@ -219,9 +218,9 @@ void AASCharacter::OnStartDeath(AActor* OwningActor)
 	CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 
-	UCharacterMovementComponent* LyraMoveComp = GetCharacterMovement();
-	LyraMoveComp->StopMovementImmediately();
-	LyraMoveComp->DisableMovement();
+	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
+	MoveComp->StopMovementImmediately();
+	MoveComp->DisableMovement();
 }
 
 void AASCharacter::OnEndDeath()

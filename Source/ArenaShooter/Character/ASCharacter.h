@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "NinjaCharacter.h"
 #include "ArenaShooter/Components/ASWeaponComponent.h"
 #include "InputActionValue.h"
+#include "GameFramework/Character.h"
 #include "ASCharacter.generated.h"
 
 class UASSpeedComponent;
@@ -25,7 +25,7 @@ struct FInputActionValue;
  */
 
 UCLASS()
-class ARENASHOOTER_API AASCharacter : public ANinjaCharacter
+class ARENASHOOTER_API AASCharacter : public ACharacter
 {
 	GENERATED_BODY()
 	/* ---------------------------------- MEMBERS --------------------------------------*/
@@ -66,7 +66,6 @@ protected:
 	bool m_IsPrimaryWeaponEquipped;
 	
 	/** Event World SubSystem */
-	UPROPERTY()
 	TObjectPtr<UASEventWorldSubSystem> m_EventWorldSubSystem;
 
 	
@@ -100,13 +99,20 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "Close Combat Action"))
 	UInputAction* m_CloseCombatAction;
 
+	/** Close Combat Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "Switch Gravity Action"))
+	UInputAction* m_switchGravityAction;
+	
+
 	/** CheatSpeed bool */
 	bool SpeedCheatAllowed;
+
+	bool bIsSwitchingGravity;
 
 	
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
-	AASCharacter(const FObjectInitializer& ObjectInitializer);
+	AASCharacter();
 	
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -127,6 +133,7 @@ protected:
 	void Reload(const FInputActionValue& Value);
 	void Switch(const FInputActionValue& Value) const;
 	void CloseCombat(const FInputActionValue& Value);
+	void SwitchGravity(const FInputActionValue& Value);
 	
 	UFUNCTION()
 	virtual void OnStartDeath(AActor* OwningActor);

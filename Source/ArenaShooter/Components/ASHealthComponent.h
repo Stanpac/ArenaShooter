@@ -72,7 +72,7 @@ public:
 	void Damage(float amount, AActor* DamageDealer);
 
 	UFUNCTION()
-	void Death();
+	void Death();	
 	
 protected:
 	virtual void BeginPlay() override;
