@@ -13,6 +13,7 @@ void UASWeaponComponent::Fire(FVector fireOrigin, FVector fireDirection)
 		if(!m_CurrentEquipedWeapon->m_IsReloading && !m_CurrentEquipedWeapon->m_IsWaitingForFireDelay)
 		{
 			m_CurrentEquipedWeapon->Fire(fireOrigin, fireDirection);
+			GEngine->AddOnScreenDebugMessage(0, 1, FColor::Blue, TEXT("Fire"));
 		}
 	}
 	else

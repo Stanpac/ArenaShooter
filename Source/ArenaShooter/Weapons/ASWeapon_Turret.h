@@ -19,4 +19,8 @@ public:
 	/** Blueprint reference to the projectile Spawned */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Gameplay")
 	TSubclassOf<AASTurretBullet> m_BulletBP;
+
+	/** 1 = 100 unit by seconds */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gun Play", meta=(DisplayName = "Bullet Speed"))
+	float m_bulletSpeed = 13;
 };

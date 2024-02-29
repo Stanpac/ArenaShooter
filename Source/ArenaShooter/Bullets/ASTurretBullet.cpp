@@ -4,6 +4,7 @@
 #include "ASTurretBullet.h"
 
 #include "ArenaShooter/Components/ASHealthComponent.h"
+#include "Evaluation/Blending/MovieSceneBlendType.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -22,6 +23,10 @@ void AASTurretBullet::BeginPlay()
 {
 	Super::BeginPlay();
 	m_Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	const FVector LookAtLocation = m_Character->GetActorLocation();
+	const FVector PawnLocation = GetActorLocation();
+	const FRotator LookAtRotation = (LookAtLocation - PawnLocation).Rotation();
+	SetActorRotation(LookAtRotation);
 	m_HealthComponent->OnDeathStarted.AddDynamic(this, &AASTurretBullet::OnDeath);
 }
 
@@ -29,7 +34,7 @@ void AASTurretBullet::BeginPlay()
 void AASTurretBullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	MovementToCharacter(DeltaTime);
+	MovementForward(DeltaTime);
 }
 
 void AASTurretBullet::MovementToCharacter(float DeltaTime)
@@ -41,6 +46,15 @@ void AASTurretBullet::MovementToCharacter(float DeltaTime)
 	const FVector newPosition = startPosition + (endPosition - startPosition) * distanceToTravel;
 
 	SetActorLocation(newPosition, true); 
+	
+}
+
+void AASTurretBullet::MovementForward(float DeltaTime)
+{
+	const FVector startPosition = GetActorLocation();
+	const FVector endPosition = startPosition + GetActorForwardVector() * 100;
+	const FVector newPosition = FMath::Lerp(startPosition, endPosition, DeltaTime * m_bulletSpeed);
+	SetActorLocation(newPosition);
 	
 }
 

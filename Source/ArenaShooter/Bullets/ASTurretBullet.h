@@ -31,12 +31,18 @@ protected:
 
 public:
 	// Called every frame
+
+	UPROPERTY()
+	float m_bulletSpeed;
 	
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
 	void MovementToCharacter(float DeltaTime);
 
+	UFUNCTION()
+	void MovementForward(float DeltaTime);
+	
 	UFUNCTION()
 	void OnDeath(AActor* actor);
 	// Declare the overlap function
