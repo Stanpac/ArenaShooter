@@ -8,11 +8,19 @@ UASWeaponComponent::UASWeaponComponent()
 
 void UASWeaponComponent::Fire(FVector fireOrigin, FVector fireDirection)
 {
-	if(!m_CurrentEquipedWeapon->m_IsReloading && !m_CurrentEquipedWeapon->m_IsWaitingForFireDelay)
+	if(IsValid(m_CurrentEquipedWeapon))
 	{
-		m_CurrentEquipedWeapon->Fire(fireOrigin, fireDirection);
+		if(!m_CurrentEquipedWeapon->m_IsReloading && !m_CurrentEquipedWeapon->m_IsWaitingForFireDelay)
+		{
+			m_CurrentEquipedWeapon->Fire(fireOrigin, fireDirection);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("NO CURRENT WEAPON ON %s"), *GetOwner()->GetName());
 	}
 }
+
 
 void UASWeaponComponent::Reload()
 {
