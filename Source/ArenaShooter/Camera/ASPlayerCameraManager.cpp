@@ -3,14 +3,13 @@
 
 #include "ASPlayerCameraManager.h"
 
-#include "NinjaCharacter.h"
 #include "Camera/CameraModifier.h"
 
 DECLARE_CYCLE_STAT(TEXT("Camera ProcessViewRotation"), STAT_Camera_ProcessViewRotation, STATGROUP_Game);
 
 void AASPlayerCameraManager::ProcessViewRotation(float DeltaTime, FRotator& OutViewRotation, FRotator& OutDeltaRot)
 {
-	SCOPE_CYCLE_COUNTER(STAT_Camera_ProcessViewRotation);
+	/*SCOPE_CYCLE_COUNTER(STAT_Camera_ProcessViewRotation);
 
 	const FRotator OldViewRotation = OutViewRotation;
 
@@ -96,7 +95,7 @@ void AASPlayerCameraManager::ProcessViewRotation(float DeltaTime, FRotator& OutV
 			LimitViewYaw(OutViewRotation, ViewYawMin, ViewYawMax);
 			LimitViewRoll(OutViewRotation, ViewRollMin, ViewRollMax);
 		}
-	}
+	}*/
 	
 }
 
