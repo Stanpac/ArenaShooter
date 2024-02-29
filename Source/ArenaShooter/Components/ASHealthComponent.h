@@ -68,10 +68,10 @@ public:
 	UFUNCTION()
 	void healing(float amount);
 	
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void Damage(float amount, AActor* DamageDealer);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void Death();
 	
 protected:

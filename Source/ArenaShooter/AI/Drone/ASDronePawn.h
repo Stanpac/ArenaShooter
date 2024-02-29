@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ArenaShooter/AI/ASPawn.h"
 #include "GameFramework/Pawn.h"
 #include "ASDronePawn.generated.h"
 
@@ -10,7 +11,7 @@ class UASHealthComponent;
 class UASWeaponComponent;
 
 UCLASS()
-class ARENASHOOTER_API AASDronePawn : public APawn
+class ARENASHOOTER_API AASDronePawn : public AASPawn
 {
 	GENERATED_BODY()
 
@@ -21,14 +22,6 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	/** Health Component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Health", meta = (DisplayName = "HealthComponent"))
-	UASHealthComponent* m_HealthComponent;
-
-	/** Weapon Component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Weapon", meta = (DisplayName = "WeaponComponent"))
-	UASWeaponComponent* m_WeaponComponent;
 
 	/** Player Reference */
 	UPROPERTY()

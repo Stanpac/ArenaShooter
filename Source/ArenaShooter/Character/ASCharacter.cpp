@@ -15,6 +15,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 
 
 AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -47,7 +48,7 @@ AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(
 	NinjaMoveComp->SetAlignGravityToBase(true);
 	NinjaMoveComp->SetAlignComponentToGravity(true);
 	NinjaMoveComp->bAlwaysRotateAroundCenter = true;
-
+	
 	m_FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	m_FirstPersonCameraComponent->SetupAttachment(CapsuleComp);
 	m_FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 40.f));
@@ -162,6 +163,7 @@ void AASCharacter::Move(const FInputActionValue& Value)
 
 void AASCharacter::Look(const FInputActionValue& Value)
 {
+	// Get Camera And Ad it manually
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
 	if (Controller != nullptr) {

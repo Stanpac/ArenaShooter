@@ -1,3 +1,5 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -17,7 +19,7 @@ class ARENASHOOTER_API UASSpeedComponent : public UActorComponent
 	/* ---------------------------------- MEMBERS --------------------------------------*/
 protected:
 
-	UPROPERTY(EditDefaultsOnly, Category = "ASSpeedComponent|Profile", meta = (DisplayName = "Speed Profile Data Asset"))
+	UPROPERTY(EditAnywhere, Category = "ASSpeedComponent|Profile", meta = (DisplayName = "Speed Profile Data Asset"))
 	TObjectPtr<USpeedProfilsData> m_speedProfilData;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASSpeedComponent|Profile", meta = (DisplayName = "Current Speed Profile", ClampMin = 0, ClampMax = 3))
