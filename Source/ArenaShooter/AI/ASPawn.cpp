@@ -4,6 +4,7 @@
 #include "ArenaShooter/AI/ASPawn.h"
 
 #include "ArenaShooter/Components/ASHealthComponent.h"
+#include "ArenaShooter/Components/ASWeaponComponent.h"
 #include "ArenaShooter/SubSystem/ASEventWorldSubSystem.h"
 #include "ArenaShooter/Widget/ASEnemyWidget.h"
 #include "Components/CapsuleComponent.h"
@@ -30,6 +31,8 @@ AASPawn::AASPawn()
 	m_HealthBarWidgetComponent->SetupAttachment(m_CapsuleComponent);
 	m_HealthBarWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
 	m_HealthBarWidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 100.0f));
+
+	m_WeaponComponent = CreateDefaultSubobject<UASWeaponComponent>(TEXT("WeaponComponent"));
 }
 
 void AASPawn::BeginPlay()
@@ -48,7 +51,8 @@ void AASPawn::BeginPlay()
 	
 	m_HealthComponent->OnHealthChanged.AddDynamic(this, &AASPawn::OnHealthChanged);
 	m_HealthComponent->OnDeathStarted.AddDynamic(this, &AASPawn::OnDeath);
-	
+
+	m_WeaponComponent->InitializeWeapon();
 }
 
 void AASPawn::OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer)

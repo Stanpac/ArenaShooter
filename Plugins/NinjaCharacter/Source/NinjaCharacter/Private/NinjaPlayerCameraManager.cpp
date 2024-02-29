@@ -52,7 +52,7 @@ void ANinjaPlayerCameraManager::ProcessViewRotation(float DeltaTime, FRotator& O
 		FQuat ViewRotation = OutViewRotation.Quaternion();
 		if (OutDeltaRot.Pitch != 0.0f)
 		{
-			ViewRotation = FQuat(ViewRotationY, FMath::DegreesToRadians(-OutDeltaRot.Pitch)) * ViewRotation;
+			ViewRotation = FQuat(ViewRotationY, FMath::DegreesToRadians(OutDeltaRot.Pitch)) * ViewRotation;
 		}
 		if (OutDeltaRot.Yaw != 0.0f)
 		{
