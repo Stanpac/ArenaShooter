@@ -44,6 +44,7 @@ void AASIASpawner::OnConstruction(const FTransform& Transform)
 	ChangeSpawnZone();
 }
 
+/*
 void AASIASpawner::PreEditChange(FProperty* PropertyAboutToChange)
 {
 	Super::PreEditChange(PropertyAboutToChange);
@@ -63,6 +64,7 @@ void AASIASpawner::PostEditChangeProperty(FPropertyChangedEvent& PropertyChanged
 	
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
+*/
 
 void AASIASpawner::Tick(float DeltaSeconds)
 {
