@@ -17,7 +17,8 @@ AASWeapon::AASWeapon()
 void AASWeapon::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	if(!m_ShowWeapon)
+		SetHidden(true);
 }
 
 // Called every frame

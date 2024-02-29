@@ -4,6 +4,7 @@
 #include "ArenaShooter/AI/ASPawn.h"
 
 #include "ArenaShooter/Components/ASHealthComponent.h"
+#include "ArenaShooter/Components/ASWeaponComponent.h"
 #include "ArenaShooter/SubSystem/ASEventWorldSubSystem.h"
 #include "ArenaShooter/Widget/ASEnemyWidget.h"
 #include "Components/CapsuleComponent.h"
@@ -30,6 +31,8 @@ AASPawn::AASPawn()
 	m_HealthBarWidgetComponent->SetupAttachment(m_CapsuleComponent);
 	m_HealthBarWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
 	m_HealthBarWidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 100.0f));
+
+	m_WeaponComponent = CreateDefaultSubobject<UASWeaponComponent>(TEXT("WeaponComponent"));
 }
 
 void AASPawn::BeginPlay()
@@ -48,7 +51,8 @@ void AASPawn::BeginPlay()
 	
 	m_HealthComponent->OnHealthChanged.AddDynamic(this, &AASPawn::OnHealthChanged);
 	m_HealthComponent->OnDeathStarted.AddDynamic(this, &AASPawn::OnDeath);
-	
+
+	m_WeaponComponent->InitializeWeapon();
 }
 
 void AASPawn::OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer)
@@ -71,20 +75,23 @@ void AASPawn::OnHealthChanged(float PreviousHealth, float CurrentHealth, float M
 
 void AASPawn::OnDeath(AActor* DeathDealer)
 {
-	// Temporary
-	int randX = FMath::RandRange(-200, 200);
-	int randY = FMath::RandRange(-200, 200);
+	if(IsValid(m_TurretCopy))
+	{
+		int randX = FMath::RandRange(-200, 200);
+		int randY = FMath::RandRange(-200, 200);
 
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-	GetWorld()->SpawnActor<AActor>(m_TurretCopy,GetActorLocation() + FVector(randX,randY, 0),FRotator(0), SpawnParams);
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		GetWorld()->SpawnActor<AActor>(m_TurretCopy,GetActorLocation() + FVector(randX,randY, 0),FRotator(0), SpawnParams);
+	}
 	
 	// end temporary
 	if (m_EventWorldSubSystem) {
 		m_EventWorldSubSystem->BroadcastEnemyDeath();
 	}
-	SetLifeSpan(0.1f);
-	SetActorHiddenInGame(true);
+	Destroy();
+	/*SetLifeSpan(0.1f);
+	SetActorHiddenInGame(true);*/
 }
 
 void AASPawn::SetWidgetVisibility(bool visible)

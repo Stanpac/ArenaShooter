@@ -8,6 +8,7 @@
 #include "InputActionValue.h"
 #include "ASCharacter.generated.h"
 
+class USpringArmComponent;
 class UASSpeedComponent;
 class UASGlobalWidget;
 class UASHealthComponent;

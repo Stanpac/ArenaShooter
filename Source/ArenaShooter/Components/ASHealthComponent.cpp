@@ -62,6 +62,7 @@ void UASHealthComponent::Death()
 	// TODO : Move On Character
 	if(m_Sound_Death) {
 		UGameplayStatics::PlaySoundAtLocation( GetWorld(), m_Sound_Death, GetOwner()->GetActorLocation());
+		GetOwner()->SetLifeSpan(.1f);
 	}
 }
 

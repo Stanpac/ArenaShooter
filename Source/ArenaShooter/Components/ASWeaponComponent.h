@@ -63,6 +63,7 @@ public:
 	void SwitchWeapon();
 
 	/** At Begin Play **/
+	UFUNCTION(BlueprintCallable, Category="Gameplay")
 	virtual void InitializeWeapon();
 };
 

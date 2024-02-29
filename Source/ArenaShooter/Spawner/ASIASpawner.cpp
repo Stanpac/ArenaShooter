@@ -13,10 +13,22 @@ AASIASpawner::AASIASpawner()
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
+	m_RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	RootComponent = m_RootComponent;
+
+	m_SpawnZoneComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("SpawnZone"));
+	if (m_SpawnZoneComponent) {
+		m_SpawnZoneComponent->SetupAttachment(RootComponent);
+		m_SpawnZoneComponent->SetSimulatePhysics(false);
+		m_SpawnZoneComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		m_SpawnZoneComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
+	}
+
 #if WITH_EDITORONLY_DATA
 	ArrowComponent = CreateEditorOnlyDefaultSubobject<UArrowComponent>(TEXT("Arrow"));
 	if (ArrowComponent)
 	{
+		ArrowComponent->SetupAttachment(RootComponent);
 		ArrowComponent->ArrowColor = FColor::Red;
 		ArrowComponent->bTreatAsASprite = true;
 		ArrowComponent->SetupAttachment(RootComponent);
@@ -32,19 +44,27 @@ void AASIASpawner::OnConstruction(const FTransform& Transform)
 	ChangeSpawnZone();
 }
 
-/*void AASIASpawner::PreEditChange(FProperty* PropertyAboutToChange)
+/*
+void AASIASpawner::PreEditChange(FProperty* PropertyAboutToChange)
 {
 	Super::PreEditChange(PropertyAboutToChange);
-}*/
+}
 
-/*void AASIASpawner::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+void AASIASpawner::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
-	Super::PostEditChangeProperty(PropertyChangedEvent);
+	UE_LOG(LogTemp, Warning, TEXT("PostEditChangeProperty"));
+	
+	if (PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(AASIASpawner, m_SphereRadius) || PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(AASIASpawner, m_BoxExtend)){
+		UpdateSpawnZoneValues();
+	}
 	
 	if (PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(AASIASpawner, m_SpawnZone)) {
 		ChangeSpawnZone();
-	} 
-}*/
+	}
+	
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+}
+*/
 
 void AASIASpawner::Tick(float DeltaSeconds)
 {
@@ -58,22 +78,35 @@ void AASIASpawner::Tick(float DeltaSeconds)
 	} else if (m_SpawnType == ESpawnType::VE_SpawnInTheAir) {
 		SpawnAIInTheAir();
 	}
-	
 }
 
 void AASIASpawner::ChangeSpawnZone()
 {
-	
+	UE_LOG(LogTemp, Warning, TEXT("ChangeSpawnZone"));
 	if (m_SpawnZone == ESPawnZone::VE_Box) {
-		if (!m_SpawnZoneComponent->IsA<UBoxComponent>()) {
-			if (m_SpawnZoneComponent) m_SpawnZoneComponent->DestroyComponent();
+		if (IsValid(m_SpawnZoneComponent) && !m_SpawnZoneComponent->IsA<UBoxComponent>()) {
+			m_SpawnZoneComponent->DestroyComponent();
 			m_SpawnZoneComponent = NewObject<UBoxComponent>(this);
+			CastChecked<UBoxComponent>(m_SpawnZoneComponent)->SetBoxExtent(m_BoxExtend);
+		} 
+	} else if (m_SpawnZone == ESPawnZone::VE_Sphere) {
+		if (IsValid(m_SpawnZoneComponent) && !m_SpawnZoneComponent->IsA<USphereComponent>()) {
+			m_SpawnZoneComponent->DestroyComponent();
+			m_SpawnZoneComponent = NewObject<USphereComponent>(this);
+			CastChecked<USphereComponent>(m_SpawnZoneComponent)->SetSphereRadius(m_SphereRadius);
+		} 
+	}
+}
+
+void AASIASpawner::UpdateSpawnZoneValues()
+{
+	UE_LOG(LogTemp, Warning, TEXT("UpdateSpawnZoneValues"));
+	if (m_SpawnZone == ESPawnZone::VE_Box) {
+		if (IsValid(m_SpawnZoneComponent) && m_SpawnZoneComponent->IsA<UBoxComponent>()) {
 			CastChecked<UBoxComponent>(m_SpawnZoneComponent)->SetBoxExtent(m_BoxExtend);
 		}
 	} else if (m_SpawnZone == ESPawnZone::VE_Sphere) {
-		if (!m_SpawnZoneComponent->IsA<USphereComponent>()) {
-			if (m_SpawnZoneComponent) m_SpawnZoneComponent->DestroyComponent();
-			m_SpawnZoneComponent = NewObject<USphereComponent>(this);
+		if (IsValid(m_SpawnZoneComponent) && m_SpawnZoneComponent->IsA<USphereComponent>()) {
 			CastChecked<USphereComponent>(m_SpawnZoneComponent)->SetSphereRadius(m_SphereRadius);
 		}
 	}
@@ -85,7 +118,6 @@ void AASIASpawner::SpawnAI(FVector Location, FRotator Rotation)
 		UE_LOG(LogTemp, Warning, TEXT("AIPawnClassTOSpawn is NULL!"));
 		return;
 	}
-	
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
@@ -100,21 +132,40 @@ void AASIASpawner::SpawnAI(FVector Location, FRotator Rotation)
 void AASIASpawner::SpawnAIOnGround()
 {
 	// Find a random location in the zone of the m_SpawnZoneComponent and Start a Raycast, if the Raycast hit the ground, spawn the AI here and rotate it to the normal of the hit
+	FVector Location = GetActorLocation();
 	if (m_SpawnZoneComponent->IsA<UBoxComponent>()) {
-		// Cast a raycast from the center of the box to the ground
+		FVector BoxExtent = CastChecked<UBoxComponent>(m_SpawnZoneComponent)->GetScaledBoxExtent();
+		Location = GetActorLocation() + FVector(FMath::RandRange(-BoxExtent.X, BoxExtent.X), FMath::RandRange(-BoxExtent.Y, BoxExtent.Y), 0);
 	} else if (m_SpawnZoneComponent->IsA<USphereComponent>()) {
-		// Cast a raycast from the center of the sphere to the ground
+		// Get a random point in the sphere
+		FVector RandomPoint = FMath::VRand() * m_SphereRadius;
+		Location = GetActorLocation() + RandomPoint;
+	}
+
+	FHitResult Hit;
+	FVector Start = Location;
+	FVector End = Location - GetActorUpVector() * 1000;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+	if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, CollisionParams)) {
+		SpawnAI(Hit.Location, Hit.ImpactNormal.Rotation());
 	}
 }
 
 void AASIASpawner::SpawnAIInTheAir()
 {
 	// Find a random location in the zone of the m_SpawnZoneComponent and spawn the AI if
+	FVector Location = GetActorLocation();
 	if (m_SpawnZoneComponent->IsA<UBoxComponent>()) {
-		
+		FVector BoxExtent = CastChecked<UBoxComponent>(m_SpawnZoneComponent)->GetScaledBoxExtent();
+		Location = GetActorLocation() + FVector(FMath::RandRange(-BoxExtent.X, BoxExtent.X), FMath::RandRange(-BoxExtent.Y, BoxExtent.Y), 0);
 	} else if (m_SpawnZoneComponent->IsA<USphereComponent>()) {
-		
+		// Get a random point in the sphere
+		FVector RandomPoint = FMath::VRand() * m_SphereRadius;
+		Location = GetActorLocation() + RandomPoint;
 	}
+	
+	SpawnAI(Location, GetActorRotation());
 }
 
 void AASIASpawner::OnAIDestroyed(AActor* DestroyedActor)
