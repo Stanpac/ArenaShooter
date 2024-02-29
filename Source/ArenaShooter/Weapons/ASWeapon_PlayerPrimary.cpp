@@ -10,7 +10,6 @@ void AASWeapon_PlayerPrimary::Fire(FVector FireOrigin, FVector FireDirection)
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.bIgnoreTouches = false;
 	CollisionParams.AddIgnoredActor(GetOwner());
-	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Black, TEXT("Fire triggered"));
 	if(m_Sound_ShotFired)
 		{
 			UGameplayStatics::PlaySoundAtLocation(

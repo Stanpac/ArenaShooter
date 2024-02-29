@@ -75,20 +75,23 @@ void AASPawn::OnHealthChanged(float PreviousHealth, float CurrentHealth, float M
 
 void AASPawn::OnDeath(AActor* DeathDealer)
 {
-	// Temporary
-	int randX = FMath::RandRange(-200, 200);
-	int randY = FMath::RandRange(-200, 200);
+	if(IsValid(m_TurretCopy))
+	{
+		int randX = FMath::RandRange(-200, 200);
+		int randY = FMath::RandRange(-200, 200);
 
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-	GetWorld()->SpawnActor<AActor>(m_TurretCopy,GetActorLocation() + FVector(randX,randY, 0),FRotator(0), SpawnParams);
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		GetWorld()->SpawnActor<AActor>(m_TurretCopy,GetActorLocation() + FVector(randX,randY, 0),FRotator(0), SpawnParams);
+	}
 	
 	// end temporary
 	if (m_EventWorldSubSystem) {
 		m_EventWorldSubSystem->BroadcastEnemyDeath();
 	}
-	SetLifeSpan(0.1f);
-	SetActorHiddenInGame(true);
+	Destroy();
+	/*SetLifeSpan(0.1f);
+	SetActorHiddenInGame(true);*/
 }
 
 void AASPawn::SetWidgetVisibility(bool visible)
