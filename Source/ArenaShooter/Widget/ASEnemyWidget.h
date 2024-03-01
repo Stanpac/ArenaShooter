@@ -23,7 +23,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASEnemyWidget", meta = (BindWidget))
 	TObjectPtr<UProgressBar> m_HealthBar;
-	
+
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
 	UASEnemyWidget(const FObjectInitializer& ObjectInitializer);
@@ -31,6 +31,8 @@ public:
 	virtual bool Initialize() override;
 
 	void UpdatehealthBar(float percent);
+
+	void SetHealthBarColor(bool isVulnerable);
 	
 protected:
 	void SethealthBarPercent(float percent);

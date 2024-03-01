@@ -49,8 +49,12 @@ void UASHealthComponent::Damage(float amount, AActor* DamageDealer)
 	float NewHealth = FMath::Clamp(PreviousHealth - (amount * m_DamageMultiplicator), m_MinhHealth, m_MaxHealth);
 
 	m_Health = NewHealth;
+	if(m_Health <= 15)
+		m_IsExecutable = true;
 	OnHealthChanged.Broadcast(PreviousHealth, m_Health, m_MaxHealth, DamageDealer);
 
+
+	
 	if (m_Health <= 0.0f) {
 		OnDeathStarted.Broadcast(GetOwner());
 		Death();

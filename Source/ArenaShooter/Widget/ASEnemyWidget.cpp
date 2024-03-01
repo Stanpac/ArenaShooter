@@ -21,6 +21,14 @@ void UASEnemyWidget::UpdatehealthBar(float percent)
 	SethealthBarPercent(percent);
 }
 
+void UASEnemyWidget::SetHealthBarColor(bool isVulnerable)
+{
+	if(isVulnerable)
+		m_HealthBar->SetFillColorAndOpacity(FColor::Red);
+	else
+		m_HealthBar->SetFillColorAndOpacity(FColor::Green);
+}
+
 void UASEnemyWidget::SethealthBarPercent(float percent)
 {
 	if (m_HealthBar) {

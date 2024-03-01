@@ -38,11 +38,17 @@ AASPawn::AASPawn()
 void AASPawn::BeginPlay()
 {
 	Super::BeginPlay();
+
 	
 	m_EventWorldSubSystem = GetWorld()->GetSubsystem<UASEventWorldSubSystem>();
 	
 	m_HealthBarWidgetComponent->SetWidgetClass(m_HealthBarWidgetClass);
 	m_HealthBarWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+
+	
+	if (UASEnemyWidget* GlobalWidget = CastChecked<UASEnemyWidget>(m_HealthBarWidgetComponent->GetUserWidgetObject())) {
+		GlobalWidget->SetHealthBarColor(m_HealthComponent->GetIsExecutable());
+	}
 	
 	SetWidgetVisibility(false);
 	
@@ -67,6 +73,7 @@ void AASPawn::OnHealthChanged(float PreviousHealth, float CurrentHealth, float M
 		
 		if (UASEnemyWidget* GlobalWidget = CastChecked<UASEnemyWidget>(m_HealthBarWidgetComponent->GetUserWidgetObject())) {
 			GlobalWidget->UpdatehealthBar(CurrentHealth / MaxHealth);
+			GlobalWidget->SetHealthBarColor(m_HealthComponent->GetIsExecutable());
 		}
 	}
 	

@@ -49,6 +49,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Audio", meta = (DisplayName = "Audio On Hit trigger"))
 	USoundBase* m_Sound_Hit;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Health", meta = (DisplayName = "Is Executatble"))
+	bool m_IsExecutable;
 	
 public:
 	// Delegate call when the Death Start
@@ -65,7 +68,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = "ASHealthComponent|Health")
 	static UASHealthComponent* FindHealthComponent(const AActor* Actor) { return (Actor ? Actor->FindComponentByClass<UASHealthComponent>() : nullptr) ;}
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void healing(float amount);
 	
 	UFUNCTION(BlueprintCallable)
@@ -79,4 +82,6 @@ protected:
 
 public:
 	float GetHealth() const { return m_Health; }
+
+	bool GetIsExecutable() const { return m_IsExecutable; }
 };
