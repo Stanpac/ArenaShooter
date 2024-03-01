@@ -22,7 +22,7 @@ protected:
 	int m_MaxSpawnCount = 5;
 
 	UPROPERTY(VisibleAnywhere, Category = "UASTurretSingleSpawner", meta = (DisplayName = "Current Actor Spawned"))
-	TArray<AActor*> m_currentSpawnedActors;
+	AActor* m_currentSpawnedActor;
 	
 	UPROPERTY(VisibleAnywhere, Category = "UASTurretSingleSpawner", meta = (DisplayName = "Spawn Count"))
 	int m_SpawnCount = 0;
