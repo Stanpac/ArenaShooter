@@ -3,13 +3,14 @@
 
 #include "ASPlayerCameraManager.h"
 
+#include "ArenaShooter/Character/ASCharacter.h"
 #include "Camera/CameraModifier.h"
 
 DECLARE_CYCLE_STAT(TEXT("Camera ProcessViewRotation"), STAT_Camera_ProcessViewRotation, STATGROUP_Game);
 
 void AASPlayerCameraManager::ProcessViewRotation(float DeltaTime, FRotator& OutViewRotation, FRotator& OutDeltaRot)
 {
-	/*SCOPE_CYCLE_COUNTER(STAT_Camera_ProcessViewRotation);
+	SCOPE_CYCLE_COUNTER(STAT_Camera_ProcessViewRotation);
 
 	const FRotator OldViewRotation = OutViewRotation;
 
@@ -23,8 +24,7 @@ void AASPlayerCameraManager::ProcessViewRotation(float DeltaTime, FRotator& OutV
 	}
 
 	const APawn* Pawn = GetViewTargetPawn();
-	const ANinjaCharacter* Ninja = Cast<ANinjaCharacter>(Pawn);
-	const FVector ViewPlaneZ = (Pawn == nullptr) ? FVector::ZeroVector : ((Ninja != nullptr) ? Ninja->GetActorAxisZ() : Pawn->GetActorQuat().GetAxisZ());
+	const FVector ViewPlaneZ = (Pawn == nullptr) ? FVector::ZeroVector : Pawn->GetActorQuat().GetAxisZ();
 
 	if (!OutDeltaRot.IsZero()) {
 		// Obtain current view orthonormal axes
@@ -95,7 +95,7 @@ void AASPlayerCameraManager::ProcessViewRotation(float DeltaTime, FRotator& OutV
 			LimitViewYaw(OutViewRotation, ViewYawMin, ViewYawMax);
 			LimitViewRoll(OutViewRotation, ViewRollMin, ViewRollMax);
 		}
-	}*/
+	}
 	
 }
 

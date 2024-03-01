@@ -36,6 +36,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
 	TObjectPtr<UTextBlock> m_SpeedProfile;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
+	TObjectPtr<UImage> m_GravityAbilityImage;
+	
 	/* ---------------------------------- FUNCTIOns --------------------------------------*/
 public:
 	UASGlobalWidget(const FObjectInitializer& ObjectInitializer);
@@ -49,6 +53,9 @@ public:
 	void ChangeCursorVisibility(bool visible);
 
 	void SetSpeedProfile(int profile);
+
+	void SetGravityAbilityImageVisibility(bool visible);
+
 protected:
 };
 

@@ -3,3 +3,7 @@
 
 #include "ASPlayerController.h"
 
+void AASPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+}

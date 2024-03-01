@@ -8,6 +8,8 @@
 #include "GameFramework/Character.h"
 #include "ASCharacter.generated.h"
 
+class USpringArmComponent;
+class UGravitySwitchComponent;
 class UASSpeedComponent;
 class UASGlobalWidget;
 class UASHealthComponent;
@@ -35,6 +37,10 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
 	USkeletalMeshComponent* m_Mesh1P;
 
+	/** Spring Arm Component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Camera", meta = (DisplayName = "Spring Arm Component"))
+	USpringArmComponent* m_SpringArmComponent;
+	
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Camera", meta = (DisplayName = "First Person Camera Component"))
 	UCameraComponent* m_FirstPersonCameraComponent;
@@ -55,6 +61,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Speed", meta = (DisplayName = "SpeedComponent"))
 	UASSpeedComponent* m_SpeedComponent;
 
+	/** Gravity Switch Component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Speed", meta = (DisplayName = "GravitySwitchComponent"))
+	UGravitySwitchComponent* m_GravitySwitchComponent;
+
 	/** Player Widget */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Widget", meta = (DisplayName = "Player Widget"))
 	UASGlobalWidget* M_PlayerWidget;
@@ -67,7 +77,6 @@ protected:
 	
 	/** Event World SubSystem */
 	TObjectPtr<UASEventWorldSubSystem> m_EventWorldSubSystem;
-
 	
 	/* ---------------------- Input To move in component -------------------------------*/
 	
@@ -103,12 +112,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "Switch Gravity Action"))
 	UInputAction* m_switchGravityAction;
 	
-
 	/** CheatSpeed bool */
 	bool SpeedCheatAllowed;
-
-	bool bIsSwitchingGravity;
-
 	
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
@@ -131,7 +136,7 @@ protected:
 	void Look(const FInputActionValue& Value);
 	void Shoot(const FInputActionValue& Value);
 	void Reload(const FInputActionValue& Value);
-	void Switch(const FInputActionValue& Value) const;
+	void Switch(const FInputActionValue& Value);
 	void CloseCombat(const FInputActionValue& Value);
 	void SwitchGravity(const FInputActionValue& Value);
 	
@@ -140,6 +145,12 @@ protected:
 
 	UFUNCTION()
 	virtual void OnEndDeath();
+
+	UFUNCTION()
+	virtual void OnChangeGravity();
+
+	UFUNCTION()
+	virtual void OnAbilityCooldownEnd();
 
 	UFUNCTION()
 	void OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer);

@@ -48,3 +48,12 @@ void UASGlobalWidget::SetSpeedProfile(int profile)
 	}
 }
 
+void UASGlobalWidget::SetGravityAbilityImageVisibility(bool visible)
+{
+	if (m_GravityAbilityImage) {
+		m_GravityAbilityImage->SetIsEnabled(visible);
+	}
+}
+
+
+

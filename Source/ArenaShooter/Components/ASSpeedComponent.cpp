@@ -30,7 +30,6 @@ void UASSpeedComponent::TickComponent(float DeltaTime, ELevelTick TickType,FActo
 
 void UASSpeedComponent::UpdateSpeedProfile(int SpeedProfile)
 {
-	return;
 	if(!IsValid(m_speedProfilData)) {
 		return;
 	}
