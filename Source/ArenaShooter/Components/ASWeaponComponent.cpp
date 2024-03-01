@@ -10,8 +10,7 @@ UASWeaponComponent::UASWeaponComponent()
 
 void UASWeaponComponent::Fire(FVector fireOrigin, FVector fireDirection)
 {
-	if(IsValid(m_CurrentEquipedWeapon))
-	{
+	if(IsValid(m_CurrentEquipedWeapon)) {
 		if(!m_CurrentEquipedWeapon->m_IsReloading && !m_CurrentEquipedWeapon->m_IsWaitingForFireDelay && (!IsValid(m_ASPawnOwner) || !m_ASPawnOwner->GetIsStunned()))
 		{
 			m_CurrentEquipedWeapon->Fire(fireOrigin, fireDirection);
@@ -19,8 +18,7 @@ void UASWeaponComponent::Fire(FVector fireOrigin, FVector fireDirection)
 			OnFireEvent.Broadcast();
 		}
 	}
-	else
-	{
+	else {
 		UE_LOG(LogTemp, Error, TEXT("NO CURRENT WEAPON ON %s"), *GetOwner()->GetName());
 	}
 }
@@ -28,22 +26,18 @@ void UASWeaponComponent::Fire(FVector fireOrigin, FVector fireDirection)
 
 void UASWeaponComponent::Reload()
 {
-	if(!m_CurrentEquipedWeapon->m_IsReloading && m_CurrentEquipedWeapon->m_EnableReload)
-	{
+	if(!m_CurrentEquipedWeapon->m_IsReloading && m_CurrentEquipedWeapon->m_EnableReload) {
 		m_CurrentEquipedWeapon->Reload();
 	}
 }
 
 void UASWeaponComponent::SwitchWeapon()
 {
-	if(m_isPrimaryWeaponEquiped)
-	{
+	if(m_isPrimaryWeaponEquiped){
 		m_CurrentEquipedWeapon->Stach();
 		m_CurrentEquipedWeapon = m_SecondaryWeapon;
 		m_CurrentEquipedWeapon->Equip();
-	}
-	else
-	{
+	} else {
 		m_CurrentEquipedWeapon->Stach();
 		m_CurrentEquipedWeapon = m_PrimaryWeapon;
 		m_CurrentEquipedWeapon->Equip();
@@ -60,20 +54,15 @@ void UASWeaponComponent::InitializeWeapon()
 	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 
-	if(IsValid(m_primaryWeaponBlueprint))
-	{
+	if(IsValid(m_primaryWeaponBlueprint)) {
 		m_PrimaryWeapon = GetWorld()->SpawnActor<AASWeapon>(m_primaryWeaponBlueprint, params);
-		if(IsValid(m_PrimaryWeapon))
-		{
+		if(IsValid(m_PrimaryWeapon)) {
 			//m_PrimaryWeapon->SetHidden(true);
-			if(GetOwner()->IsA<ACharacter>())
-			{
+			if(GetOwner()->IsA<ACharacter>()) {
 				USceneComponent* parent = CastChecked<AASCharacter>(GetOwner())->GetMesh1P();
 				m_PrimaryWeapon->Owner = parent->GetAttachmentRootActor();
 				m_PrimaryWeapon->AttachToComponent(parent, AttachmentRules, TEXT("WeaponSocket"));
-			}
-			else
-			{
+			} else {
 				m_PrimaryWeapon->Owner = GetOwner();
 				m_PrimaryWeapon->AttachToActor(GetOwner(), AttachmentRules);
 				m_PrimaryWeapon->SetActorScale3D(m_ScaleOffset);
@@ -81,15 +70,11 @@ void UASWeaponComponent::InitializeWeapon()
 				m_PrimaryWeapon->SetActorLocation(GetOwner()->GetActorLocation() + m_PositionOffset);
 			}
 			m_CurrentEquipedWeapon = m_PrimaryWeapon;
-		}
-		else
-		{
+		} else {
 			UE_LOG(LogTemp, Error, TEXT("No Primary Weapon Spawned"));
 			return;
 		}
-	}
-	else
-	{
+	} else {
 		UE_LOG(LogTemp, Error, TEXT("No Blueprint for primary Weapon"));
 		return;
 	}

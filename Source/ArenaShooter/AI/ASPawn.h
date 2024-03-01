@@ -14,6 +14,7 @@ class UWidgetComponent;
 class UUserWidget;
 class UASEventWorldSubSystem;
 class UASWeaponComponent;
+class USceneComponent;
 
 
 UCLASS()
@@ -22,7 +23,7 @@ class ARENASHOOTER_API AASPawn : public APawn
 	GENERATED_BODY()
 	/* ---------------------------------- MEMBERS --------------------------------------*/
 protected:
-
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASPawn|Components", meta = (DisplayName = "MeshComponent"))
 	UStaticMeshComponent* m_MeshComponent;
 	
