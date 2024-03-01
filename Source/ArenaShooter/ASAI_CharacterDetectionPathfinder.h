@@ -20,14 +20,25 @@ struct FPathfindingPoint
 		m_DistanceToOrigin = 0;
 		m_IsChecked = false;
 		m_previousPoint = FInt32Vector(-1, 0, 0);
+		m_Coordinates = FInt32Vector(-1, 0, 0);
 	}
 	
-	FPathfindingPoint(bool IsInWall)
+	FPathfindingPoint(FInt32Vector Coordinates)
+	{
+		m_IsInWall = true;
+		m_DistanceToOrigin = 0;
+		m_IsChecked = false;
+		m_previousPoint = FInt32Vector(-1, 0, 0);
+		m_Coordinates = Coordinates;
+	}
+	
+	FPathfindingPoint(bool IsInWall, FInt32Vector Coordinates)
 	{
 		m_IsInWall = IsInWall;
 		m_DistanceToOrigin = 0;
 		m_IsChecked = false;
 		m_previousPoint = FInt32Vector(-1, 0, 0);
+		m_Coordinates = Coordinates;
 	}
 
 	UPROPERTY()
@@ -41,6 +52,9 @@ struct FPathfindingPoint
 
 	UPROPERTY()
 	FInt32Vector m_previousPoint;
+
+	UPROPERTY()
+	FInt32Vector m_Coordinates;
 
 };
 
@@ -64,7 +78,7 @@ public:
 	FVector GetWorldCoordinatesFromPathfindingPoint(FInt32Vector PathfindingPoint) const;
 	
 	UFUNCTION()
-	TArray<FVector> GetPathToCharacterDetectionPoint(const FVector& SourcePosition);
+	TArray<FVector> GetPathToCharacterDetectionPoint(const FVector SourcePosition);
 
 	UFUNCTION()
 	TArray<FInt32Vector> CheckAllAdjacentPointsDetection(FInt32Vector previousPoint);
@@ -79,11 +93,18 @@ public:
 	UPROPERTY()
 	UAS_AIDetection_DataAsset* m_dataAsset;
 
+	UFUNCTION()
+	FInt32Vector IndexToCoordinates(int32 index) const;
 
+	UFUNCTION()
+	int32 CoordinatesToIndex(FInt32Vector point) const;
+
+	UFUNCTION()
+	FVector PathfindingCoordinatesToWorldCoordinates(FInt32Vector point) const;
 	
 private:
 	UPROPERTY()
-	TMap<FInt32Vector, FPathfindingPoint> m_PathfindingData;
+	TArray<FPathfindingPoint> m_PathfindingData;
 
 	UPROPERTY()
 	bool m_IsPointFound;
@@ -92,7 +113,7 @@ private:
 	ACharacter* m_character;
 	
 public:
-	TMap<FInt32Vector, FPathfindingPoint> GetPathfindingData()
+	TArray<FPathfindingPoint> GetPathfindingData()
 	{
 		return m_PathfindingData;
 	}

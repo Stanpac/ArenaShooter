@@ -13,6 +13,7 @@ class UStaticMeshComponent;
 class UWidgetComponent;
 class UUserWidget;
 class UASEventWorldSubSystem;
+class UASWeaponComponent;
 
 
 UCLASS()
@@ -30,6 +31,9 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASPawn|Components", meta = (DisplayName = "HealthComponent"))
 	UASHealthComponent* m_HealthComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASPawn|Components", meta = (DisplayName = "WeaponComponent"))
+	UASWeaponComponent* m_WeaponComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASPawn|Components", meta = (DisplayName = "HealthVisibilitySphereComponent"))
 	USphereComponent* m_HealthVisibilitySphereComponent;
