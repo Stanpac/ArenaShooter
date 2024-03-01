@@ -16,7 +16,7 @@ class ARENASHOOTER_API AASTurretSingleSpawner : public AActor
 	/* ---------------------------------- MEMBERS -------------------------------------- */
 protected:
 	UPROPERTY(EditAnywhere, Category = "UASTurretSingleSpawner", meta = (DisplayName = "AI Pawn Class To Spawn"))
-	TSoftClassPtr<APawn> m_AIPawnClassTOSpawn;
+	TSubclassOf<APawn> m_AIPawnClassTOSpawn;
 
 	UPROPERTY(EditAnywhere, Category = "UASTurretSingleSpawner", meta = (DisplayName = "Spawn Zone"))
 	TObjectPtr<USphereComponent> m_SpawnZone;

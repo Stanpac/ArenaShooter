@@ -13,7 +13,7 @@ class ARENASHOOTER_API AASDroneSpawner : public AActor
 	/* ---------------------------------- MEMBERS -------------------------------------- */
 protected:
 	UPROPERTY(EditAnywhere, Category = "AASDroneSpawner", meta = (DisplayName = "AI Pawn Class To Spawn"))
-	TSoftClassPtr<APawn> m_AIPawnClassTOSpawn;
+	TSubclassOf<APawn> m_AIPawnClassTOSpawn;
 
 	UPROPERTY(EditAnywhere, Category = "UASTurretSingleSpawner", meta = (DisplayName = "Spawn Delay"))
 	float m_SpawnDelay = 5.0f;

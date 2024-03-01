@@ -21,7 +21,7 @@ void AASTurretSingleSpawner::SpawnAI()
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-	AActor* Actor = GetWorld()->SpawnActor<AActor>(m_AIPawnClassTOSpawn.Get(), GetActorLocation() + m_SpawnLocation, FRotator::ZeroRotator, SpawnParams);
+	AActor* Actor = GetWorld()->SpawnActor<AActor>(m_AIPawnClassTOSpawn, GetActorLocation() + m_SpawnLocation, FRotator::ZeroRotator, SpawnParams);
 	if (Actor != nullptr) {
 		CanSpawn = false;
 		m_CurrentActorSpawned = Actor;
