@@ -127,7 +127,7 @@ void AASPawn::StunTick(float DeltaTime)
 void AASPawn::SetWidgetVisibility(bool visible)
 {
 	if (m_HealthBarWidgetComponent) {
-		//GEngine->AddOnScreenDebugMessage(3, 2.0f, FColor::Green, "Setvisibility");
+
 		m_HealthBarWidgetComponent->SetVisibility(visible);
 	}
 }
@@ -141,7 +141,6 @@ void AASPawn::SetWidgetVisibilityfalse()
 
 void AASPawn::OnHealthVisibilitySphereComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent,AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,const FHitResult& SweepResult)
 {
-	//GEngine->AddOnScreenDebugMessage(4, 2.0f, FColor::Red, "OnHealthVisibilitySphereComponentBeginOverlap");
 	if (OtherActor == this) {
 		return;
 	}
@@ -150,7 +149,6 @@ void AASPawn::OnHealthVisibilitySphereComponentBeginOverlap(UPrimitiveComponent*
 
 void AASPawn::OnHealthVisibilitySphereComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	//GEngine->AddOnScreenDebugMessage(5, 2.0f, FColor::Red, "OnHealthVisibilitySphereComponentEndOverlap");
 	if (OtherActor == this) {
 		return;
 	}

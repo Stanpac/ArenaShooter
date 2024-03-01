@@ -15,7 +15,8 @@ void UASWeaponComponent::Fire(FVector fireOrigin, FVector fireDirection)
 		if(!m_CurrentEquipedWeapon->m_IsReloading && !m_CurrentEquipedWeapon->m_IsWaitingForFireDelay && (!IsValid(m_ASPawnOwner) || !m_ASPawnOwner->GetIsStunned()))
 		{
 			m_CurrentEquipedWeapon->Fire(fireOrigin, fireDirection);
-			//GEngine->AddOnScreenDebugMessage(0, 1, FColor::Blue, TEXT("Fire"));
+			
+			OnFireEvent.Broadcast();
 		}
 	}
 	else
@@ -67,7 +68,7 @@ void UASWeaponComponent::InitializeWeapon()
 			//m_PrimaryWeapon->SetHidden(true);
 			if(GetOwner()->IsA<ACharacter>())
 			{
-				USceneComponent* parent = CastChecked<ACharacter>(GetOwner())->GetMesh();
+				USceneComponent* parent = CastChecked<AASCharacter>(GetOwner())->GetMesh1P();
 				m_PrimaryWeapon->Owner = parent->GetAttachmentRootActor();
 				m_PrimaryWeapon->AttachToComponent(parent, AttachmentRules, TEXT("WeaponSocket"));
 			}

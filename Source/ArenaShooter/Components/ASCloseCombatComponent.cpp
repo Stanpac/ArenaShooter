@@ -45,6 +45,7 @@ void UASCloseCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType
 void UASCloseCombatComponent::StartCloseCombatAttack()
 {
 	CooldownTrigger();
+	OnStartCloseCombatAttack.Broadcast();
 	const FVector Start = GetOwner()->GetActorLocation();
 	const FVector ForwardVector = GetOwner()->GetActorForwardVector();
 	const FVector End = Start + (ForwardVector * m_AttackRange);
