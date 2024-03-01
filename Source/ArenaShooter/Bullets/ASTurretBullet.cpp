@@ -22,6 +22,7 @@ AASTurretBullet::AASTurretBullet(): m_Speed(10)
 void AASTurretBullet::BeginPlay()
 {
 	Super::BeginPlay();
+	if(!IsValid(m_Character)) return;
 	m_Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	const FVector LookAtLocation = m_Character->GetActorLocation();
 	const FVector PawnLocation = GetActorLocation();

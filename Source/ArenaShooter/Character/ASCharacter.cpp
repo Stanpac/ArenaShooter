@@ -219,6 +219,22 @@ void AASCharacter::SwitchGravity(const FInputActionValue& Value)
 
 void AASCharacter::OnStartDeath(AActor* OwningActor)
 {
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	// Get the name of the current level.
+	FString CurrentLevelName = World->GetMapName();
+	CurrentLevelName.RemoveFromStart(World->StreamingLevelsPrefix);
+
+	// Convert the name into a format that can be used for loading.
+	FName LevelName(*CurrentLevelName);
+
+	// Use the GameplayStatics class to load the level.
+	UGameplayStatics::OpenLevel(World, LevelName);
+	if (m_EventWorldSubSystem) {
+		m_EventWorldSubSystem->BroadcastPlayerEndDeath();
+	}
+	
 	//TODO : Should be moved In a Player Class if there is
 	if (m_EventWorldSubSystem) {
 		m_EventWorldSubSystem->BroadcastPlayerStartDeath();
@@ -241,9 +257,8 @@ void AASCharacter::OnStartDeath(AActor* OwningActor)
 void AASCharacter::OnEndDeath()
 {
 	//TODO : Should be moved In a Player Class if there is
-	if (m_EventWorldSubSystem) {
-		m_EventWorldSubSystem->BroadcastPlayerEndDeath();
-	}
+
+	GEngine->AddOnScreenDebugMessage(0, 10, FColor::Red, TEXT("DIE"));
 	//end
 	UWorld* World = GetWorld();
 	if (!World) return;
@@ -257,6 +272,9 @@ void AASCharacter::OnEndDeath()
 
 	// Use the GameplayStatics class to load the level.
 	UGameplayStatics::OpenLevel(World, LevelName);
+	if (m_EventWorldSubSystem) {
+		m_EventWorldSubSystem->BroadcastPlayerEndDeath();
+	}
 	//SetLifeSpan(0.1f);
 	//SetActorHiddenInGame(true);
 }

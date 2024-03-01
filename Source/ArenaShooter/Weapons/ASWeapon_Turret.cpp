@@ -14,7 +14,7 @@ void AASWeapon_Turret::Fire(FVector FireOrigin, FVector FireDirection)
 	params.ObjectFlags |= RF_Transient;
 	params.bNoFail = true;
 	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	if(IsValid(m_BulletBP))
+	if(IsValid(m_BulletBP) && IsValid(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)))
 	{
 		const ACharacter* m_Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 		const FVector LookAtLocation = m_Character->GetActorLocation();
