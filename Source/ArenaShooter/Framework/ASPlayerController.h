@@ -13,5 +13,9 @@ UCLASS()
 class ARENASHOOTER_API AASPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-	
+	/* ---------------------------------- MEMBERS --------------------------------------*/
+protected:
+	/* ---------------------------------- FUNCTIONS --------------------------------------*/
+public :
+	virtual void BeginPlay() override;
 };
