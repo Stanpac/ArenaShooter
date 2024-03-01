@@ -52,7 +52,9 @@ private:
 	TArray<FSpeedProfile> m_SpeedProfiles;
 
 public:
-	FSpeedProfile GetSpeedProfile(int SpeedProfile);
+	UFUNCTION()
+	FORCEINLINE FSpeedProfile GetSpeedProfile(int SpeedProfile);
 
+	UFUNCTION()
 	FORCEINLINE int GetSpeedProfileCount() const { return m_SpeedProfiles.Num(); }
 };

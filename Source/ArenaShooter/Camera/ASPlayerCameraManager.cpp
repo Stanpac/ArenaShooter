@@ -2,7 +2,6 @@
 
 
 #include "ASPlayerCameraManager.h"
-
 #include "Camera/CameraModifier.h"
 
 DECLARE_CYCLE_STAT(TEXT("Camera ProcessViewRotation"), STAT_Camera_ProcessViewRotation, STATGROUP_Game);

@@ -30,7 +30,7 @@ void UASSpeedComponent::TickComponent(float DeltaTime, ELevelTick TickType,FActo
 
 void UASSpeedComponent::UpdateSpeedProfile(int SpeedProfile)
 {
-	if (IsValid(m_speedProfilData)) {
+	if (m_speedProfilData == nullptr) {
 		UE_LOG(LogTemp, Warning, TEXT("SpeedProfileData is not set!"));
 		return;
 	}
