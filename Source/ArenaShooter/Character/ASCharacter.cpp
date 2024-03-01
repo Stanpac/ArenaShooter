@@ -135,6 +135,9 @@ void AASCharacter::BeginPlay()
 	m_HealthComponent->OnHealthChanged.AddDynamic(this, &AASCharacter::OnHealthChanged);
 	
 	m_WeaponComponent->InitializeWeapon();
+	m_WeaponComponent->OnFireEvent.AddDynamic(this, &AASCharacter::OnFire);
+
+	m_CloseCombatComponent->OnStartCloseCombatAttack.AddDynamic(this, &AASCharacter::OnAttack);
 
 	m_GravitySwitchComponent->OnSwitchGravity.AddDynamic(this, &AASCharacter::OnChangeGravity);
 	m_GravitySwitchComponent->OnSwitchGravityAbiltyCooldownEnd.AddDynamic(this, &AASCharacter::OnAbilityCooldownEnd);
@@ -243,6 +246,22 @@ void AASCharacter::OnEndDeath()
 	//end
 	SetLifeSpan(0.1f);
 	SetActorHiddenInGame(true);
+}
+
+void AASCharacter::OnFire()
+{
+	UAnimInstance* AnimInstance = GetMesh1P()->GetAnimInstance();
+	if (!IsValid(AnimInstance)) return;
+	
+	const float MontageLength = AnimInstance->Montage_Play(m_FireMontage, 1.0f, EMontagePlayReturnType::MontageLength, 0.0f, true);
+}
+
+void AASCharacter::OnAttack()
+{
+	UAnimInstance* AnimInstance = GetMesh1P()->GetAnimInstance();
+	if (!IsValid(AnimInstance)) return;
+	
+	const float MontageLength = AnimInstance->Montage_Play(m_CacAttackMontage, 1.0f, EMontagePlayReturnType::MontageLength, 0.0f, true);
 }
 
 void AASCharacter::OnChangeGravity()

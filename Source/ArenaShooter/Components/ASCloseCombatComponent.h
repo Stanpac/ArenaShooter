@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "ASCloseCombatComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FWeaponComponent_OnStartCloseCombatAttackEvent);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ARENASHOOTER_API UASCloseCombatComponent : public UActorComponent
@@ -66,4 +67,7 @@ public:
 	/** Sound Played when performing a successful close combat attack**/
 	UPROPERTY(EditAnywhere, Category="Feedbacks", meta = (DisplayName="Hit Attack Sound"))
 	USoundBase* m_Sound_SuccessfulCloseCombatAttack;
+
+	UPROPERTY(BlueprintAssignable)
+	FWeaponComponent_OnStartCloseCombatAttackEvent OnStartCloseCombatAttack;
 };
