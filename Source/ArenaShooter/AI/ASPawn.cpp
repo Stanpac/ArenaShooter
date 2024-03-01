@@ -6,7 +6,6 @@
 #include "ArenaShooter/Components/ASHealthComponent.h"
 #include "ArenaShooter/Components/ASWeaponComponent.h"
 #include "ArenaShooter/SubSystem/ASEventWorldSubSystem.h"
-#include "ArenaShooter/Weapons/ASWeapon.h"
 #include "ArenaShooter/Widget/ASEnemyWidget.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
@@ -17,7 +16,6 @@ AASPawn::AASPawn()
 {
 	m_CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
 	m_CapsuleComponent->SetCollisionProfileName("Pawn");
-	RootComponent = m_CapsuleComponent;
 
 	m_MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
 	m_MeshComponent->SetupAttachment(m_CapsuleComponent);
@@ -96,23 +94,12 @@ void AASPawn::OnHealthChanged(float PreviousHealth, float CurrentHealth, float M
 
 void AASPawn::OnDeath(AActor* DeathDealer)
 {
-	if(IsValid(m_TurretCopy))
-	{
-		int randX = FMath::RandRange(-200, 200);
-		int randY = FMath::RandRange(-200, 200);
-
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-		GetWorld()->SpawnActor<AActor>(m_TurretCopy,GetActorLocation() + FVector(randX,randY, 0),FRotator(0), SpawnParams);
-	}
-	
-	// end temporary
 	if (m_EventWorldSubSystem) {
 		m_EventWorldSubSystem->BroadcastEnemyDeath();
 	}
-	Destroy();
-	/*SetLifeSpan(0.1f);
-	SetActorHiddenInGame(true);*/
+	
+	SetLifeSpan(0.1f);
+	SetActorHiddenInGame(true);
 }
 
 void AASPawn::StunTick(float DeltaTime)
