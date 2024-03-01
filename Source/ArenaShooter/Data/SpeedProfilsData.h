@@ -40,7 +40,6 @@ struct FSpeedProfile
 	
 	UPROPERTY(EditAnywhere, meta = (DisplayName = "SpeedBar Value Max"));
 	float m_SpeedBarValueMax = 1000.f;
-
 };
 
 UCLASS()
@@ -53,7 +52,9 @@ private:
 	TArray<FSpeedProfile> m_SpeedProfiles;
 
 public:
-	FSpeedProfile GetSpeedProfile(int SpeedProfile);
+	UFUNCTION()
+	FORCEINLINE FSpeedProfile GetSpeedProfile(int SpeedProfile);
 
-	int GetSpeedProfileCount() { return m_SpeedProfiles.Num(); }
+	UFUNCTION()
+	FORCEINLINE int GetSpeedProfileCount() const { return m_SpeedProfiles.Num(); }
 };

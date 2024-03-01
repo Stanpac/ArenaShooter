@@ -30,7 +30,8 @@ void UASSpeedComponent::TickComponent(float DeltaTime, ELevelTick TickType,FActo
 
 void UASSpeedComponent::UpdateSpeedProfile(int SpeedProfile)
 {
-	if(!IsValid(m_speedProfilData)) {
+	if (m_speedProfilData == nullptr) {
+		UE_LOG(LogTemp, Warning, TEXT("SpeedProfileData is not set!"));
 		return;
 	}
 	
@@ -42,16 +43,17 @@ void UASSpeedComponent::UpdateSpeedProfile(int SpeedProfile)
 	FSpeedProfile profile = m_speedProfilData->GetSpeedProfile(SpeedProfile);
 	m_CurrentSpeedProfile = profile.m_SpeedProfile;
 	if (AASCharacter* character = CastChecked<AASCharacter>(GetOwner())) {
-		UCharacterMovementComponent* MoveComp = character->GetCharacterMovement();
-		MoveComp->MaxAcceleration = profile.m_MaxAcceleration;
-		MoveComp->MaxWalkSpeed = profile.m_MaxWalkSpeed;
-		MoveComp->Mass = profile.m_Mass;
-		MoveComp->GravityScale = profile.m_Gravity;
-		MoveComp->JumpZVelocity = profile.m_JumpZ;
-		MoveComp->AirControl = profile.m_AirControl;
-		MoveComp->BrakingDecelerationFalling = profile.m_BreakingDecelerationFalling;
-		UpdateSpeedBarMaxValue(profile.m_SpeedBarValueMax);
-		m_SpeedBarDecreasRate = profile.m_SpeedBarDecreasRate;
+		if (UCharacterMovementComponent* MoveComp = character->GetCharacterMovement()) {
+			MoveComp->MaxAcceleration = profile.m_MaxAcceleration;
+			MoveComp->MaxWalkSpeed = profile.m_MaxWalkSpeed;
+			MoveComp->Mass = profile.m_Mass;
+			MoveComp->GravityScale = profile.m_Gravity;
+			MoveComp->JumpZVelocity = profile.m_JumpZ;
+			MoveComp->AirControl = profile.m_AirControl;
+			MoveComp->BrakingDecelerationFalling = profile.m_BreakingDecelerationFalling;
+			UpdateSpeedBarMaxValue(profile.m_SpeedBarValueMax);
+			m_SpeedBarDecreasRate = profile.m_SpeedBarDecreasRate;
+		}
 	}
 
 	OnUpdateSpeedProfile.Broadcast(m_CurrentSpeedProfile);
