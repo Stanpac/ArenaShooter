@@ -2,9 +2,6 @@
 
 
 #include "ASPlayerCameraManager.h"
-
-#include "IXRTrackingSystem.h"
-#include "NinjaCharacter.h"
 #include "Camera/CameraModifier.h"
 
 DECLARE_CYCLE_STAT(TEXT("Camera ProcessViewRotation"), STAT_Camera_ProcessViewRotation, STATGROUP_Game);
@@ -27,12 +24,10 @@ void AASPlayerCameraManager::ProcessViewRotation(float DeltaTime, FRotator& OutV
 	}
 
 	const APawn* Pawn = GetViewTargetPawn();
-	const ANinjaCharacter* Ninja = Cast<ANinjaCharacter>(Pawn);
-	const FVector ViewPlaneZ = (Pawn == nullptr) ? FVector::ZeroVector :
-		((Ninja != nullptr) ? Ninja->GetActorAxisZ() : Pawn->GetActorQuat().GetAxisZ());
-	
-	if (!OutDeltaRot.IsZero())
-	{
+	const FVector ViewPlaneZ = (Pawn == nullptr) ? FVector::ZeroVector : Pawn->GetActorQuat().GetAxisZ();
+
+	if (!OutDeltaRot.IsZero()) {
+
 		// Obtain current view orthonormal axes
 		FVector ViewRotationX, ViewRotationY, ViewRotationZ;
 		FRotationMatrix(OutViewRotation).GetUnitAxes(ViewRotationX, ViewRotationY, ViewRotationZ);
@@ -63,7 +58,7 @@ void AASPlayerCameraManager::ProcessViewRotation(float DeltaTime, FRotator& OutV
 		// Consume delta rotation
 		OutDeltaRot = FRotator::ZeroRotator;
 	}
-
+	
 	if (OutViewRotation != OldViewRotation)
 	{
 		if (!ViewPlaneZ.IsZero())

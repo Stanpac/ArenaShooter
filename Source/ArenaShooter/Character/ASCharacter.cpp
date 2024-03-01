@@ -4,11 +4,11 @@
 #include "ArenaShooter/Character/ASCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "NinjaCharacterMovementComponent.h"
 #include "ArenaShooter/Components/ASCloseCombatComponent.h"
 #include "ArenaShooter/Components/ASHealthComponent.h"
 #include "ArenaShooter/Components/ASSpeedComponent.h"
 #include "ArenaShooter/Components/ASWeaponComponent.h"
+#include "ArenaShooter/Components/GravitySwitchComponent.h"
 #include "ArenaShooter/SubSystem/ASEventWorldSubSystem.h"
 #include "ArenaShooter/Widget/ASGlobalWidget.h"
 #include "Camera/CameraComponent.h"
@@ -18,7 +18,7 @@
 #include "GameFramework/SpringArmComponent.h"
 
 
-AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+AASCharacter::AASCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	PrimaryActorTick.bStartWithTickEnabled = false;
@@ -26,7 +26,7 @@ AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(
 	UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
 	check(CapsuleComp);
 	CapsuleComp->InitCapsuleSize(40.0f, 90.0f);
-
+	
 	// Character Movement (Lyra Params)
 	UCharacterMovementComponent* MoveComp = CastChecked<UCharacterMovementComponent>(GetCharacterMovement());
 	MoveComp->GravityScale = 1.0f;
@@ -35,26 +35,19 @@ AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(
 	MoveComp->BrakingFriction = 6.0f;
 	MoveComp->GroundFriction = 8.0f;
 	MoveComp->BrakingDecelerationWalking = 1400.0f;
-	MoveComp->bUseControllerDesiredRotation = false;
+	MoveComp->bUseControllerDesiredRotation = true;
 	MoveComp->bOrientRotationToMovement = false;
 	MoveComp->RotationRate = FRotator(0.0f, 720.0f, 0.0f);
 	MoveComp->bAllowPhysicsRotationDuringAnimRootMotion = false;
-	MoveComp->GetNavAgentPropertiesRef().bCanCrouch = true;
-	MoveComp->bCanWalkOffLedgesWhenCrouching = true;
-	MoveComp->SetCrouchedHalfHeight(65.0f);
 	
-	// Ninja Component (Temp)
-	UNinjaCharacterMovementComponent* NinjaMoveComp = CastChecked<UNinjaCharacterMovementComponent>(GetCharacterMovement());
-	NinjaMoveComp->SetAlignGravityToBase(true);
-	NinjaMoveComp->SetAlignComponentToGravity(true);
-	NinjaMoveComp->bAlwaysRotateAroundCenter = true;
+	m_SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
+	m_SpringArmComponent->SetupAttachment(CapsuleComp);
+	m_SpringArmComponent->bUsePawnControlRotation = true;
+	m_SpringArmComponent->TargetArmLength = 0.f;
 	
 	m_FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-	m_FirstPersonCameraComponent->SetupAttachment(CapsuleComp);
-	m_FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 40.f));
-	m_FirstPersonCameraComponent->bUsePawnControlRotation = true;
-
-	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
+	m_FirstPersonCameraComponent->SetupAttachment(m_SpringArmComponent, USpringArmComponent::SocketName);
+	
 	m_Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
 	m_Mesh1P->SetOnlyOwnerSee(true);
 	m_Mesh1P->SetupAttachment(m_FirstPersonCameraComponent);
@@ -68,6 +61,7 @@ AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(
 	m_WeaponComponent = CreateDefaultSubobject<UASWeaponComponent>(TEXT("WeaponComponent"));
 	m_CloseCombatComponent = CreateDefaultSubobject<UASCloseCombatComponent>(TEXT("CloseCombatComponent"));
 	m_SpeedComponent = CreateDefaultSubobject<UASSpeedComponent>(TEXT("SpeedComponent"));
+	m_GravitySwitchComponent = CreateDefaultSubobject<UGravitySwitchComponent>(TEXT("GravitySwitchComponent"));
 
 }
 
@@ -93,6 +87,8 @@ void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 		// CloseCombat
 		EnhancedInputComponent->BindAction(m_CloseCombatAction, ETriggerEvent::Triggered, this, &AASCharacter::CloseCombat);
+		
+		EnhancedInputComponent->BindAction(m_switchGravityAction, ETriggerEvent::Triggered, this, &AASCharacter::SwitchGravity);
 		
 		// Switching Weapon
 		//EnhancedInputComponent->BindAction(m_switchWeaponAction, ETriggerEvent::Triggered, this, &AASCharacter::SwitchWeapon);
@@ -139,6 +135,9 @@ void AASCharacter::BeginPlay()
 	m_HealthComponent->OnHealthChanged.AddDynamic(this, &AASCharacter::OnHealthChanged);
 	
 	m_WeaponComponent->InitializeWeapon();
+
+	m_GravitySwitchComponent->OnSwitchGravity.AddDynamic(this, &AASCharacter::OnChangeGravity);
+	m_GravitySwitchComponent->OnSwitchGravityAbiltyCooldownEnd.AddDynamic(this, &AASCharacter::OnAbilityCooldownEnd);
 }
 
 void AASCharacter::GetAllSubsystem()
@@ -149,7 +148,7 @@ void AASCharacter::GetAllSubsystem()
 void AASCharacter::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
-
+	
 	if (Controller != nullptr) {
 		if (MovementVector.X != 0.0f) {
 			AddMovementInput(GetActorRightVector(), MovementVector.X);
@@ -163,17 +162,19 @@ void AASCharacter::Move(const FInputActionValue& Value)
 
 void AASCharacter::Look(const FInputActionValue& Value)
 {
-	// Get Camera And Ad it manually
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
-
-	if (Controller != nullptr) {
-		if (LookAxisVector.X != 0.0f) {
-			AddControllerYawInput(LookAxisVector.X);
+	if (m_GravitySwitchComponent) {
+		if (GetGravityDirection() != m_GravitySwitchComponent->GetBaseGravityDirection()) {
+			LookAxisVector = FVector2D(-LookAxisVector.X, -LookAxisVector.Y);
 		}
+	}
+	
+	if (LookAxisVector.X != 0.0f) {
+		AddControllerYawInput(LookAxisVector.X);
+	}
 
-		if (LookAxisVector.Y != 0.0f) {
-			AddControllerPitchInput(LookAxisVector.Y);
-		}
+	if (LookAxisVector.Y != 0.0f) {
+		m_SpringArmComponent->AddRelativeRotation(FRotator(FMath::Clamp(-LookAxisVector.Y, -85, 85), 0.0f, 0.0f));
 	}
 }
 
@@ -194,7 +195,7 @@ void AASCharacter::Reload(const FInputActionValue& Value)
 	m_WeaponComponent->Reload();
 }
 
-void AASCharacter::Switch(const FInputActionValue& Value) const
+void AASCharacter::Switch(const FInputActionValue& Value) 
 {
 	m_WeaponComponent->SwitchWeapon();		
 }
@@ -203,6 +204,13 @@ void AASCharacter::CloseCombat(const FInputActionValue& Value)
 {
 	if(m_CloseCombatComponent->m_CanAttack)
 		m_CloseCombatComponent->StartCloseCombatAttack();
+}
+
+void AASCharacter::SwitchGravity(const FInputActionValue& Value)
+{
+	if (m_GravitySwitchComponent) {
+		m_GravitySwitchComponent->SwitchGravity();
+	}
 }
 
 void AASCharacter::OnStartDeath(AActor* OwningActor)
@@ -221,9 +229,9 @@ void AASCharacter::OnStartDeath(AActor* OwningActor)
 	CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 
-	UCharacterMovementComponent* LyraMoveComp = GetCharacterMovement();
-	LyraMoveComp->StopMovementImmediately();
-	LyraMoveComp->DisableMovement();
+	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
+	MoveComp->StopMovementImmediately();
+	MoveComp->DisableMovement();
 }
 
 void AASCharacter::OnEndDeath()
@@ -235,6 +243,18 @@ void AASCharacter::OnEndDeath()
 	//end
 	SetLifeSpan(0.1f);
 	SetActorHiddenInGame(true);
+}
+
+void AASCharacter::OnChangeGravity()
+{
+	// Call when the Gravity Switch Start
+	GetPlayerWidget()->SetGravityAbilityImageVisibility(false);
+}
+
+void AASCharacter::OnAbilityCooldownEnd()
+{
+	// Call when the Gravity Switch Cooldown End
+	GetPlayerWidget()->SetGravityAbilityImageVisibility(true);
 }
 
 void AASCharacter::OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth,AActor* DamageDealer)
@@ -269,6 +289,6 @@ void AASCharacter::RemoveDefaultMappingContext()
 		}
 	}
 }
-
+	
 
 
