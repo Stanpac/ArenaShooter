@@ -16,6 +16,7 @@
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 
 AASCharacter::AASCharacter()
@@ -244,8 +245,20 @@ void AASCharacter::OnEndDeath()
 		m_EventWorldSubSystem->BroadcastPlayerEndDeath();
 	}
 	//end
-	SetLifeSpan(0.1f);
-	SetActorHiddenInGame(true);
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	// Get the name of the current level.
+	FString CurrentLevelName = World->GetMapName();
+	CurrentLevelName.RemoveFromStart(World->StreamingLevelsPrefix);
+
+	// Convert the name into a format that can be used for loading.
+	FName LevelName(*CurrentLevelName);
+
+	// Use the GameplayStatics class to load the level.
+	UGameplayStatics::OpenLevel(World, LevelName);
+	//SetLifeSpan(0.1f);
+	//SetActorHiddenInGame(true);
 }
 
 void AASCharacter::OnFire()
