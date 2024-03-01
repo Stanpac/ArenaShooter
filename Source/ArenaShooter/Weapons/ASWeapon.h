@@ -65,6 +65,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Reload", meta=(DisplayName = "Is Reloading ?"))
 	bool m_IsReloading;
 
+
+
+	/** How long will targets be stunned when hit **/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stun", meta=(DisplayName = "Ennemy Stun Duration On Hit"))
+	float m_OnHitStunDuration = 0;
+	
 	/** Sound when shot is fired **/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feedback", meta=(DisplayName = "Fire Sound"))
 	USoundBase* m_Sound_ShotFired;
@@ -82,7 +88,7 @@ protected:
 
 	UFUNCTION()
 	virtual void ReloadTick(float DeltaTime);
-
+	
 	UFUNCTION()
 	virtual void FireDelayProc();
 

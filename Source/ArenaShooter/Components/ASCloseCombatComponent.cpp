@@ -78,9 +78,9 @@ void UASCloseCombatComponent::StartCloseCombatAttack()
 				{
 					UGameplayStatics::SpawnSoundAtLocation(GetWorld(), m_Sound_SuccessfulCloseCombatAttack, End);
 
-					HealthComponent->Damage(m_Damage, GetOwner());
-					UE_LOG(LogTemp, Warning, TEXT("CloseCombat hit %s"), *HitActor->GetName());
-					GEngine->AddOnScreenDebugMessage(1, 2, FColor::Red, TEXT("Target Hit"));
+					HealthComponent->Damage(m_Damage, GetOwner(), m_StunDuration);
+					//UE_LOG(LogTemp, Warning, TEXT("CloseCombat hit %s"), *HitActor->GetName());
+					//GEngine->AddOnScreenDebugMessage(1, 2, FColor::Red, TEXT("Target Hit"));
 					return;
 				}
 			}

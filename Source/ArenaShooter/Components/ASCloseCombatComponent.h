@@ -55,6 +55,10 @@ public:
 	UPROPERTY(EditAnywhere, Category="Stats", meta = (DisplayName="Attack Range"))
 	float m_AttackRange;
 
+	/** Stun Duration When Ennemy is Hit **/
+	UPROPERTY(EditAnywhere, Category="Stats", meta = (DisplayName="Stun Duration"))
+	float m_StunDuration;
+	
 	/** Sound Played when performing a missed close combat attack**/
 	UPROPERTY(EditAnywhere, Category="Feedbacks", meta = (DisplayName="Missed Attack Sound"))
 	USoundBase* m_Sound_MissedCloseCombatAttack;

@@ -21,20 +21,18 @@ void AASWeapon_PlayerPrimary::Fire(FVector FireOrigin, FVector FireDirection)
 		HitResult,
 		FireOrigin,
 		FireOrigin + FireDirection * 1000000,
-		ECC_Visibility, // Change this collision channel as needed
+		ECC_Visibility, 
 		CollisionParams))
 	{
 		// Process the hit result
 		AActor* HitActor = HitResult.GetActor();
-		UE_LOG(LogTemp, Warning, TEXT("Something is hit"));
 		if (HitActor != nullptr) {
 			DrawDebugLine(GetWorld(),FireOrigin,HitResult.ImpactPoint ,FColor::Red,false,1.0f,0,1.0f);
 			
 			UASHealthComponent* HealthComponent = UASHealthComponent::FindHealthComponent(HitActor);
 			if(HealthComponent != nullptr) {
 				
-				HealthComponent->Damage(m_DamageByBullet, GetOwner());
-				GEngine->AddOnScreenDebugMessage(1, 2, FColor::Red, TEXT("Target Hit"));
+				HealthComponent->Damage(m_DamageByBullet, GetOwner(), m_OnHitStunDuration);
 			}
 		} else {
 			DrawDebugLine(GetWorld(),FireOrigin,FireOrigin + FireDirection * 100000,FColor::Red,false,1.0f,0,1.0f);

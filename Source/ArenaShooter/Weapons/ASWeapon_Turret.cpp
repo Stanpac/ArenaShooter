@@ -19,6 +19,7 @@ void AASWeapon_Turret::Fire(FVector FireOrigin, FVector FireDirection)
 		const ACharacter* m_Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 		const FVector LookAtLocation = m_Character->GetActorLocation();
 		const FRotator LookAtRotation = (LookAtLocation - FireOrigin).Rotation();
+		const FVector SpawnPoint = (LookAtLocation - FireOrigin).GetSafeNormal() * 300 + FireOrigin; 
 		AASTurretBullet* bullet = GetWorld()->SpawnActor<AASTurretBullet>(m_BulletBP, FireOrigin ,LookAtRotation, params);
 		bullet->m_bulletSpeed = m_bulletSpeed;
 	}

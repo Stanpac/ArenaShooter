@@ -6,6 +6,7 @@
 #include "ArenaShooter/Components/ASHealthComponent.h"
 #include "ArenaShooter/Components/ASWeaponComponent.h"
 #include "ArenaShooter/SubSystem/ASEventWorldSubSystem.h"
+#include "ArenaShooter/Weapons/ASWeapon.h"
 #include "ArenaShooter/Widget/ASEnemyWidget.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
@@ -35,6 +36,12 @@ AASPawn::AASPawn()
 	m_WeaponComponent = CreateDefaultSubobject<UASWeaponComponent>(TEXT("WeaponComponent"));
 }
 
+void AASPawn::Stun(float stunDuration)
+{
+	m_IsStunned = true;
+	m_StunTimer = stunDuration;
+}
+
 void AASPawn::BeginPlay()
 {
 	Super::BeginPlay();
@@ -59,6 +66,13 @@ void AASPawn::BeginPlay()
 	m_HealthComponent->OnDeathStarted.AddDynamic(this, &AASPawn::OnDeath);
 
 	m_WeaponComponent->InitializeWeapon();
+	m_WeaponComponent->m_ASPawnOwner = this;
+}
+
+void AASPawn::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	if(m_IsStunned) StunTick(DeltaSeconds);
 }
 
 void AASPawn::OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer)
@@ -101,10 +115,19 @@ void AASPawn::OnDeath(AActor* DeathDealer)
 	SetActorHiddenInGame(true);*/
 }
 
+void AASPawn::StunTick(float DeltaTime)
+{
+	m_StunTimer -= DeltaTime;
+	if(m_StunTimer <= 0)
+	{
+		m_IsStunned = false;
+	}
+}
+
 void AASPawn::SetWidgetVisibility(bool visible)
 {
 	if (m_HealthBarWidgetComponent) {
-		GEngine->AddOnScreenDebugMessage(3, 2.0f, FColor::Green, "Setvisibility");
+		//GEngine->AddOnScreenDebugMessage(3, 2.0f, FColor::Green, "Setvisibility");
 		m_HealthBarWidgetComponent->SetVisibility(visible);
 	}
 }
@@ -118,7 +141,7 @@ void AASPawn::SetWidgetVisibilityfalse()
 
 void AASPawn::OnHealthVisibilitySphereComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent,AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,const FHitResult& SweepResult)
 {
-	GEngine->AddOnScreenDebugMessage(4, 2.0f, FColor::Red, "OnHealthVisibilitySphereComponentBeginOverlap");
+	//GEngine->AddOnScreenDebugMessage(4, 2.0f, FColor::Red, "OnHealthVisibilitySphereComponentBeginOverlap");
 	if (OtherActor == this) {
 		return;
 	}
@@ -127,7 +150,7 @@ void AASPawn::OnHealthVisibilitySphereComponentBeginOverlap(UPrimitiveComponent*
 
 void AASPawn::OnHealthVisibilitySphereComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	GEngine->AddOnScreenDebugMessage(5, 2.0f, FColor::Red, "OnHealthVisibilitySphereComponentEndOverlap");
+	//GEngine->AddOnScreenDebugMessage(5, 2.0f, FColor::Red, "OnHealthVisibilitySphereComponentEndOverlap");
 	if (OtherActor == this) {
 		return;
 	}

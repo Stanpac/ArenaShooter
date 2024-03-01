@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "ASWeaponComponent.generated.h"
 
+class AASPawn;
 class AASWeapon;
 
 UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -49,6 +50,9 @@ public:
 
 	UPROPERTY()
 	AASWeapon* m_CurrentEquipedWeapon;
+
+	UPROPERTY()
+	AASPawn* m_ASPawnOwner;
 	
 	/** Make the weapon Fire a Projectile */
 	UFUNCTION(BlueprintCallable, Category="Gameplay")

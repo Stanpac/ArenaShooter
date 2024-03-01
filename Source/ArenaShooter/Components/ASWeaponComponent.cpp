@@ -1,4 +1,6 @@
 #include "ArenaShooter/Components/ASWeaponComponent.h"
+
+#include "ArenaShooter/AI/ASPawn.h"
 #include "ArenaShooter/Character/ASCharacter.h"
 #include "ArenaShooter/Weapons/ASWeapon.h"
 
@@ -10,10 +12,10 @@ void UASWeaponComponent::Fire(FVector fireOrigin, FVector fireDirection)
 {
 	if(IsValid(m_CurrentEquipedWeapon))
 	{
-		if(!m_CurrentEquipedWeapon->m_IsReloading && !m_CurrentEquipedWeapon->m_IsWaitingForFireDelay)
+		if(!m_CurrentEquipedWeapon->m_IsReloading && !m_CurrentEquipedWeapon->m_IsWaitingForFireDelay && (!IsValid(m_ASPawnOwner) || !m_ASPawnOwner->GetIsStunned()))
 		{
 			m_CurrentEquipedWeapon->Fire(fireOrigin, fireDirection);
-			GEngine->AddOnScreenDebugMessage(0, 1, FColor::Blue, TEXT("Fire"));
+			//GEngine->AddOnScreenDebugMessage(0, 1, FColor::Blue, TEXT("Fire"));
 		}
 	}
 	else
