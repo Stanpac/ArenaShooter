@@ -5,6 +5,9 @@
 #include "ArenaShooter/Components/ASWeaponComponent.h"
 #include "GameFramework/Character.h"
 
+#include "Kismet/GameplayStatics.h"
+// Sets default values
+
 AASDronePawn::AASDronePawn()
 {
 	PrimaryActorTick.bCanEverTick = true;

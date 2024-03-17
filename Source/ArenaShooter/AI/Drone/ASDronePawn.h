@@ -24,10 +24,8 @@ class ARENASHOOTER_API AASDronePawn : public AASPawn
 {
 	GENERATED_BODY()
 
-public:
-	AASDronePawn();
-
 private:
+	/*---------------------------------- MEMBERS --------------------------------------*/
 
 	UPROPERTY(EditAnywhere, Category = "AI Enablers", DisplayName = "Enable shooting")
 	bool m_EnableShooting = true;
@@ -90,13 +88,18 @@ private:
 	FVector m_DispersionVector;
 	
 protected:
-	virtual void BeginPlay() override;
-
 	UPROPERTY()
 	ACharacter* m_Player;
 
 	UPROPERTY()
 	EDroneBehaviour m_CurrentBehaviour;
+
+	/*---------------------------------- FUNCTIONS --------------------------------------*/
+public:
+	AASDronePawn();
+
+protected:
+	virtual void BeginPlay() override;
 	
 	UFUNCTION()
 	virtual void LookAtPlayer(float DeltaTime);

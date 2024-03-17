@@ -9,6 +9,9 @@
 class UNiagaraComponent;
 class UNiagaraSystem;
 class UNiagaraFunctionLibrary;
+class UStaticMeshComponent;
+class USoundBase;
+
 
 UCLASS()
 class ARENASHOOTER_API AASWeapon : public AActor
@@ -78,8 +81,8 @@ public:
 	USoundBase* m_Sound_ShotFired;
 
 	/** Particle System when shot is fired **/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feedback", meta=(DisplayName = "Fire Particle System"))
-	UNiagaraSystem* m_PSys_ShotFired;
+	/*UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feedback", meta=(DisplayName = "Fire Particle System"))
+	UNiagaraSystem* m_PSys_ShotFired;*/
 
 	/** Determines if the weapon will be set hidden at start **/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feedback", meta=(DisplayName = "Is the Weapon Shown"))
@@ -87,10 +90,20 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* m_FireMuzzleComponent;
-	
-	/*/** Particle System when shot is fired *#1#
+
+protected:	
+	/* Particle System when shot is fired */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feedback", meta=(DisplayName = "Fire Particle System"))
-	UNiagaraSystem* m_Niagara_ShotFired;*/
+	UNiagaraSystem* m_Niagara_ShotFired;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category = "Feedback", meta=(DisplayName = "Fire Shoot Pos"))
+	USceneComponent* m_FireShootPos;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feedback", meta=(DisplayName = "Fire Shoot Niagara Component"))
+	UNiagaraComponent* m_Niagara_ShotFiredComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feedback", meta=(DisplayName = "Weapon Mesh"))
+	UStaticMeshComponent* M_WeaponMesh;
 
 protected:
 	// Called when the game starts or when spawned
