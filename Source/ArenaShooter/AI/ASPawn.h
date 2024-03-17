@@ -62,6 +62,12 @@ protected:
 	UUserWidget* m_IndicatorWidget;
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASPawn|Components", meta = (DisplayName = "Death parrticle"))
+	UParticleSystem* m_DeathParticle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASPawn|Components", meta = (DisplayName = "Impact parrticle"));
+	UParticleSystem* m_ImpactParticle;
+
 	/** How much time is left to end stun **/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stun", meta=(DisplayName = "Current Stun Timer"))
 	float m_StunTimer;
