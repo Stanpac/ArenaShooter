@@ -10,6 +10,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 
 AASPawn::AASPawn()
@@ -89,7 +90,7 @@ void AASPawn::OnHealthChanged(float PreviousHealth, float CurrentHealth, float M
 		}
 	}
 	
-	// TODO Spawn Decal of the Damage
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), m_ImpactParticle, GetActorLocation());
 }
 
 void AASPawn::OnDeath(AActor* DeathDealer)
@@ -97,6 +98,8 @@ void AASPawn::OnDeath(AActor* DeathDealer)
 	if (m_EventWorldSubSystem) {
 		m_EventWorldSubSystem->BroadcastEnemyDeath();
 	}
+	
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), m_DeathParticle, GetActorLocation());
 	
 	SetLifeSpan(0.1f);
 	SetActorHiddenInGame(true);

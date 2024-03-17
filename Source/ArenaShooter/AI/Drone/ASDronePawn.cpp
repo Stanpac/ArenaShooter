@@ -3,15 +3,12 @@
 #include "ArenaShooter/Components/ASWeaponComponent.h"
 #include "ArenaShooter/Weapons/ASWeapon.h"
 #include "GameFramework/Character.h"
+#include "Kismet/GameplayStatics.h"
 // Sets default values
 AASDronePawn::AASDronePawn()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	/*m_HealthComponent = CreateDefaultSubobject<UASHealthComponent>(TEXT("HealthComponent"));
-
-	m_WeaponComponent = CreateDefaultSubobject<UASWeaponComponent>(TEXT("WeaponComponent"));*/
 }
 
 // Called when the game starts or when spawned

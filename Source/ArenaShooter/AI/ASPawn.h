@@ -48,6 +48,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASPawn|Temp", meta = (DisplayName = "Copy"))
 	TSubclassOf<AASPawn> m_TurretCopy;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASPawn|Components", meta = (DisplayName = "Death parrticle"))
+	UParticleSystem* m_DeathParticle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASPawn|Components", meta = (DisplayName = "Impact parrticle"));
+	UParticleSystem* m_ImpactParticle;
+
 	/** How much time is left to end stun **/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stun", meta=(DisplayName = "Current Stun Timer"))
 	float m_StunTimer;
@@ -79,7 +85,7 @@ protected:
 	void OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer);
 
 	UFUNCTION()
-	void OnDeath(AActor* DeathDealer);
+	virtual void OnDeath(AActor* DeathDealer);
 
 	UFUNCTION()
 	virtual void StunTick(float DeltaTime);

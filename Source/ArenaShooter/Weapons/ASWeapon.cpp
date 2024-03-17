@@ -14,14 +14,22 @@ AASWeapon::AASWeapon()
 	PrimaryActorTick.bCanEverTick = true;
 
 	m_FireMuzzleComponent = CreateDefaultSubobject<USceneComponent>("SceneComponent");
+
+	M_WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>("WeaponMesh");
+	M_WeaponMesh->SetupAttachment(m_FireMuzzleComponent);
+
+	m_FireShootPos = CreateDefaultSubobject<USceneComponent>("FireShootPosition");
+	m_FireShootPos->SetupAttachment(M_WeaponMesh, "FireShootPosition");
+	
+	m_Niagara_ShotFiredComponent = CreateDefaultSubobject<UNiagaraComponent>("NiagaraComponent");
+	m_Niagara_ShotFiredComponent->SetupAttachment(M_WeaponMesh, "FireShootPosition");
 }
 
 // Called when the game starts or when spawned
 void AASWeapon::BeginPlay()
 {
 	Super::BeginPlay();
-	if(!m_ShowWeapon)
-		SetHidden(true);
+	if(!m_ShowWeapon) SetHidden(true);
 }
 
 // Called every frame
@@ -63,10 +71,8 @@ void AASWeapon::Fire(FVector fireOrigin, FVector fireDirection)
 {
 	FireDelayProc();
 	
-	if (m_PSys_ShotFired) {
-		// This spawns the chosen effect on the owning WeaponMuzzle SceneComponent
-		//UNiagaraComponent* Comp_ShotFired = UNiagaraFunctionLibrary::SpawnSystemAttached(m_PSys_ShotFired, m_FireMuzzleComponent, NAME_None, FVector(0, 0, 0), FRotator(0.f, 180, 0), EAttachLocation::Type::KeepRelativeOffset, true);
-		//Comp_ShotFired->Activate();
+	if (m_Niagara_ShotFiredComponent){
+		m_Niagara_ShotFiredComponent->Activate();
 	}
 	
 	if(m_EnableReload)

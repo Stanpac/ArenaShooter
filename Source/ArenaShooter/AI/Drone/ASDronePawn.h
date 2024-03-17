@@ -14,27 +14,25 @@ UCLASS()
 class ARENASHOOTER_API AASDronePawn : public AASPawn
 {
 	GENERATED_BODY()
-
-public:
-	// Sets default values for this pawn's properties
-	AASDronePawn();
-
+	/*---------------------------------- MEMBERS --------------------------------------*/
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
 	/** Player Reference */
 	UPROPERTY()
 	ACharacter* m_Player;
 
+	/*---------------------------------- FUNCTIONS --------------------------------------*/
+public:
+	AASDronePawn();
+
+protected:
+	virtual void BeginPlay() override;
+	
 	UFUNCTION()
 	virtual void LookAtPlayer(float DeltaTime);
 	
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
+	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 };
