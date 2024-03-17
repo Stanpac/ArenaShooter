@@ -16,6 +16,7 @@
 #include "NiagaraDataInterfaceArrayFunctionLibrary.h"
 
 
+
 AASPawn::AASPawn()
 {
 	m_CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
@@ -59,6 +60,7 @@ void AASPawn::OnHealthChanged(float PreviousHealth, float CurrentHealth, float M
 	// Oeverlay Mat ?
 	
 	SpawnFloatingDamage(GetActorLocation(), GetActorRotation(), PreviousHealth - CurrentHealth);
+	
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), m_ImpactParticle, GetActorLocation());
 }
 
