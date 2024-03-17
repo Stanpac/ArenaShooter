@@ -5,7 +5,6 @@
 #include "ArenaShooter/Components/ASWeaponComponent.h"
 #include "ArenaShooter/Weapons/ASWeapon.h"
 #include "GameFramework/Character.h"
-
 #include "Kismet/GameplayStatics.h"
 // Sets default values
 
@@ -264,7 +263,7 @@ void AASDronePawn::DroneMovement(float DeltaTime)
 	dispersion.Z = FMath::Clamp(dispersion.Z, 0, 1000);
 	FVector moveVector = GetActorLocation() + ( dispersion + moveToPlayer ) * DeltaTime;
 
-
+	
 	FHitResult OutHit;
 	FVector StartLocation = GetActorLocation();
 	FVector EndLocation = GetActorLocation() + moveVector.GetSafeNormal() * m_DistanceToTeleport * .9;

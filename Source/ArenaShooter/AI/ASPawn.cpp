@@ -8,14 +8,9 @@
 #include "ArenaShooter/Components/ASHealthComponent.h"
 #include "ArenaShooter/Components/ASWeaponComponent.h"
 #include "ArenaShooter/SubSystem/ASEventWorldSubSystem.h"
-#include "ArenaShooter/Widget/ASEnemyWidget.h"
 #include "Components/CapsuleComponent.h"
-#include "Components/SphereComponent.h"
-#include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraDataInterfaceArrayFunctionLibrary.h"
-
-
 
 AASPawn::AASPawn()
 {
@@ -61,6 +56,7 @@ void AASPawn::OnHealthChanged(float PreviousHealth, float CurrentHealth, float M
 	// Find a Way to get the Indicate that you can one shoot the enemy
 	// Oeverlay Mat ?
 	
+
 	SpawnFloatingDamage(GetActorLocation(), GetActorRotation(), PreviousHealth - CurrentHealth);
 	
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), m_ImpactParticle, m_HitLocation);

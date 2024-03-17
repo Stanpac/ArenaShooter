@@ -40,7 +40,7 @@ protected:
 	void OnCS1Reached();
 	void OnCS2Reached();
 	void OnCS3Reached();
-	
+
 public:
 	virtual void Fire(FVector FireOrigin, FVector FireDirection) override;
 
