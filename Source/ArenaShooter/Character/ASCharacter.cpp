@@ -128,7 +128,7 @@ void AASCharacter::BeginPlay()
 	
 	m_WeaponComponent->InitializeWeapon();
 	m_WeaponComponent->OnFireEvent.AddDynamic(this, &AASCharacter::OnFire);
-
+	
 	m_GravitySwitchComponent->OnStartSwitchGravity.AddDynamic(this, &AASCharacter::OnChangeGravity);
 	m_GravitySwitchComponent->OnSwitchGravityAbiltyCooldownEnd.AddDynamic(this, &AASCharacter::OnAbilityCooldownEnd);
 	m_GravitySwitchComponent->OnGravityChargeRefill.AddDynamic(this, &AASCharacter::OnGravityChargeRefill);
@@ -257,6 +257,7 @@ void AASCharacter::OnAbilityCooldownEnd()
 
 void AASCharacter::OnGravityChargeRefill()
 {
+
 	GetPlayerWidget()->SetGravityChargeBarPercent(m_GravitySwitchComponent->GetTimer() / m_GravitySwitchComponent->GetGravityChargeRefillTime());
 	GetPlayerWidget()->SetNbrOfChargeText(m_GravitySwitchComponent->GetNbrOfCharge());
 }

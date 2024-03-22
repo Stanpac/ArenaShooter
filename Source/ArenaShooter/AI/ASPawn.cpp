@@ -56,10 +56,7 @@ void AASPawn::OnHealthChanged(float PreviousHealth, float CurrentHealth, float M
 	// Find a Way to get the Indicate that you can one shoot the enemy
 	// Oeverlay Mat ?
 	
-
 	SpawnFloatingDamage(GetActorLocation(), GetActorRotation(), PreviousHealth - CurrentHealth);
-	
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), m_ImpactParticle, m_HitLocation);
 }
 
 void AASPawn::OnDeath(AActor* DeathDealer)
@@ -84,6 +81,7 @@ void AASPawn::StunTick(float DeltaTime)
 }
 
 void AASPawn::SpawnFloatingDamage(const FVector& SpawnLocation, const FRotator& SpawnRotation, const float Damage)
+
 {
 	if (GetWorld() == nullptr) {
 		UE_LOG(LogTemp, Error,TEXT("%s, can't spawn floating damage. No context"), *GetNameSafe(this));

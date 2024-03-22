@@ -53,8 +53,9 @@ public:
 	void SetGravityAbilityImageVisibility(bool visible);
 
 	void SetGravityChargeBarPercent(float percent);
-
+	
 	void SetNbrOfChargeText(int NbrOfCharge);
+
 	
 protected:
 };

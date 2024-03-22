@@ -46,8 +46,7 @@ protected:
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Camera", meta = (DisplayName = "First Person Camera Component"))
 	UCameraComponent* m_FirstPersonCameraComponent;
-
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Camera", meta = (DisplayName = "Play Shake On taking Damage"))
 	bool bPlayShakeOntakingDamage;
 
@@ -175,6 +174,7 @@ protected:
 	void CheckPlayScreenShake();
 
 	void GetAllSubsystem();
+	
 	void AddDefaultMappingContext();
 	void RemoveDefaultMappingContext();
 
