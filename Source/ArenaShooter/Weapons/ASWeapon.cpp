@@ -4,13 +4,16 @@
 #include "ASWeapon.h"
 
 #include "ArenaShooter/Components/ASHealthComponent.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 // Sets default values
 AASWeapon::AASWeapon()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	m_FireMuzzleComponent = CreateDefaultSubobject<USceneComponent>("SceneComponent");
 }
 
 // Called when the game starts or when spawned
@@ -59,6 +62,12 @@ void AASWeapon::Stach()
 void AASWeapon::Fire(FVector fireOrigin, FVector fireDirection)
 {
 	FireDelayProc();
+	
+	if (m_PSys_ShotFired) {
+		// This spawns the chosen effect on the owning WeaponMuzzle SceneComponent
+		//UNiagaraComponent* Comp_ShotFired = UNiagaraFunctionLibrary::SpawnSystemAttached(m_PSys_ShotFired, m_FireMuzzleComponent, NAME_None, FVector(0, 0, 0), FRotator(0.f, 180, 0), EAttachLocation::Type::KeepRelativeOffset, true);
+		//Comp_ShotFired->Activate();
+	}
 	
 	if(m_EnableReload)
 	{

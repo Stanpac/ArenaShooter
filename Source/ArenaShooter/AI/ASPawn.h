@@ -14,6 +14,7 @@ class UWidgetComponent;
 class UUserWidget;
 class UASEventWorldSubSystem;
 class UASWeaponComponent;
+class USceneComponent;
 
 
 UCLASS()
@@ -22,7 +23,7 @@ class ARENASHOOTER_API AASPawn : public APawn
 	GENERATED_BODY()
 	/* ---------------------------------- MEMBERS --------------------------------------*/
 protected:
-
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASPawn|Components", meta = (DisplayName = "MeshComponent"))
 	UStaticMeshComponent* m_MeshComponent;
 	
@@ -46,6 +47,14 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASPawn|Temp", meta = (DisplayName = "Copy"))
 	TSubclassOf<AASPawn> m_TurretCopy;
+
+	/** How much time is left to end stun **/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stun", meta=(DisplayName = "Current Stun Timer"))
+	float m_StunTimer;
+	
+	/** Is the pawn stunned **/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stun", meta=(DisplayName = "Is Stunned ?"))
+	bool m_IsStunned;
 	
 	/** Event World SubSystem */
 	UPROPERTY()
@@ -57,16 +66,29 @@ protected:
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
 	AASPawn();
-	
+
+	UFUNCTION(BlueprintCallable, Category="Gameplay")
+	void Stun(float stunDuration) ;
+
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void Tick(float DeltaSeconds) override;
+	
 	UFUNCTION()
 	void OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer);
 
 	UFUNCTION()
 	void OnDeath(AActor* DeathDealer);
 
+	UFUNCTION()
+	virtual void StunTick(float DeltaTime);
+
+public:
+	
+	bool GetIsStunned() const { return m_IsStunned;}
+
+protected:
 	void SetWidgetVisibility(bool visible);
 
 	void SetWidgetVisibilityfalse();

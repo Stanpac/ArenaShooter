@@ -16,7 +16,6 @@ AASPawn::AASPawn()
 {
 	m_CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
 	m_CapsuleComponent->SetCollisionProfileName("Pawn");
-	RootComponent = m_CapsuleComponent;
 
 	m_MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
 	m_MeshComponent->SetupAttachment(m_CapsuleComponent);
@@ -33,6 +32,12 @@ AASPawn::AASPawn()
 	m_HealthBarWidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 100.0f));
 
 	m_WeaponComponent = CreateDefaultSubobject<UASWeaponComponent>(TEXT("WeaponComponent"));
+}
+
+void AASPawn::Stun(float stunDuration)
+{
+	m_IsStunned = true;
+	m_StunTimer = stunDuration;
 }
 
 void AASPawn::BeginPlay()
@@ -59,6 +64,13 @@ void AASPawn::BeginPlay()
 	m_HealthComponent->OnDeathStarted.AddDynamic(this, &AASPawn::OnDeath);
 
 	m_WeaponComponent->InitializeWeapon();
+	m_WeaponComponent->m_ASPawnOwner = this;
+}
+
+void AASPawn::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	if(m_IsStunned) StunTick(DeltaSeconds);
 }
 
 void AASPawn::OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer)
@@ -82,29 +94,27 @@ void AASPawn::OnHealthChanged(float PreviousHealth, float CurrentHealth, float M
 
 void AASPawn::OnDeath(AActor* DeathDealer)
 {
-	if(IsValid(m_TurretCopy))
-	{
-		int randX = FMath::RandRange(-200, 200);
-		int randY = FMath::RandRange(-200, 200);
-
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-		GetWorld()->SpawnActor<AActor>(m_TurretCopy,GetActorLocation() + FVector(randX,randY, 0),FRotator(0), SpawnParams);
-	}
-	
-	// end temporary
 	if (m_EventWorldSubSystem) {
 		m_EventWorldSubSystem->BroadcastEnemyDeath();
 	}
-	Destroy();
-	/*SetLifeSpan(0.1f);
-	SetActorHiddenInGame(true);*/
+	
+	SetLifeSpan(0.1f);
+	SetActorHiddenInGame(true);
+}
+
+void AASPawn::StunTick(float DeltaTime)
+{
+	m_StunTimer -= DeltaTime;
+	if(m_StunTimer <= 0)
+	{
+		m_IsStunned = false;
+	}
 }
 
 void AASPawn::SetWidgetVisibility(bool visible)
 {
 	if (m_HealthBarWidgetComponent) {
-		GEngine->AddOnScreenDebugMessage(3, 2.0f, FColor::Green, "Setvisibility");
+
 		m_HealthBarWidgetComponent->SetVisibility(visible);
 	}
 }
@@ -118,7 +128,6 @@ void AASPawn::SetWidgetVisibilityfalse()
 
 void AASPawn::OnHealthVisibilitySphereComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent,AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,const FHitResult& SweepResult)
 {
-	GEngine->AddOnScreenDebugMessage(4, 2.0f, FColor::Red, "OnHealthVisibilitySphereComponentBeginOverlap");
 	if (OtherActor == this) {
 		return;
 	}
@@ -127,7 +136,6 @@ void AASPawn::OnHealthVisibilitySphereComponentBeginOverlap(UPrimitiveComponent*
 
 void AASPawn::OnHealthVisibilitySphereComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	GEngine->AddOnScreenDebugMessage(5, 2.0f, FColor::Red, "OnHealthVisibilitySphereComponentEndOverlap");
 	if (OtherActor == this) {
 		return;
 	}

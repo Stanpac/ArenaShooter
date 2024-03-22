@@ -20,6 +20,7 @@ class UCameraComponent;
 class UASWeaponComponent;
 class UASCloseCombatComponent;
 class USkeletalMeshComponent;
+class UAnimMontage;
 struct FInputActionValue;
 
 /**
@@ -74,6 +75,13 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Widget", meta = (DisplayName = "Weapon"))
 	bool m_IsPrimaryWeaponEquipped;
+
+	/** Fire Animation */
+	UPROPERTY(EditAnywhere, Category = "ASCharacter|Animation", meta = (DisplayName = "Fire Montage"))
+	TObjectPtr<UAnimMontage> m_FireMontage;
+
+	UPROPERTY(EditAnywhere, Category = "ASCharacter|Animation", meta = (DisplayName = "Reload Montage"))
+	TObjectPtr<UAnimMontage> m_CacAttackMontage;
 	
 	/** Event World SubSystem */
 	TObjectPtr<UASEventWorldSubSystem> m_EventWorldSubSystem;
@@ -147,6 +155,12 @@ protected:
 	virtual void OnEndDeath();
 
 	UFUNCTION()
+	virtual void OnFire();
+
+	UFUNCTION()
+	virtual void OnAttack();
+
+	UFUNCTION()
 	virtual void OnChangeGravity();
 
 	UFUNCTION()
@@ -166,5 +180,7 @@ protected:
 	void RemoveDefaultMappingContext();
 
 public:
-	UASGlobalWidget* GetPlayerWidget() const { return M_PlayerWidget; }
+	FORCEINLINE UASGlobalWidget* GetPlayerWidget() const { return M_PlayerWidget; }
+
+	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return m_Mesh1P; }
 };

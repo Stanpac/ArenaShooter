@@ -16,6 +16,7 @@
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 
 AASCharacter::AASCharacter()
@@ -135,6 +136,9 @@ void AASCharacter::BeginPlay()
 	m_HealthComponent->OnHealthChanged.AddDynamic(this, &AASCharacter::OnHealthChanged);
 	
 	m_WeaponComponent->InitializeWeapon();
+	m_WeaponComponent->OnFireEvent.AddDynamic(this, &AASCharacter::OnFire);
+
+	m_CloseCombatComponent->OnStartCloseCombatAttack.AddDynamic(this, &AASCharacter::OnAttack);
 
 	m_GravitySwitchComponent->OnSwitchGravity.AddDynamic(this, &AASCharacter::OnChangeGravity);
 	m_GravitySwitchComponent->OnSwitchGravityAbiltyCooldownEnd.AddDynamic(this, &AASCharacter::OnAbilityCooldownEnd);
@@ -215,6 +219,22 @@ void AASCharacter::SwitchGravity(const FInputActionValue& Value)
 
 void AASCharacter::OnStartDeath(AActor* OwningActor)
 {
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	// Get the name of the current level.
+	FString CurrentLevelName = World->GetMapName();
+	CurrentLevelName.RemoveFromStart(World->StreamingLevelsPrefix);
+
+	// Convert the name into a format that can be used for loading.
+	FName LevelName(*CurrentLevelName);
+
+	// Use the GameplayStatics class to load the level.
+	UGameplayStatics::OpenLevel(World, LevelName);
+	if (m_EventWorldSubSystem) {
+		m_EventWorldSubSystem->BroadcastPlayerEndDeath();
+	}
+	
 	//TODO : Should be moved In a Player Class if there is
 	if (m_EventWorldSubSystem) {
 		m_EventWorldSubSystem->BroadcastPlayerStartDeath();
@@ -237,12 +257,42 @@ void AASCharacter::OnStartDeath(AActor* OwningActor)
 void AASCharacter::OnEndDeath()
 {
 	//TODO : Should be moved In a Player Class if there is
+
+	GEngine->AddOnScreenDebugMessage(0, 10, FColor::Red, TEXT("DIE"));
+	//end
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	// Get the name of the current level.
+	FString CurrentLevelName = World->GetMapName();
+	CurrentLevelName.RemoveFromStart(World->StreamingLevelsPrefix);
+
+	// Convert the name into a format that can be used for loading.
+	FName LevelName(*CurrentLevelName);
+
+	// Use the GameplayStatics class to load the level.
+	UGameplayStatics::OpenLevel(World, LevelName);
 	if (m_EventWorldSubSystem) {
 		m_EventWorldSubSystem->BroadcastPlayerEndDeath();
 	}
-	//end
-	SetLifeSpan(0.1f);
-	SetActorHiddenInGame(true);
+	//SetLifeSpan(0.1f);
+	//SetActorHiddenInGame(true);
+}
+
+void AASCharacter::OnFire()
+{
+	UAnimInstance* AnimInstance = GetMesh1P()->GetAnimInstance();
+	if (!IsValid(AnimInstance)) return;
+	
+	const float MontageLength = AnimInstance->Montage_Play(m_FireMontage, 1.0f, EMontagePlayReturnType::MontageLength, 0.0f, true);
+}
+
+void AASCharacter::OnAttack()
+{
+	UAnimInstance* AnimInstance = GetMesh1P()->GetAnimInstance();
+	if (!IsValid(AnimInstance)) return;
+	
+	const float MontageLength = AnimInstance->Montage_Play(m_CacAttackMontage, 1.0f, EMontagePlayReturnType::MontageLength, 0.0f, true);
 }
 
 void AASCharacter::OnChangeGravity()

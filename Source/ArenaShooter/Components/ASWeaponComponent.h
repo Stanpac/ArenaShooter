@@ -6,7 +6,10 @@
 #include "Components/ActorComponent.h"
 #include "ASWeaponComponent.generated.h"
 
+class AASPawn;
 class AASWeapon;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FWeaponComponent_OnFireEvent);
 
 UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARENASHOOTER_API UASWeaponComponent : public UActorComponent
@@ -49,6 +52,9 @@ public:
 
 	UPROPERTY()
 	AASWeapon* m_CurrentEquipedWeapon;
+
+	UPROPERTY()
+	AASPawn* m_ASPawnOwner;
 	
 	/** Make the weapon Fire a Projectile */
 	UFUNCTION(BlueprintCallable, Category="Gameplay")
@@ -65,6 +71,10 @@ public:
 	/** At Begin Play **/
 	UFUNCTION(BlueprintCallable, Category="Gameplay")
 	virtual void InitializeWeapon();
+
+	/** Event that will be broadcasted when the weapon is fired */
+	UPROPERTY(BlueprintAssignable)
+	FWeaponComponent_OnFireEvent OnFireEvent;
 };
 
 

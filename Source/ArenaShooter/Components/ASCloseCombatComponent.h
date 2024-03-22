@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "ASCloseCombatComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FWeaponComponent_OnStartCloseCombatAttackEvent);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ARENASHOOTER_API UASCloseCombatComponent : public UActorComponent
@@ -55,6 +56,10 @@ public:
 	UPROPERTY(EditAnywhere, Category="Stats", meta = (DisplayName="Attack Range"))
 	float m_AttackRange;
 
+	/** Stun Duration When Ennemy is Hit **/
+	UPROPERTY(EditAnywhere, Category="Stats", meta = (DisplayName="Stun Duration"))
+	float m_StunDuration;
+	
 	/** Sound Played when performing a missed close combat attack**/
 	UPROPERTY(EditAnywhere, Category="Feedbacks", meta = (DisplayName="Missed Attack Sound"))
 	USoundBase* m_Sound_MissedCloseCombatAttack;
@@ -62,4 +67,7 @@ public:
 	/** Sound Played when performing a successful close combat attack**/
 	UPROPERTY(EditAnywhere, Category="Feedbacks", meta = (DisplayName="Hit Attack Sound"))
 	USoundBase* m_Sound_SuccessfulCloseCombatAttack;
+
+	UPROPERTY(BlueprintAssignable)
+	FWeaponComponent_OnStartCloseCombatAttackEvent OnStartCloseCombatAttack;
 };
