@@ -49,6 +49,13 @@ void UASGlobalWidget::SetGravityChargeBarPercent(float percent)
 	}
 }
 
+void UASGlobalWidget::SetNbrOfChargeText(int NbrOfCharge)
+{
+	if (m_NbrOfChargeText) {
+		m_NbrOfChargeText->SetText(FText::FromString(FString::FromInt(NbrOfCharge)));
+	}
+}
+
 
 void UASGlobalWidget::SetNbrOfChargeText(int NbrOfCharge)
 {

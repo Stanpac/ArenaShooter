@@ -80,12 +80,6 @@ void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		// Shooting
 		EnhancedInputComponent->BindAction(m_ShootAction, ETriggerEvent::Triggered, this, &AASCharacter::Shoot);
 
-		// Reload
-		//EnhancedInputComponent->BindAction(m_ReloadAction, ETriggerEvent::Triggered, this, &AASCharacter::Reload);
-
-		// CloseCombat
-		//EnhancedInputComponent->BindAction(m_CloseCombatAction, ETriggerEvent::Triggered, this, &AASCharacter::CloseCombat);
-
 		//GravitySwitch
 		EnhancedInputComponent->BindAction(m_switchGravityAction, ETriggerEvent::Triggered, this, &AASCharacter::SwitchGravity);
 
@@ -128,7 +122,7 @@ void AASCharacter::BeginPlay()
 	
 	m_WeaponComponent->InitializeWeapon();
 	m_WeaponComponent->OnFireEvent.AddDynamic(this, &AASCharacter::OnFire);
-	
+
 	m_GravitySwitchComponent->OnStartSwitchGravity.AddDynamic(this, &AASCharacter::OnChangeGravity);
 	m_GravitySwitchComponent->OnSwitchGravityAbiltyCooldownEnd.AddDynamic(this, &AASCharacter::OnAbilityCooldownEnd);
 	m_GravitySwitchComponent->OnGravityChargeRefill.AddDynamic(this, &AASCharacter::OnGravityChargeRefill);
@@ -257,7 +251,6 @@ void AASCharacter::OnAbilityCooldownEnd()
 
 void AASCharacter::OnGravityChargeRefill()
 {
-
 	GetPlayerWidget()->SetGravityChargeBarPercent(m_GravitySwitchComponent->GetTimer() / m_GravitySwitchComponent->GetGravityChargeRefillTime());
 	GetPlayerWidget()->SetNbrOfChargeText(m_GravitySwitchComponent->GetNbrOfCharge());
 }

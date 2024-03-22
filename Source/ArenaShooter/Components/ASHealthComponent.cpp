@@ -51,7 +51,7 @@ void UASHealthComponent::Damage(float amount, AActor* DamageDealer, float stunDu
 		}
 		pawn->SetHitPosition(hitLocation);
 	}
-	
+
 	// previous health can be Use Later For Lerp maybe ?
 	const float PreviousHealth = m_Health;
 	const float NewHealth = FMath::Clamp(PreviousHealth - (amount * m_DamageMultiplicator), m_MinhHealth, m_MaxHealth);

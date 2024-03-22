@@ -97,6 +97,6 @@ protected:
 
 public:
 	bool GetIsStunned() const { return m_IsStunned;}
-
 	void SetHitPosition(FVector hitPosition) { m_HitLocation = hitPosition; }
+
 };

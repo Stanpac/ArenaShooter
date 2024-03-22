@@ -60,11 +60,11 @@ protected:
 	/** Weapon Component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Weapon", meta = (DisplayName = "Weapon Component"))
 	UASWeaponComponent* m_WeaponComponent;
-
+	
 	/** Dash Component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Speed", meta = (DisplayName = "DashComponent"))
 	UASDashComponent* m_DashComponent;
-	
+
 	/** Gravity Switch Component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Speed", meta = (DisplayName = "GravitySwitchComponent"))
 	UGravitySwitchComponent* m_GravitySwitchComponent;
@@ -115,20 +115,18 @@ protected:
 	/** Shoot Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "Shoot Action"))
 	UInputAction* m_ShootAction;
-
+	
 	/** Close Combat Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "Dash Action"))
 	UInputAction* m_DashAction;
 	
-	/** Close Combat Input Action */
+	/** Switch Gravity Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "Switch Gravity Action"))
 	UInputAction* m_switchGravityAction;
 
 	UPROPERTY()
 	bool m_DisableMovements;
-
-
-
+	
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
 	AASCharacter();
