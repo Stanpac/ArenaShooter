@@ -59,14 +59,6 @@ void AASWeapon::FireDelayTick(float DeltaTime)
 	}
 }
 
-void AASWeapon::Equip()
-{
-}
-
-void AASWeapon::Stach()
-{
-}
-
 void AASWeapon::Fire(FVector fireOrigin, FVector fireDirection)
 {
 	FireDelayProc();

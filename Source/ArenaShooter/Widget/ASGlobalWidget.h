@@ -27,16 +27,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
 	TObjectPtr<UProgressBar> m_HealthBar;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
-	TObjectPtr<UProgressBar> m_SpeedBar;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
 	TObjectPtr<UImage> m_CursorImage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
-	TObjectPtr<UTextBlock> m_SpeedProfile;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
 	TObjectPtr<UImage> m_GravityAbilityImage;
 
@@ -53,16 +47,14 @@ public:
 	virtual bool Initialize() override;
 
 	void SethealthBarPercent(float percent);
-
-	void SetSpeedBarPercent(float percent);
-
+	
 	void ChangeCursorVisibility(bool visible);
-
-	void SetSpeedProfile(int profile);
 	
 	void SetGravityAbilityImageVisibility(bool visible);
 
 	void SetGravityChargeBarPercent(float percent);
+
+	void SetNbrOfChargeText(int NbrOfCharge);
 	
 protected:
 };

@@ -29,11 +29,11 @@ void UGravitySwitchComponent::SwitchGravity()
 	m_NbrOfCharge--;
 
 	if (!GetWorld()->GetTimerManager().IsTimerActive(m_RefillTimerHandle)) {
-		GetWorld()->GetTimerManager().SetTimer(m_RefillTimerHandle, this, &UGravitySwitchComponent::EndSwitchGravity,0.1f, true);
+		GetWorld()->GetTimerManager().SetTimer(m_RefillTimerHandle, this, &UGravitySwitchComponent::RefillGravityCharge,0.1f, true);
 	}
 	
     FTimerHandle TimerHandle;
-    GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UGravitySwitchComponent::EndSwitchGravity,m_AbilityCooldown , false);
+    GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UGravitySwitchComponent::EndSwitchGravity,m_AbilityCooldown, false);
 }
 
 void UGravitySwitchComponent::RefullllGravityCharge()
@@ -55,6 +55,8 @@ void UGravitySwitchComponent::EndSwitchGravity()
 
 void UGravitySwitchComponent::RefillGravityCharge()
 {
+	OnGravityChargeRefill.Broadcast();
+	
 	if (m_NbrOfCharge >= m_MaxNbrOfCharge) {
 		GetWorld()->GetTimerManager().ClearTimer(m_RefillTimerHandle);
 		m_Timer = 0.f;

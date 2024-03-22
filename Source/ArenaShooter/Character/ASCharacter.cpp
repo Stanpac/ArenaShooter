@@ -4,10 +4,8 @@
 #include "ArenaShooter/Character/ASCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "ArenaShooter/Components/ASCloseCombatComponent.h"
 #include "ArenaShooter/Components/ASDashComponent.h"
 #include "ArenaShooter/Components/ASHealthComponent.h"
-#include "ArenaShooter/Components/ASSpeedComponent.h"
 #include "ArenaShooter/Components/ASWeaponComponent.h"
 #include "ArenaShooter/Components/GravitySwitchComponent.h"
 #include "ArenaShooter/SubSystem/ASEventWorldSubSystem.h"
@@ -61,8 +59,6 @@ AASCharacter::AASCharacter()
 	// Actor Components 
 	m_HealthComponent = CreateDefaultSubobject<UASHealthComponent>(TEXT("HealthComponent"));
 	m_WeaponComponent = CreateDefaultSubobject<UASWeaponComponent>(TEXT("WeaponComponent"));
-	m_CloseCombatComponent = CreateDefaultSubobject<UASCloseCombatComponent>(TEXT("CloseCombatComponent"));
-	m_SpeedComponent = CreateDefaultSubobject<UASSpeedComponent>(TEXT("SpeedComponent"));
 	m_GravitySwitchComponent = CreateDefaultSubobject<UGravitySwitchComponent>(TEXT("GravitySwitchComponent"));
 	m_DashComponent = CreateDefaultSubobject<UASDashComponent>(TEXT("DashComponent"));
 }
@@ -85,19 +81,16 @@ void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		EnhancedInputComponent->BindAction(m_ShootAction, ETriggerEvent::Triggered, this, &AASCharacter::Shoot);
 
 		// Reload
-		EnhancedInputComponent->BindAction(m_ReloadAction, ETriggerEvent::Triggered, this, &AASCharacter::Reload);
+		//EnhancedInputComponent->BindAction(m_ReloadAction, ETriggerEvent::Triggered, this, &AASCharacter::Reload);
 
 		// CloseCombat
-		EnhancedInputComponent->BindAction(m_CloseCombatAction, ETriggerEvent::Triggered, this, &AASCharacter::CloseCombat);
+		//EnhancedInputComponent->BindAction(m_CloseCombatAction, ETriggerEvent::Triggered, this, &AASCharacter::CloseCombat);
 
 		//GravitySwitch
 		EnhancedInputComponent->BindAction(m_switchGravityAction, ETriggerEvent::Triggered, this, &AASCharacter::SwitchGravity);
 
 		//Dash
 		EnhancedInputComponent->BindAction(m_DashAction, ETriggerEvent::Triggered, this, &AASCharacter::Dash);
-		
-		// Switching Weapon
-		//EnhancedInputComponent->BindAction(m_switchWeaponAction, ETriggerEvent::Triggered, this, &AASCharacter::SwitchWeapon);
 		
 	} else {
 		UE_LOG(LogTemp, Error, TEXT("'%s' Don't Find EnhancedInputComponent."), *GetNameSafe(this));
@@ -118,11 +111,6 @@ void AASCharacter::DebugHealing(float amount)
 	}
 }
 
-void AASCharacter::CheatSpeed(bool Cheat)
-{
-	SpeedCheatAllowed = Cheat;
-}
-
 void AASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -132,10 +120,8 @@ void AASCharacter::BeginPlay()
 	M_PlayerWidget = CreateWidget<UASGlobalWidget>(GetWorld(), M_PlayerWidgetClass);
 	if (M_PlayerWidget) {
 		M_PlayerWidget->AddToViewport();
+		GetPlayerWidget()->SetNbrOfChargeText(m_GravitySwitchComponent->GetNbrOfCharge());
 	}
-
-	m_SpeedComponent->OnUpdateSpeedProfile.AddDynamic(this, &AASCharacter::OnSpeedProfileChanged);
-	m_SpeedComponent->OnUpdateSpeed.AddDynamic(this, &AASCharacter::OnSpeedChanged);
 
 	m_HealthComponent->OnDeathStarted.AddDynamic(this, &AASCharacter::OnStartDeath);
 	m_HealthComponent->OnHealthChanged.AddDynamic(this, &AASCharacter::OnHealthChanged);
@@ -143,10 +129,9 @@ void AASCharacter::BeginPlay()
 	m_WeaponComponent->InitializeWeapon();
 	m_WeaponComponent->OnFireEvent.AddDynamic(this, &AASCharacter::OnFire);
 
-	m_CloseCombatComponent->OnStartCloseCombatAttack.AddDynamic(this, &AASCharacter::OnAttack);
-
 	m_GravitySwitchComponent->OnStartSwitchGravity.AddDynamic(this, &AASCharacter::OnChangeGravity);
 	m_GravitySwitchComponent->OnSwitchGravityAbiltyCooldownEnd.AddDynamic(this, &AASCharacter::OnAbilityCooldownEnd);
+	m_GravitySwitchComponent->OnGravityChargeRefill.AddDynamic(this, &AASCharacter::OnGravityChargeRefill);
 }
 
 void AASCharacter::GetAllSubsystem()
@@ -189,12 +174,6 @@ void AASCharacter::Look(const FInputActionValue& Value)
 
 void AASCharacter::Shoot(const FInputActionValue& Value)
 {
-	// Temp : Should not be here, just For testing
-	if (SpeedCheatAllowed) {
-		m_EventWorldSubSystem->BroadcastEnemyDeath();
-	}
-	//end
-	
 	//TODO Take into account if the weapon allows maintaining the input or not
 	m_WeaponComponent->Fire(m_FirstPersonCameraComponent->GetComponentLocation(), m_FirstPersonCameraComponent->GetForwardVector());
 }
@@ -202,17 +181,6 @@ void AASCharacter::Shoot(const FInputActionValue& Value)
 void AASCharacter::Reload(const FInputActionValue& Value)
 {
 	m_WeaponComponent->Reload();
-}
-
-void AASCharacter::Switch(const FInputActionValue& Value) 
-{
-	m_WeaponComponent->SwitchWeapon();		
-}
-
-void AASCharacter::CloseCombat(const FInputActionValue& Value)
-{
-	if(m_CloseCombatComponent->m_CanAttack)
-		m_CloseCombatComponent->StartCloseCombatAttack();
 }
 
 void AASCharacter::SwitchGravity(const FInputActionValue& Value)
@@ -229,27 +197,10 @@ void AASCharacter::Dash(const FInputActionValue& Value)
 
 void AASCharacter::OnStartDeath(AActor* OwningActor)
 {
-	UWorld* World = GetWorld();
-	if (!World) return;
-
-	// Get the name of the current level.
-	FString CurrentLevelName = World->GetMapName();
-	CurrentLevelName.RemoveFromStart(World->StreamingLevelsPrefix);
-
-	// Convert the name into a format that can be used for loading.
-	FName LevelName(*CurrentLevelName);
-
-	// Use the GameplayStatics class to load the level.
-	UGameplayStatics::OpenLevel(World, LevelName);
-	if (m_EventWorldSubSystem) {
-		m_EventWorldSubSystem->BroadcastPlayerEndDeath();
-	}
-	
-	//TODO : Should be moved In a Player Class if there is
 	if (m_EventWorldSubSystem) {
 		m_EventWorldSubSystem->BroadcastPlayerStartDeath();
 	}
-	//end
+	
 	if (Controller) {
 		Controller->SetIgnoreMoveInput(true);
 	}
@@ -262,31 +213,26 @@ void AASCharacter::OnStartDeath(AActor* OwningActor)
 	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
 	MoveComp->StopMovementImmediately();
 	MoveComp->DisableMovement();
+	
+	if(m_SoundDeath) {
+		UGameplayStatics::PlaySoundAtLocation( GetWorld(), m_SoundDeath, GetOwner()->GetActorLocation());
+	}
+	
+	// TODO : Add Death Animation and Call OnEndDeath at the end of the animation
+	OnEndDeath();
 }
 
 void AASCharacter::OnEndDeath()
 {
-	//TODO : Should be moved In a Player Class if there is
-
-	GEngine->AddOnScreenDebugMessage(0, 10, FColor::Red, TEXT("DIE"));
-	//end
 	UWorld* World = GetWorld();
 	if (!World) return;
-
-	// Get the name of the current level.
-	FString CurrentLevelName = World->GetMapName();
-	CurrentLevelName.RemoveFromStart(World->StreamingLevelsPrefix);
-
-	// Convert the name into a format that can be used for loading.
-	FName LevelName(*CurrentLevelName);
-
-	// Use the GameplayStatics class to load the level.
-	UGameplayStatics::OpenLevel(World, LevelName);
+	
+	SetLifeSpan(0.1f);
+	SetActorHiddenInGame(true);
+	
 	if (m_EventWorldSubSystem) {
 		m_EventWorldSubSystem->BroadcastPlayerEndDeath();
 	}
-	//SetLifeSpan(0.1f);
-	//SetActorHiddenInGame(true);
 }
 
 void AASCharacter::OnFire()
@@ -297,14 +243,6 @@ void AASCharacter::OnFire()
 	const float MontageLength = AnimInstance->Montage_Play(m_FireMontage, 1.0f, EMontagePlayReturnType::MontageLength, 0.0f, true);
 }
 
-void AASCharacter::OnAttack()
-{
-	UAnimInstance* AnimInstance = GetMesh1P()->GetAnimInstance();
-	if (!IsValid(AnimInstance)) return;
-	
-	const float MontageLength = AnimInstance->Montage_Play(m_CacAttackMontage, 1.0f, EMontagePlayReturnType::MontageLength, 0.0f, true);
-}
-
 void AASCharacter::OnChangeGravity()
 {
 	// Call when the Gravity Switch Start
@@ -313,33 +251,25 @@ void AASCharacter::OnChangeGravity()
 
 void AASCharacter::OnAbilityCooldownEnd()
 {
-	// Call when the Gravity Switch Cooldown End
+	//GetPlayerWidget()->SetNbrOfChargeText(m_GravitySwitchComponent->GetNbrOfCharge());
 	GetPlayerWidget()->SetGravityAbilityImageVisibility(true);
 }
 
 void AASCharacter::OnGravityChargeRefill()
 {
-	// Call when the Gravity Charge Refill (each 0.1f)
 	GetPlayerWidget()->SetGravityChargeBarPercent(m_GravitySwitchComponent->GetTimer() / m_GravitySwitchComponent->GetGravityChargeRefillTime());
+	GetPlayerWidget()->SetNbrOfChargeText(m_GravitySwitchComponent->GetNbrOfCharge());
 }
 
 void AASCharacter::OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth,AActor* DamageDealer)
 {
 	GetPlayerWidget()->SethealthBarPercent(CurrentHealth / MaxHealth);
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("OnHealthChanged"));
 	if (CurrentHealth < PreviousHealth) {
 		CheckPlayScreenShake();
+		if(m_SoundHit) {
+			UGameplayStatics::PlaySoundAtLocation( GetWorld(), m_SoundHit,GetOwner()->GetActorLocation());
+		}
 	}
-}
-
-void AASCharacter::OnSpeedProfileChanged(int SpeedProfile)
-{
-	GetPlayerWidget()->SetSpeedProfile(SpeedProfile);
-}
-
-void AASCharacter::OnSpeedChanged(float NewSpeed, float MaxSpeed)
-{
-	GetPlayerWidget()->SetSpeedBarPercent(NewSpeed / MaxSpeed);
 }
 
 void AASCharacter::CheckPlayScreenShake()
@@ -351,7 +281,6 @@ void AASCharacter::CheckPlayScreenShake()
 	APlayerCameraManager* lCamMgr = UGameplayStatics::GetPlayerCameraManager(this->GetWorld(), 0);
 	if (lCamMgr != nullptr) {
 		lCamMgr->StartCameraShake(m_ShakeClass);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Shake"));
 	}
 }
 

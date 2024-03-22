@@ -41,11 +41,6 @@ void UASHealthComponent::healing(float amount)
 void UASHealthComponent::Damage(float amount, AActor* DamageDealer, float stunDuration)
 {
 	if(!m_IsDamageable) return;
-	// TODO : Move On Character 
-	if(m_Sound_Hit) {
-		UGameplayStatics::PlaySoundAtLocation( GetWorld(), m_Sound_Hit,GetOwner()->GetActorLocation());
-	}
-	
 	// previous health can be Use Later For Lerp maybe ?
 	const float PreviousHealth = m_Health;
 	const float NewHealth = FMath::Clamp(PreviousHealth - (amount * m_DamageMultiplicator), m_MinhHealth, m_MaxHealth);
@@ -60,21 +55,11 @@ void UASHealthComponent::Damage(float amount, AActor* DamageDealer, float stunDu
 		m_IsExecutable = true;
 	OnHealthChanged.Broadcast(PreviousHealth, m_Health, m_MaxHealth, DamageDealer);
 
-
 	
 	if (m_Health <= 0.0f) {
 		OnDeathStarted.Broadcast(GetOwner());
-		Death();
 	}
 }
 
-void UASHealthComponent::Death()
-{
-	// TODO : Move On Character
-	if(m_Sound_Death) {
-		UGameplayStatics::PlaySoundAtLocation( GetWorld(), m_Sound_Death, GetOwner()->GetActorLocation());
-		GetOwner()->SetLifeSpan(.1f);
-	}
-}
 
 

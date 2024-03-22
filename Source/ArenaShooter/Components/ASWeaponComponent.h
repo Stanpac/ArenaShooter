@@ -25,10 +25,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Gameplay")
 	TSubclassOf<AASWeapon> m_primaryWeaponBlueprint;
 
-	/** Blueprint reference to the secondary weapon */
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Gameplay")
-	//TSubclassOf<AASWeapon> m_secondaryWeaponBlueprint;
-
 	/** Weapon position offset (Especially useful when there is no socket) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Gameplay")
 	FVector m_PositionOffset;
@@ -63,10 +59,6 @@ public:
 	/** Make the weapon Recharge its munitions */
 	UFUNCTION(BlueprintCallable, Category="Gameplay")
 	void Reload();
-	
-	/** Switch between primary and secondary weapons **/
-	UFUNCTION(BlueprintCallable, Category="Gameplay")
-	void SwitchWeapon();
 
 	/** At Begin Play **/
 	UFUNCTION(BlueprintCallable, Category="Gameplay")

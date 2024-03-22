@@ -25,16 +25,6 @@ AASPawn::AASPawn()
 	m_MeshComponent->SetupAttachment(m_CapsuleComponent);
 
 	m_HealthComponent = CreateDefaultSubobject<UASHealthComponent>(TEXT("HealthComponent"));
-
-	m_HealthVisibilitySphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("HealthVisibilitySphereComponent"));
-	m_HealthVisibilitySphereComponent->SetupAttachment(m_CapsuleComponent);
-	m_HealthVisibilitySphereComponent->SetSphereRadius(1000.0f);
-	
-	m_HealthBarWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBarWidgetComponent"));
-	m_HealthBarWidgetComponent->SetupAttachment(m_CapsuleComponent);
-	m_HealthBarWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
-	m_HealthBarWidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 100.0f));
-
 	m_WeaponComponent = CreateDefaultSubobject<UASWeaponComponent>(TEXT("WeaponComponent"));
 }
 
@@ -47,22 +37,8 @@ void AASPawn::Stun(float stunDuration)
 void AASPawn::BeginPlay()
 {
 	Super::BeginPlay();
-
 	
 	m_EventWorldSubSystem = GetWorld()->GetSubsystem<UASEventWorldSubSystem>();
-	
-	m_HealthBarWidgetComponent->SetWidgetClass(m_HealthBarWidgetClass);
-	m_HealthBarWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
-
-	
-	if (UASEnemyWidget* GlobalWidget = CastChecked<UASEnemyWidget>(m_HealthBarWidgetComponent->GetUserWidgetObject())) {
-		GlobalWidget->SetHealthBarColor(m_HealthComponent->GetIsExecutable());
-	}
-	
-	SetWidgetVisibility(false);
-	
-	m_HealthVisibilitySphereComponent->OnComponentBeginOverlap.AddDynamic(this, &AASPawn::OnHealthVisibilitySphereComponentBeginOverlap);
-	m_HealthVisibilitySphereComponent->OnComponentEndOverlap.AddDynamic(this, &AASPawn::OnHealthVisibilitySphereComponentEndOverlap);
 	
 	m_HealthComponent->OnHealthChanged.AddDynamic(this, &AASPawn::OnHealthChanged);
 	m_HealthComponent->OnDeathStarted.AddDynamic(this, &AASPawn::OnDeath);
@@ -79,19 +55,9 @@ void AASPawn::Tick(float DeltaSeconds)
 
 void AASPawn::OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer)
 {
-	if (m_HealthBarWidgetComponent) {
-		
-		if (DamageDealer != this && !m_HealthBarWidgetComponent->IsWidgetVisible()) {
-			SetWidgetVisibility(true);
-			GetWorldTimerManager().SetTimer(m_HealthBarTimerHandle, this, &AASPawn::SetWidgetVisibilityfalse, 1, false);
-			// Launch Timer For the HealthBar
-		}
-		
-		if (UASEnemyWidget* GlobalWidget = CastChecked<UASEnemyWidget>(m_HealthBarWidgetComponent->GetUserWidgetObject())) {
-			GlobalWidget->UpdatehealthBar(CurrentHealth / MaxHealth);
-			GlobalWidget->SetHealthBarColor(m_HealthComponent->GetIsExecutable());
-		}
-	}
+	// Find a Way to get the Indicate that you can one shoot the enemy
+	// Oeverlay Mat ?
+	
 	SpawnFloatingDamage(GetActorLocation(), GetActorRotation(), PreviousHealth - CurrentHealth);
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), m_ImpactParticle, GetActorLocation());
 }
@@ -140,37 +106,6 @@ void AASPawn::SpawnFloatingDamage(const FVector& SpawnLocation, const FRotator& 
 	
 	/*Set the damage value into the system, it will use to compute where the texture number should take float*/
 	UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVector4Value(lNiagaraComp, FName("DamageInfo"), 0, lDamageData, false);
-}
-
-void AASPawn::SetWidgetVisibility(bool visible)
-{
-	if (m_HealthBarWidgetComponent) {
-
-		m_HealthBarWidgetComponent->SetVisibility(visible);
-	}
-}
-
-void AASPawn::SetWidgetVisibilityfalse()
-{
-	if (m_HealthBarWidgetComponent) {
-		m_HealthBarWidgetComponent->SetVisibility(false);
-	}
-}
-
-void AASPawn::OnHealthVisibilitySphereComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent,AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,const FHitResult& SweepResult)
-{
-	if (OtherActor == this) {
-		return;
-	}
-	SetWidgetVisibility(true);
-}
-
-void AASPawn::OnHealthVisibilitySphereComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	if (OtherActor == this) {
-		return;
-	}
-	SetWidgetVisibility(false);
 }
 
 

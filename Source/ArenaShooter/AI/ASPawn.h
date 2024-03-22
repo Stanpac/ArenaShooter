@@ -37,15 +37,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASPawn|Components", meta = (DisplayName = "WeaponComponent"))
 	UASWeaponComponent* m_WeaponComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASPawn|Components", meta = (DisplayName = "HealthVisibilitySphereComponent"))
-	USphereComponent* m_HealthVisibilitySphereComponent;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASPawn|Components", meta = (DisplayName = "HealthBarWidgetComponent"))
-	UWidgetComponent* m_HealthBarWidgetComponent;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASPawn|Widget", meta = (DisplayName = "HealthBarWidgetClass"))
-	TSubclassOf<UUserWidget> m_HealthBarWidgetClass;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASPawn|Temp", meta = (DisplayName = "Copy"))
 	TSubclassOf<AASPawn> m_TurretCopy;
 
@@ -98,18 +89,6 @@ protected:
 	void SpawnFloatingDamage(const FVector& SpawnLocation, const FRotator& SpawnRotation, const float Damage);
 
 public:
-	
 	bool GetIsStunned() const { return m_IsStunned;}
-
-protected:
-	void SetWidgetVisibility(bool visible);
-
-	void SetWidgetVisibilityfalse();
-
-	UFUNCTION()
-	virtual void OnHealthVisibilitySphereComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION()
-	virtual void OnHealthVisibilitySphereComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,int32 OtherBodyIndex);
 	
 };

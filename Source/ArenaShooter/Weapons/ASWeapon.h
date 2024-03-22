@@ -114,15 +114,7 @@ public:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	/** Equip the weapon to the owning Pawns **/
-	UFUNCTION(BlueprintCallable, Category="Gameplay")
-	void Equip();
-
-	/** Stach the weapon to the owning Pawns **/
-	UFUNCTION(BlueprintCallable, Category="Gameplay")
-	void Stach();
-
+	
 	UFUNCTION(BlueprintCallable, Category="Gameplay")
 	virtual void Fire(FVector fireOrigin, FVector fireDirection);
 

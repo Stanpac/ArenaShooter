@@ -44,12 +44,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Healing|Multiplicator", meta = (EditCondition = "m_UseMultiplicator"))
 	float m_DamageMultiplicator;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Audio", meta = (DisplayName = "Audio On Death trigger"))
-	USoundBase* m_Sound_Death;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Audio", meta = (DisplayName = "Audio On Hit trigger"))
-	USoundBase* m_Sound_Hit;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Health", meta = (DisplayName = "Is Executatble"))
 	bool m_IsExecutable;
 	
@@ -78,8 +72,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Damage(float amount, AActor* DamageDealer, float stunAmount = 0);
 
-	UFUNCTION(BlueprintCallable)
-	void Death();
 	
 protected:
 	virtual void BeginPlay() override;
