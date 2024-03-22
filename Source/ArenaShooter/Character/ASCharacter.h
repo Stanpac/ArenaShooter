@@ -47,13 +47,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Camera", meta = (DisplayName = "First Person Camera Component"))
 	UCameraComponent* m_FirstPersonCameraComponent;
 
-public:
-	UCameraComponent* GetCameraComponent() const
-	{
-		return m_FirstPersonCameraComponent;
-	}
 
-protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Camera", meta = (DisplayName = "Play Shake On taking Damage"))
+	bool bPlayShakeOntakingDamage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Camera", meta = (DisplayName = "Camera Shake Class"))
+	TSubclassOf<UCameraShakeBase> m_ShakeClass;
+
 	/** Health Component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Health", meta = (DisplayName = "Health Component"))
 	UASHealthComponent* m_HealthComponent;
@@ -184,6 +184,9 @@ protected:
 	virtual void OnAbilityCooldownEnd();
 
 	UFUNCTION()
+	virtual void OnGravityChargeRefill();
+
+	UFUNCTION()
 	void OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer);
 
 	UFUNCTION()
@@ -191,6 +194,8 @@ protected:
 
 	UFUNCTION()
 	void OnSpeedChanged(float NewSpeed, float MaxSpeed);
+
+	void CheckPlayScreenShake();
 
 	void GetAllSubsystem();
 	void AddDefaultMappingContext();
@@ -200,4 +205,7 @@ public:
 	FORCEINLINE UASGlobalWidget* GetPlayerWidget() const { return M_PlayerWidget; }
 
 	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return m_Mesh1P; }
+
+	FORCEINLINE UCameraComponent* GetCameraComponent() const{ return m_FirstPersonCameraComponent; }
+
 };

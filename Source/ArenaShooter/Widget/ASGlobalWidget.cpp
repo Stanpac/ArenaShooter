@@ -55,5 +55,12 @@ void UASGlobalWidget::SetGravityAbilityImageVisibility(bool visible)
 	}
 }
 
+void UASGlobalWidget::SetGravityChargeBarPercent(float percent)
+{
+	if (m_GravityAbilityRefillBar) {
+		m_GravityAbilityRefillBar->SetPercent(percent);
+	}
+}
+
 
 

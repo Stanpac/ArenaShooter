@@ -145,7 +145,7 @@ void AASCharacter::BeginPlay()
 
 	m_CloseCombatComponent->OnStartCloseCombatAttack.AddDynamic(this, &AASCharacter::OnAttack);
 
-	m_GravitySwitchComponent->OnSwitchGravity.AddDynamic(this, &AASCharacter::OnChangeGravity);
+	m_GravitySwitchComponent->OnStartSwitchGravity.AddDynamic(this, &AASCharacter::OnChangeGravity);
 	m_GravitySwitchComponent->OnSwitchGravityAbiltyCooldownEnd.AddDynamic(this, &AASCharacter::OnAbilityCooldownEnd);
 }
 
@@ -317,9 +317,19 @@ void AASCharacter::OnAbilityCooldownEnd()
 	GetPlayerWidget()->SetGravityAbilityImageVisibility(true);
 }
 
+void AASCharacter::OnGravityChargeRefill()
+{
+	// Call when the Gravity Charge Refill (each 0.1f)
+	GetPlayerWidget()->SetGravityChargeBarPercent(m_GravitySwitchComponent->GetTimer() / m_GravitySwitchComponent->GetGravityChargeRefillTime());
+}
+
 void AASCharacter::OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth,AActor* DamageDealer)
 {
 	GetPlayerWidget()->SethealthBarPercent(CurrentHealth / MaxHealth);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("OnHealthChanged"));
+	if (CurrentHealth < PreviousHealth) {
+		CheckPlayScreenShake();
+	}
 }
 
 void AASCharacter::OnSpeedProfileChanged(int SpeedProfile)
@@ -330,6 +340,19 @@ void AASCharacter::OnSpeedProfileChanged(int SpeedProfile)
 void AASCharacter::OnSpeedChanged(float NewSpeed, float MaxSpeed)
 {
 	GetPlayerWidget()->SetSpeedBarPercent(NewSpeed / MaxSpeed);
+}
+
+void AASCharacter::CheckPlayScreenShake()
+{
+	if (!bPlayShakeOntakingDamage || m_ShakeClass == nullptr) {
+		return;
+	}
+	
+	APlayerCameraManager* lCamMgr = UGameplayStatics::GetPlayerCameraManager(this->GetWorld(), 0);
+	if (lCamMgr != nullptr) {
+		lCamMgr->StartCameraShake(m_ShakeClass);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Shake"));
+	}
 }
 
 void AASCharacter::AddDefaultMappingContext()

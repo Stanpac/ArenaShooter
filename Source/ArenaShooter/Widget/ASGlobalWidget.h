@@ -39,6 +39,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
 	TObjectPtr<UImage> m_GravityAbilityImage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
+	TObjectPtr<UTextBlock> m_NbrOfChargeText;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
+	TObjectPtr<UProgressBar> m_GravityAbilityRefillBar;
 	
 	/* ---------------------------------- FUNCTIOns --------------------------------------*/
 public:
@@ -53,9 +59,11 @@ public:
 	void ChangeCursorVisibility(bool visible);
 
 	void SetSpeedProfile(int profile);
-
+	
 	void SetGravityAbilityImageVisibility(bool visible);
 
+	void SetGravityChargeBarPercent(float percent);
+	
 protected:
 };
 

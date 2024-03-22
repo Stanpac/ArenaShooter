@@ -18,34 +18,35 @@ void AASDroneSpawner::SpawnAI()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	AActor* Actor = GetWorld()->SpawnActor<AActor>(m_AIPawnClassTOSpawn, GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
 	if (Actor != nullptr) {
-		CanSpawn = false;
 		m_currentSpawnedActors.Add(Actor);
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AASDroneSpawner::CanSpawnAgain, m_SpawnDelay, false);
-		Actor->OnDestroyed.AddDynamic(this, &AASDroneSpawner::OnCurrentSpawnedActorDestroyed);
+		m_SpawnCount++;
+		if (m_SpawnCount >= m_NbrOfDroneToSpawn) {
+			SetCanSpawn(false);
+			m_SpawnCount = 0;
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AASDroneSpawner::CanSpawnAgain, m_SpawnDelay, false);
+		}
 	}
 }
 
 void AASDroneSpawner::OnCurrentSpawnedActorDestroyed(AActor* DestroyedActor)
 {
 	m_currentSpawnedActors.Remove(DestroyedActor);
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AASDroneSpawner::CanSpawnAgain, m_SpawnDelay, false);
 }
 
 void AASDroneSpawner::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	if (CanSpawn) SpawnAI();
+	if (IsCanSpawn()) SpawnAI();
 }
 
 void AASDroneSpawner::BeginPlay()
 {
 	Super::BeginPlay();
-	CanSpawn = true;
+	SetCanSpawn(true);
 }
 
 void AASDroneSpawner::CanSpawnAgain()
 {
-	CanSpawn = true;
+	SetCanSpawn(true);
 }

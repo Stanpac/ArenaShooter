@@ -80,10 +80,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feedback", meta=(DisplayName = "Fire Sound"))
 	USoundBase* m_Sound_ShotFired;
 
-	/** Particle System when shot is fired **/
-	/*UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feedback", meta=(DisplayName = "Fire Particle System"))
-	UNiagaraSystem* m_PSys_ShotFired;*/
-
 	/** Determines if the weapon will be set hidden at start **/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feedback", meta=(DisplayName = "Is the Weapon Shown"))
 	bool m_ShowWeapon;

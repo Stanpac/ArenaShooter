@@ -3,6 +3,8 @@
 
 #include "ArenaShooter/AI/ASPawn.h"
 
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "ArenaShooter/Components/ASHealthComponent.h"
 #include "ArenaShooter/Components/ASWeaponComponent.h"
 #include "ArenaShooter/SubSystem/ASEventWorldSubSystem.h"
@@ -11,6 +13,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraDataInterfaceArrayFunctionLibrary.h"
 
 
 AASPawn::AASPawn()
@@ -89,7 +92,7 @@ void AASPawn::OnHealthChanged(float PreviousHealth, float CurrentHealth, float M
 			GlobalWidget->SetHealthBarColor(m_HealthComponent->GetIsExecutable());
 		}
 	}
-	
+	SpawnFloatingDamage(GetActorLocation(), GetActorRotation(), PreviousHealth - CurrentHealth);
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), m_ImpactParticle, GetActorLocation());
 }
 
@@ -112,6 +115,31 @@ void AASPawn::StunTick(float DeltaTime)
 	{
 		m_IsStunned = false;
 	}
+}
+
+void AASPawn::SpawnFloatingDamage(const FVector& SpawnLocation, const FRotator& SpawnRotation, const float Damage)
+{
+	if (GetWorld() == nullptr) {
+		UE_LOG(LogTemp, Error,TEXT("%s, can't spawn floating damage. No context"), *GetNameSafe(this));
+		return;
+	}
+
+	if (m_floatingDamageSystem == nullptr) {
+		UE_LOG(LogTemp, Error,TEXT("%s, can't spawn floating damage. The system is null"), *GetNameSafe(this));
+		return;
+	}
+
+	UNiagaraComponent* lNiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_floatingDamageSystem, SpawnLocation, SpawnRotation, FVector::One(), true, true);
+	
+	FVector4 lDamageData = FVector4();
+
+	lDamageData.X = SpawnLocation.X;
+	lDamageData.Y = SpawnLocation.Y;
+	lDamageData.Z = SpawnLocation.Z;
+	lDamageData.W = Damage;
+	
+	/*Set the damage value into the system, it will use to compute where the texture number should take float*/
+	UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVector4Value(lNiagaraComp, FName("DamageInfo"), 0, lDamageData, false);
 }
 
 void AASPawn::SetWidgetVisibility(bool visible)

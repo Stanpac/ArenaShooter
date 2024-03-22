@@ -15,6 +15,7 @@ class UUserWidget;
 class UASEventWorldSubSystem;
 class UASWeaponComponent;
 class USceneComponent;
+class UNiagaraSystem;
 
 
 UCLASS()
@@ -54,6 +55,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASPawn|Components", meta = (DisplayName = "Impact parrticle"));
 	UParticleSystem* m_ImpactParticle;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ASPawn|Damage", meta = (AllowPrivateAccess = "true", DisplayName = "FloatingDamageSystem"))
+	TObjectPtr<UNiagaraSystem> m_floatingDamageSystem;
+
 	/** How much time is left to end stun **/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stun", meta=(DisplayName = "Current Stun Timer"))
 	float m_StunTimer;
@@ -89,6 +93,9 @@ protected:
 
 	UFUNCTION()
 	virtual void StunTick(float DeltaTime);
+	
+	UFUNCTION(BlueprintCallable)
+	void SpawnFloatingDamage(const FVector& SpawnLocation, const FRotator& SpawnRotation, const float Damage);
 
 public:
 	
