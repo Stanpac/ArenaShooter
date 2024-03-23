@@ -9,6 +9,7 @@
 
 class UASHealthComponent;
 class UASWeaponComponent;
+class UASDroneManager;
 
 UENUM(BlueprintType) // Makes the enum available in Blueprints
 enum class EDroneBehaviour : uint8
@@ -27,29 +28,48 @@ public:
 	AASDronePawn();
 
 private:
+
+	UPROPERTY(EditAnywhere, Category = "AI Enablers", DisplayName = "Enable shooting")
+	bool m_EnableShooting = true;
+
+	UPROPERTY(EditAnywhere, Category = "AI Enablers", DisplayName = "Enable movement towards player")
+	bool m_EnableMovementTowardsPlayer = true;
+
+	UPROPERTY(EditAnywhere, Category = "AI Enablers", DisplayName = "Enable dispersion behaviour")
+	bool m_EnableDispersionBehaviour = true;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "AI tick rate")
-	float m_AITickRate;
+	float m_AITickRate = .25f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Distance to trigger teleportation")
-	float m_DistanceToTeleport;
+	float m_DistanceToTeleport = 50;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Minimum distance to start shooting")
-	float m_MinRangeToAttack;
+	float m_MinRangeToAttack = 600;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Maximum distance to start shooting")
-	float m_MaxRangeToAttack;
+	float m_MaxRangeToAttack = 1000;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Radius of the detection sphere cast towards the player")
-	float m_SphereCastRadius;
+	float m_SphereCastRadius = 20;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Time it takes to teleport through a wall")
-	float m_TeleportationDuration;
+	float m_TeleportationDuration = 1.5f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Distance by sphere cast for teleportation")
-	int32 m_DistanceByTeleportationSphereCast;
+	int32 m_DistanceByTeleportationSphereCast = 100;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Number of teleportation raycast tests before abort")
-	int32 m_NumberOfTPBeforeAbort;
+	int32 m_NumberOfTPBeforeAbort = 30;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Speed of drone towards Player")
+	float m_DroneToPlayerSpeed = 100;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Speed of drone away from other drones")
+	float m_DroneDispersionSpeed = 100;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Curve of dispersion from other drones depending on distance")
+	UCurveFloat* m_DroneDispersionCurve;
 	
 	UPROPERTY()
 	float m_AITickTimer;
@@ -63,6 +83,12 @@ private:
 	UPROPERTY()
 	float m_TeleportationTimer;
 
+	UPROPERTY()
+	UASDroneManager* m_DroneManager;
+
+	UPROPERTY()
+	FVector m_DispersionVector;
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -100,11 +126,11 @@ protected:
 	void TeleportDrone();
 	
 	UFUNCTION()
-	void DroneMovement();
+	void DroneMovement(float DeltaTime);
+
+	UFUNCTION()
+	FVector DroneRelativeMoveDirection();
 	
 public:	
 	virtual void Tick(float DeltaTime) override;
-
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 };

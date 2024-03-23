@@ -11,6 +11,7 @@
 class USpringArmComponent;
 class UGravitySwitchComponent;
 class UASSpeedComponent;
+class UASDashComponent;
 class UASGlobalWidget;
 class UASHealthComponent;
 class UASEventWorldSubSystem;
@@ -46,6 +47,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Camera", meta = (DisplayName = "First Person Camera Component"))
 	UCameraComponent* m_FirstPersonCameraComponent;
 
+public:
+	UCameraComponent* GetCameraComponent() const
+	{
+		return m_FirstPersonCameraComponent;
+	}
+
+protected:
 	/** Health Component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Health", meta = (DisplayName = "Health Component"))
 	UASHealthComponent* m_HealthComponent;
@@ -62,6 +70,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Speed", meta = (DisplayName = "SpeedComponent"))
 	UASSpeedComponent* m_SpeedComponent;
 
+	/** Dash Component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Speed", meta = (DisplayName = "DashComponent"))
+	UASDashComponent* m_DashComponent;
+	
 	/** Gravity Switch Component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Speed", meta = (DisplayName = "GravitySwitchComponent"))
 	UGravitySwitchComponent* m_GravitySwitchComponent;
@@ -117,12 +129,16 @@ protected:
 	UInputAction* m_CloseCombatAction;
 
 	/** Close Combat Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "Dash Action"))
+	UInputAction* m_DashAction;
+	
+	/** Close Combat Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "Switch Gravity Action"))
 	UInputAction* m_switchGravityAction;
 	
 	/** CheatSpeed bool */
 	bool SpeedCheatAllowed;
-	
+
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
 	AASCharacter();
@@ -147,6 +163,7 @@ protected:
 	void Switch(const FInputActionValue& Value);
 	void CloseCombat(const FInputActionValue& Value);
 	void SwitchGravity(const FInputActionValue& Value);
+	void Dash(const FInputActionValue& Value);
 	
 	UFUNCTION()
 	virtual void OnStartDeath(AActor* OwningActor);

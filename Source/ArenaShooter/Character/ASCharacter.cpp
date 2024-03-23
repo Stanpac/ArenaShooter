@@ -5,6 +5,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "ArenaShooter/Components/ASCloseCombatComponent.h"
+#include "ArenaShooter/Components/ASDashComponent.h"
 #include "ArenaShooter/Components/ASHealthComponent.h"
 #include "ArenaShooter/Components/ASSpeedComponent.h"
 #include "ArenaShooter/Components/ASWeaponComponent.h"
@@ -63,7 +64,7 @@ AASCharacter::AASCharacter()
 	m_CloseCombatComponent = CreateDefaultSubobject<UASCloseCombatComponent>(TEXT("CloseCombatComponent"));
 	m_SpeedComponent = CreateDefaultSubobject<UASSpeedComponent>(TEXT("SpeedComponent"));
 	m_GravitySwitchComponent = CreateDefaultSubobject<UGravitySwitchComponent>(TEXT("GravitySwitchComponent"));
-
+	m_DashComponent = CreateDefaultSubobject<UASDashComponent>(TEXT("DashComponent"));
 }
 
 void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -88,8 +89,12 @@ void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 		// CloseCombat
 		EnhancedInputComponent->BindAction(m_CloseCombatAction, ETriggerEvent::Triggered, this, &AASCharacter::CloseCombat);
-		
+
+		//GravitySwitch
 		EnhancedInputComponent->BindAction(m_switchGravityAction, ETriggerEvent::Triggered, this, &AASCharacter::SwitchGravity);
+
+		//Dash
+		EnhancedInputComponent->BindAction(m_DashAction, ETriggerEvent::Triggered, this, &AASCharacter::Dash);
 		
 		// Switching Weapon
 		//EnhancedInputComponent->BindAction(m_switchWeaponAction, ETriggerEvent::Triggered, this, &AASCharacter::SwitchWeapon);
@@ -215,6 +220,11 @@ void AASCharacter::SwitchGravity(const FInputActionValue& Value)
 	if (m_GravitySwitchComponent) {
 		m_GravitySwitchComponent->SwitchGravity();
 	}
+}
+
+void AASCharacter::Dash(const FInputActionValue& Value)
+{
+	m_DashComponent->OnDash();
 }
 
 void AASCharacter::OnStartDeath(AActor* OwningActor)

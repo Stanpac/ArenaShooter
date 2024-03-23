@@ -40,6 +40,7 @@ void UASHealthComponent::healing(float amount)
 
 void UASHealthComponent::Damage(float amount, AActor* DamageDealer, float stunDuration)
 {
+	if(!m_IsDamageable) return;
 	// TODO : Move On Character 
 	if(m_Sound_Hit) {
 		UGameplayStatics::PlaySoundAtLocation( GetWorld(), m_Sound_Hit,GetOwner()->GetActorLocation());

@@ -1,4 +1,6 @@
 #include "ASDronePawn.h"
+
+#include "ASDroneManager.h"
 #include "ArenaShooter/Components/ASHealthComponent.h"
 #include "ArenaShooter/Components/ASWeaponComponent.h"
 #include "GameFramework/Character.h"
@@ -6,10 +8,6 @@
 AASDronePawn::AASDronePawn()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-	m_HealthComponent = CreateDefaultSubobject<UASHealthComponent>(TEXT("HealthComponent"));
-
-	m_WeaponComponent = CreateDefaultSubobject<UASWeaponComponent>(TEXT("WeaponComponent"));
 }
 
 void AASDronePawn::BeginPlay()
@@ -19,14 +17,22 @@ void AASDronePawn::BeginPlay()
 	check(m_Player);
 	m_CurrentBehaviour = EDroneBehaviour::CHASING;
 	OnBehaviourStateEnter();
+	m_DroneManager = GetWorld()->GetSubsystem<UASDroneManager>();
+	m_DroneManager->AddDrone(this);
 }
 
-void AASDronePawn::LookAtPlayer(float DeltaTime)
+void AASDronePawn::Tick(float DeltaTime)
 {
-	const FVector LookAtLocation = m_Player->GetActorLocation();
-	const FVector PawnLocation = GetActorLocation();
-	const FRotator LookAtRotation = (LookAtLocation - PawnLocation).Rotation();
-	SetActorRotation(LookAtRotation);
+	Super::Tick(DeltaTime);
+	LookAtPlayer(DeltaTime);
+	OnBehaviourStateTick(DeltaTime);
+	DroneMovement(DeltaTime);
+	m_AITickTimer -= DeltaTime;
+	if(m_AITickTimer <= 0)
+	{
+		m_AITickTimer = m_AITickRate;
+		OnBehaviourAIStateTick();
+	}
 }
 
 void AASDronePawn::ChangeBehaviour(EDroneBehaviour newBehaviour)
@@ -87,19 +93,38 @@ void AASDronePawn::OnBehaviourAIStateTick()
 	switch(m_CurrentBehaviour)
 	{
 		case EDroneBehaviour::CHASING:
+		{
 			ChasingBehaviour();
+			m_DispersionVector = DroneRelativeMoveDirection();
 			break;
+		}
+
 		case EDroneBehaviour::SHOOTING:
+		{
+			m_DispersionVector = DroneRelativeMoveDirection();
 			float distanceToObject;
-			if(!IsPlayerInSight(distanceToObject) || distanceToObject < m_MaxRangeToAttack || distanceToObject > m_MinRangeToAttack)
+			bool sightCondition;
+			sightCondition = IsPlayerInSight(distanceToObject);
+			bool distanceCondition;
+			distanceCondition = distanceToObject < m_MinRangeToAttack || distanceToObject > m_MaxRangeToAttack;
+			if(!sightCondition || distanceCondition)
 			{
 				ChangeBehaviour(EDroneBehaviour::CHASING);
 			}
-			else m_WeaponComponent->Fire(GetActorLocation(), GetActorForwardVector());
+			else if(m_EnableShooting) m_WeaponComponent->Fire(GetActorLocation(), GetActorForwardVector());
 			break;
+		}
 		case EDroneBehaviour::TELEPORTING:
 			break;
 	}
+}
+
+void AASDronePawn::LookAtPlayer(float DeltaTime)
+{
+	const FVector LookAtLocation = m_Player->GetActorLocation();
+	const FVector PawnLocation = GetActorLocation();
+	const FRotator LookAtRotation = (LookAtLocation - PawnLocation).Rotation();
+	SetActorRotation(LookAtRotation);
 }
 
 void AASDronePawn::ChasingBehaviour()
@@ -147,7 +172,9 @@ bool AASDronePawn::IsPlayerInSight(float& DistanceToTarget)
 	if(bHit)
 	{
 		DistanceToTarget = OutHit.Distance;
-		if(OutHit.GetActor() == m_Player) return true;
+		bool isActor = OutHit.GetActor() == m_Player;
+		if( isActor)
+			return true;
 	}
 	return false;
 }
@@ -200,27 +227,41 @@ void AASDronePawn::TeleportDrone()
 	ChangeBehaviour(EDroneBehaviour::CHASING);
 }
 
-void AASDronePawn::DroneMovement()
+void AASDronePawn::DroneMovement(float DeltaTime)
 {
+	FVector droneToPlayerVector = (m_Player->GetActorLocation() - GetActorLocation()).GetSafeNormal() * m_DroneToPlayerMult;
+	
+	float dispersionEnableValue = 1;
+	if(!m_EnableDispersionBehaviour) dispersionEnableValue = 0;
+
+	float movementTowardsPlayerEnableValue = 1;
+	if(!m_EnableMovementTowardsPlayer || m_CurrentBehaviour != EDroneBehaviour::CHASING) movementTowardsPlayerEnableValue = 0;
+
+	FVector moveToPlayer = droneToPlayerVector * m_DroneToPlayerSpeed * movementTowardsPlayerEnableValue;
+	FVector dispersion = m_DispersionVector * m_DroneDispersionSpeed * dispersionEnableValue;
+	dispersion.Z = 0;
+
+	SetActorLocation(GetActorLocation() + ( dispersion + moveToPlayer ) * DeltaTime);
 }
 
-void AASDronePawn::Tick(float DeltaTime)
+FVector AASDronePawn::DroneRelativeMoveDirection()
 {
-	Super::Tick(DeltaTime);
-	LookAtPlayer(DeltaTime);
-	OnBehaviourStateTick(DeltaTime);
-
-	m_AITickTimer -= DeltaTime;
-	if(m_AITickTimer <= 0)
+	TArray<AActor*> drones = m_DroneManager->GetDrones();
+	FVector averageDronesLocation = FVector::Zero();
+	
+	for(auto drone : drones)
 	{
-		m_AITickTimer = m_AITickRate;
-		OnBehaviourAIStateTick();
+		if(drone != this)
+		{
+			FVector direction = (drone->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+			float evaluatedAmplitude = m_DroneDispersionCurve->GetFloatValue(FVector::Distance(GetActorLocation(), drone->GetActorLocation()) / 1000);
+			averageDronesLocation += direction * evaluatedAmplitude;
+		}
 	}
+	//if(averageDronesLocation .Length() > 1) averageDronesLocation  = averageDronesLocation .GetSafeNormal();
+	return -averageDronesLocation;
 }
 
-void AASDronePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-}
+
 

@@ -53,6 +53,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Health", meta = (DisplayName = "Is Executatble"))
 	bool m_IsExecutable;
 	
+	UPROPERTY()
+	bool m_IsDamageable = true;
+
 public:
 	// Delegate call when the Death Start
 	UPROPERTY(BlueprintAssignable)
@@ -61,6 +64,7 @@ public:
 	// Delegate call when the Health Change
 	UPROPERTY(BlueprintAssignable)
 	FHealthComponent_HealthChangeEvent OnHealthChanged;
+	
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
 	UASHealthComponent();
@@ -84,4 +88,7 @@ public:
 	float GetHealth() const { return m_Health; }
 
 	bool GetIsExecutable() const { return m_IsExecutable; }
+	
+	bool GetIsDamageable() const { return m_IsDamageable; }
+	void SetIsDamageable(bool isDamageable) { m_IsDamageable = isDamageable;}
 };
