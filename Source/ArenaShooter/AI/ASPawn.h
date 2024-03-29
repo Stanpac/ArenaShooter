@@ -60,6 +60,9 @@ protected:
 	/** Event World SubSystem */
 	UPROPERTY()
 	TObjectPtr<UASEventWorldSubSystem> m_EventWorldSubSystem;
+
+	UPROPERTY()
+	FVector m_HitLocation;
 	
 	// Timer
 	FTimerHandle m_HealthBarTimerHandle;
@@ -90,5 +93,6 @@ protected:
 
 public:
 	bool GetIsStunned() const { return m_IsStunned;}
-	
+
+	void SetHitPosition(FVector hitPosition) { m_HitLocation = hitPosition; }
 };

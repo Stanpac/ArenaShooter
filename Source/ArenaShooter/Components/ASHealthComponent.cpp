@@ -38,10 +38,20 @@ void UASHealthComponent::healing(float amount)
 	OnHealthChanged.Broadcast(PreviousHealth, m_Health, m_MaxHealth, GetOwner());
 }
 
-void UASHealthComponent::Damage(float amount, AActor* DamageDealer, float stunDuration)
+void UASHealthComponent::Damage(float amount, AActor* DamageDealer, float stunDuration, FVector hitLocation)
 {
 	if(!m_IsDamageable) return;
 
+	if(GetOwner()->IsA<AASPawn>())
+	{
+		AASPawn* pawn = Cast<AASPawn>(GetOwner());
+		if(hitLocation == FVector::ZeroVector)
+		{
+			hitLocation = pawn->GetActorLocation();
+		}
+		pawn->SetHitPosition(hitLocation);
+	}
+	
 	// previous health can be Use Later For Lerp maybe ?
 	const float PreviousHealth = m_Health;
 	const float NewHealth = FMath::Clamp(PreviousHealth - (amount * m_DamageMultiplicator), m_MinhHealth, m_MaxHealth);

@@ -54,6 +54,8 @@ void AASPawn::Tick(float DeltaSeconds)
 	if(m_IsStunned) StunTick(DeltaSeconds);
 }
 
+
+
 void AASPawn::OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer)
 {
 	// Find a Way to get the Indicate that you can one shoot the enemy
@@ -61,7 +63,7 @@ void AASPawn::OnHealthChanged(float PreviousHealth, float CurrentHealth, float M
 	
 	SpawnFloatingDamage(GetActorLocation(), GetActorRotation(), PreviousHealth - CurrentHealth);
 	
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), m_ImpactParticle, GetActorLocation());
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), m_ImpactParticle, m_HitLocation);
 }
 
 void AASPawn::OnDeath(AActor* DeathDealer)
