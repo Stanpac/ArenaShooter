@@ -6,6 +6,8 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "ASDroneManager.generated.h"
 
+class AASDronePawn;
+
 UCLASS()
 class ARENASHOOTER_API UASDroneManager : public UWorldSubsystem
 {
@@ -19,5 +21,8 @@ private:
 public:
 	TArray<AActor*> GetDrones() const{ return m_Drones;}
 
-	void AddDrone(AActor* drone) { m_Drones.Add(drone);};
+	void AddDrone(AActor* drone) ;
+
+	UFUNCTION()
+	void RemoveDrones(AActor* destroyedDrone) ;
 };

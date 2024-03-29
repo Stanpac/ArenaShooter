@@ -124,7 +124,12 @@ protected:
 	/** Close Combat Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "Switch Gravity Action"))
 	UInputAction* m_switchGravityAction;
-	
+
+	UPROPERTY()
+	bool m_DisableMovements;
+
+
+
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
 	AASCharacter();
@@ -180,4 +185,5 @@ public:
 
 	FORCEINLINE UCameraComponent* GetCameraComponent() const{ return m_FirstPersonCameraComponent; }
 
+	FORCEINLINE	void SetMovementsDisabled(bool DisableMovements) { m_DisableMovements = DisableMovements; }
 };

@@ -22,6 +22,7 @@ void AASDronePawn::BeginPlay()
 	OnBehaviourStateEnter();
 	m_DroneManager = GetWorld()->GetSubsystem<UASDroneManager>();
 	m_DroneManager->AddDrone(this);
+	m_DispersionFactor = FMath::Lerp(m_DispersionFactorMin, m_DispersionFactorMax, FMath::FRand());
 }
 
 void AASDronePawn::Tick(float DeltaTime)
@@ -175,11 +176,13 @@ bool AASDronePawn::IsPlayerInSight(float& DistanceToTarget)
 	if(bHit)
 	{
 		DistanceToTarget = OutHit.Distance;
-		bool isActor = OutHit.GetActor() == m_Player;
-		if( isActor)
+ 		if(OutHit.GetActor() == m_Player)
 			return true;
+		else
+			return false;
 	}
-	return false;
+	
+	return true;
 }
 
 void AASDronePawn::TeleportDrone()
@@ -233,6 +236,8 @@ void AASDronePawn::TeleportDrone()
 void AASDronePawn::DroneMovement(float DeltaTime)
 {
 	FVector droneToPlayerVector = (m_Player->GetActorLocation() - GetActorLocation()).GetSafeNormal() * m_DroneToPlayerMult;
+
+	float DroneToFromPlayerSpeed = m_DroneToPlayerMult > 0 ? m_DroneToPlayerSpeed : m_DroneAwayFromPlayerSpeed;
 	
 	float dispersionEnableValue = 1;
 	if(!m_EnableDispersionBehaviour) dispersionEnableValue = 0;
@@ -240,11 +245,24 @@ void AASDronePawn::DroneMovement(float DeltaTime)
 	float movementTowardsPlayerEnableValue = 1;
 	if(!m_EnableMovementTowardsPlayer || m_CurrentBehaviour != EDroneBehaviour::CHASING) movementTowardsPlayerEnableValue = 0;
 
-	FVector moveToPlayer = droneToPlayerVector * m_DroneToPlayerSpeed * movementTowardsPlayerEnableValue;
-	FVector dispersion = m_DispersionVector * m_DroneDispersionSpeed * dispersionEnableValue;
-	dispersion.Z = 0;
+	FVector moveToPlayer = droneToPlayerVector * DroneToFromPlayerSpeed * movementTowardsPlayerEnableValue;
+	FVector dispersion = m_DispersionVector * m_DroneDispersionSpeed * dispersionEnableValue * m_DispersionFactor;
+	dispersion.Z = FMath::Clamp(dispersion.Z, 0, 1000);
+	FVector moveVector = GetActorLocation() + ( dispersion + moveToPlayer ) * DeltaTime;
 
-	SetActorLocation(GetActorLocation() + ( dispersion + moveToPlayer ) * DeltaTime);
+
+	FHitResult OutHit;
+	FVector StartLocation = GetActorLocation();
+	FVector EndLocation = GetActorLocation() + moveVector.GetSafeNormal() * m_DistanceToTeleport * .9;
+	ETraceTypeQuery TraceTypeQueryToValidate = UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel3);
+	TArray<AActor*> ActorsToIgnore {this};
+	
+
+	bool IsMovementAllowed =  m_IsStunned ? false : true;
+	if(IsMovementAllowed)
+	{
+		SetActorLocation(moveVector, true);
+	}
 }
 
 FVector AASDronePawn::DroneRelativeMoveDirection()
@@ -254,7 +272,7 @@ FVector AASDronePawn::DroneRelativeMoveDirection()
 	
 	for(auto drone : drones)
 	{
-		if(drone != this)
+		if(drone != this && IsValid(drone))
 		{
 			FVector direction = (drone->GetActorLocation() - GetActorLocation()).GetSafeNormal();
 			float evaluatedAmplitude = m_DroneDispersionCurve->GetFloatValue(FVector::Distance(GetActorLocation(), drone->GetActorLocation()) / 1000);

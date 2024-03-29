@@ -2,10 +2,20 @@
 #include "ArenaShooter/Components/ASHealthComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+
 void AASWeapon_PlayerPrimary::Fire(FVector FireOrigin, FVector FireDirection)
 {
 	Super::Fire(FireOrigin, FireDirection);
 
+	m_CurrentNumberOfShotsInCS ++;
+	if(m_CurrentNumberOfShotsInCS == m_NumOfCS1)
+		OnCS1Reached();
+	else if(m_CurrentNumberOfShotsInCS == m_NumOfCS2)
+		OnCS2Reached();
+	else if(m_CurrentNumberOfShotsInCS == m_NumOfCS3)
+		OnCS3Reached();
+
+	
 	FHitResult HitResult;
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.bIgnoreTouches = false;
@@ -29,4 +39,33 @@ void AASWeapon_PlayerPrimary::Fire(FVector FireOrigin, FVector FireDirection)
 	} else {
 		// nothing is Hit
 	}
+}
+
+void AASWeapon_PlayerPrimary::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	m_CurrentTimeToResetCS += DeltaSeconds;
+	if(m_CurrentTimeToResetCS >= m_TimeToResetCS)
+	{
+		OnResetCS();
+	}
+}
+
+void AASWeapon_PlayerPrimary::OnResetCS()
+{
+	m_CurrentTimeToResetCS = 0;
+	m_CurrentNumberOfShotsInCS = 0;
+}
+
+void AASWeapon_PlayerPrimary::OnCS1Reached()
+{
+}
+
+void AASWeapon_PlayerPrimary::OnCS2Reached()
+{
+}
+
+void AASWeapon_PlayerPrimary::OnCS3Reached()
+{
 }

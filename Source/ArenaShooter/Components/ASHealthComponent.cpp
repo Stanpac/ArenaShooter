@@ -41,6 +41,7 @@ void UASHealthComponent::healing(float amount)
 void UASHealthComponent::Damage(float amount, AActor* DamageDealer, float stunDuration)
 {
 	if(!m_IsDamageable) return;
+
 	// previous health can be Use Later For Lerp maybe ?
 	const float PreviousHealth = m_Health;
 	const float NewHealth = FMath::Clamp(PreviousHealth - (amount * m_DamageMultiplicator), m_MinhHealth, m_MaxHealth);

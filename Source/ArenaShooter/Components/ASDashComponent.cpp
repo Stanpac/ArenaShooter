@@ -68,10 +68,10 @@ void UASDashComponent::OnDash()
 	m_DashDurationTimer = 0;
 	m_DashStartLocation = GetOwner()->GetActorLocation();
 	m_Character->GetCharacterMovement()->GroundFriction = 0;
-	m_Character->GetCharacterMovement()->GravityScale = 1;
+	//m_Character->GetCharacterMovement()->GravityScale = 1;
+	m_Character->GetCharacterMovement()->MovementMode = MOVE_Flying;
 	m_Character->GetCharacterMovement()->DisableMovement();
 	UASHealthComponent::FindHealthComponent(GetOwner())->SetIsDamageable(false);
-	//m_Character->GetCharacterMovement()->MovementMode = MOVE_Flying;
 
 	if(m_HitTarget == nullptr)
 	{
@@ -79,7 +79,7 @@ void UASDashComponent::OnDash()
 	}
 	else
 	{
-		m_DashEndLocation = m_HitTarget->GetActorLocation() - (m_HitTarget->GetActorLocation() - GetOwner()->GetActorLocation()).GetSafeNormal() * m_DashOffset;
+		m_DashEndLocation = m_HitTarget->GetActorLocation() + (m_HitTarget->GetActorLocation() - GetOwner()->GetActorLocation()).GetSafeNormal() * m_DashOffset;
 	}
 	//m_Character->GetCharacterMovement()->Launch(m_DashEndLocation - GetOwner()->GetActorLocation());
 }
@@ -122,9 +122,10 @@ void UASDashComponent::DashMovement(float DeltaTime)
 		m_Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 
 		m_CurrentDashState = EDashStates::InCooldown;
-		m_Character->GetCharacterMovement()->GravityScale = m_StartGravity;
+		//m_Character->GetCharacterMovement()->GravityScale = m_StartGravity;
 		m_Character->GetCharacterMovement()->GroundFriction = m_StartGroundFriction;
 		m_DashCooldownTimer = m_DashCooldown;
+		m_Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		UASHealthComponent::FindHealthComponent(GetOwner())->SetIsDamageable(true);
 
 	}
@@ -151,7 +152,7 @@ AActor* UASDashComponent::DetectDashTarget()
 	TraceTypeQuery,
 	false,
 	ActorsToIgnore,
-	EDrawDebugTrace::None,
+	EDrawDebugTrace::ForOneFrame,
 	OutHits,
 	true,
 	debugColor);
@@ -161,7 +162,7 @@ AActor* UASDashComponent::DetectDashTarget()
 		for(auto hit : OutHits)
 		{
 			FVector direction = (EndLocation - StartLocation).GetSafeNormal() * 100;
-			EndLocation = hit.Location + direction;
+			EndLocation = hit.GetActor()->GetActorLocation() + direction;
 			FHitResult OutHit;
 			
 			bool bHitValidation = UKismetSystemLibrary::LineTraceSingle(

@@ -63,12 +63,21 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Speed of drone towards Player")
 	float m_DroneToPlayerSpeed = 100;
 
+	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Speed of drone away from Player")
+	float m_DroneAwayFromPlayerSpeed = 100;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Speed of drone away from other drones")
-	float m_DroneDispersionSpeed = 100;
+	float m_DroneDispersionSpeed = 200;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Curve of dispersion from other drones depending on distance")
 	UCurveFloat* m_DroneDispersionCurve;
-	
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Max Variance of the factor on the dispersion Value")
+	float m_DispersionFactorMax = 1.2f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Min Variance of the factor on the dispersion Value")
+	float m_DispersionFactorMin = .8f;
+
 	UPROPERTY()
 	float m_AITickTimer;
 
@@ -86,6 +95,9 @@ private:
 
 	UPROPERTY()
 	FVector m_DispersionVector;
+
+	UPROPERTY()
+	float m_DispersionFactor;
 	
 protected:
 	UPROPERTY()
