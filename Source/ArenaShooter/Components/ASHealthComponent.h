@@ -44,15 +44,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Healing|Multiplicator", meta = (EditCondition = "m_UseMultiplicator"))
 	float m_DamageMultiplicator;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Audio", meta = (DisplayName = "Audio On Death trigger"))
-	USoundBase* m_Sound_Death;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Audio", meta = (DisplayName = "Audio On Hit trigger"))
-	USoundBase* m_Sound_Hit;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Health", meta = (DisplayName = "Is Executatble"))
 	bool m_IsExecutable;
 	
+	UPROPERTY()
+	bool m_IsDamageable = true;
+
 public:
 	// Delegate call when the Death Start
 	UPROPERTY(BlueprintAssignable)
@@ -61,6 +58,7 @@ public:
 	// Delegate call when the Health Change
 	UPROPERTY(BlueprintAssignable)
 	FHealthComponent_HealthChangeEvent OnHealthChanged;
+	
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
 	UASHealthComponent();
@@ -74,8 +72,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Damage(float amount, AActor* DamageDealer, float stunAmount = 0);
 
-	UFUNCTION(BlueprintCallable)
-	void Death();
 	
 protected:
 	virtual void BeginPlay() override;
@@ -84,4 +80,7 @@ public:
 	float GetHealth() const { return m_Health; }
 
 	bool GetIsExecutable() const { return m_IsExecutable; }
+	
+	bool GetIsDamageable() const { return m_IsDamageable; }
+	void SetIsDamageable(bool isDamageable) { m_IsDamageable = isDamageable;}
 };

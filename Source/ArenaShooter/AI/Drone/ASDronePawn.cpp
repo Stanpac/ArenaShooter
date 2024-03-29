@@ -1,25 +1,126 @@
 #include "ASDronePawn.h"
+
+#include "ASDroneManager.h"
 #include "ArenaShooter/Components/ASHealthComponent.h"
 #include "ArenaShooter/Components/ASWeaponComponent.h"
-#include "ArenaShooter/Weapons/ASWeapon.h"
 #include "GameFramework/Character.h"
+
+#include "Kismet/GameplayStatics.h"
 // Sets default values
+
 AASDronePawn::AASDronePawn()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	/*m_HealthComponent = CreateDefaultSubobject<UASHealthComponent>(TEXT("HealthComponent"));
-
-	m_WeaponComponent = CreateDefaultSubobject<UASWeaponComponent>(TEXT("WeaponComponent"));*/
 }
 
-// Called when the game starts or when spawned
 void AASDronePawn::BeginPlay()
 {
 	Super::BeginPlay();
 	m_Player = GetWorld()->GetFirstPlayerController()->GetCharacter();
 	check(m_Player);
+	m_CurrentBehaviour = EDroneBehaviour::CHASING;
+	OnBehaviourStateEnter();
+	m_DroneManager = GetWorld()->GetSubsystem<UASDroneManager>();
+	m_DroneManager->AddDrone(this);
+	m_DispersionFactor = FMath::Lerp(m_DispersionFactorMin, m_DispersionFactorMax, FMath::FRand());
+}
+
+void AASDronePawn::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	LookAtPlayer(DeltaTime);
+	OnBehaviourStateTick(DeltaTime);
+	DroneMovement(DeltaTime);
+	m_AITickTimer -= DeltaTime;
+	if(m_AITickTimer <= 0)
+	{
+		m_AITickTimer = m_AITickRate;
+		OnBehaviourAIStateTick();
+	}
+}
+
+void AASDronePawn::ChangeBehaviour(EDroneBehaviour newBehaviour)
+{
+	OnBehaviourStateExit();
+	m_CurrentBehaviour = newBehaviour;
+	OnBehaviourStateExit();
+}
+
+void AASDronePawn::OnBehaviourStateEnter()
+{
+	switch(m_CurrentBehaviour)
+	{
+		case EDroneBehaviour::CHASING:
+			break;
+		case EDroneBehaviour::SHOOTING:
+			break;
+		case EDroneBehaviour::TELEPORTING:
+			m_TeleportationTimer = m_TeleportationDuration;
+			break;
+	}
+}
+
+void AASDronePawn::OnBehaviourStateExit()
+{
+	switch(m_CurrentBehaviour)
+	{
+		case EDroneBehaviour::CHASING:
+			break;
+		case EDroneBehaviour::SHOOTING:
+			break;
+		case EDroneBehaviour::TELEPORTING:
+			break;
+	}
+}
+
+void AASDronePawn::OnBehaviourStateTick(float DeltaTime)
+{
+	switch(m_CurrentBehaviour)
+	{
+		case EDroneBehaviour::CHASING:
+			break;
+		case EDroneBehaviour::SHOOTING:
+			break;
+		case EDroneBehaviour::TELEPORTING:
+			m_TeleportationTimer -= DeltaTime;
+			if(m_TeleportationTimer <= 0)
+			{
+				TeleportDrone();
+			}
+			break;
+	}
+}
+
+void AASDronePawn::OnBehaviourAIStateTick()
+{
+	m_DroneToPlayerMult = 0;
+	switch(m_CurrentBehaviour)
+	{
+		case EDroneBehaviour::CHASING:
+		{
+			ChasingBehaviour();
+			m_DispersionVector = DroneRelativeMoveDirection();
+			break;
+		}
+
+		case EDroneBehaviour::SHOOTING:
+		{
+			m_DispersionVector = DroneRelativeMoveDirection();
+			float distanceToObject;
+			bool sightCondition;
+			sightCondition = IsPlayerInSight(distanceToObject);
+			bool distanceCondition;
+			distanceCondition = distanceToObject < m_MinRangeToAttack || distanceToObject > m_MaxRangeToAttack;
+			if(!sightCondition || distanceCondition)
+			{
+				ChangeBehaviour(EDroneBehaviour::CHASING);
+			}
+			else if(m_EnableShooting) m_WeaponComponent->Fire(GetActorLocation(), GetActorForwardVector());
+			break;
+		}
+		case EDroneBehaviour::TELEPORTING:
+			break;
+	}
 }
 
 void AASDronePawn::LookAtPlayer(float DeltaTime)
@@ -30,17 +131,158 @@ void AASDronePawn::LookAtPlayer(float DeltaTime)
 	SetActorRotation(LookAtRotation);
 }
 
-// Called every frame
-void AASDronePawn::Tick(float DeltaTime)
+void AASDronePawn::ChasingBehaviour()
 {
-	Super::Tick(DeltaTime);
-	LookAtPlayer(DeltaTime);
+	float distanceToTarget;
+
+	if(IsPlayerInSight(distanceToTarget))
+	{
+		if(distanceToTarget < m_MinRangeToAttack)
+		{
+			//Move away from player
+			m_DroneToPlayerMult = -1;
+		}
+		else if(distanceToTarget > m_MaxRangeToAttack)
+		{
+			//Move towards player
+			m_DroneToPlayerMult = 1;
+		}
+		else ChangeBehaviour(EDroneBehaviour::SHOOTING);
+	}
+	else if(distanceToTarget < m_DistanceToTeleport)
+	{
+		ChangeBehaviour(EDroneBehaviour::TELEPORTING);
+	}
 }
 
-// Called to bind functionality to input
-void AASDronePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+bool AASDronePawn::IsPlayerInSight(float& DistanceToTarget)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
+	FHitResult OutHit;
+	FVector StartLocation = GetActorLocation();
+	FVector EndLocation = m_Player->GetActorLocation();
+	ECollisionChannel CollisionChannel = static_cast<ECollisionChannel>(StaticEnum<ECollisionChannel>()->GetValueByName(TEXT("Drone_Hit")));
+	FCollisionQueryParams CollisionQueryParams = FCollisionQueryParams(SCENE_QUERY_STAT(SphereCast), true) ;
+	CollisionQueryParams.AddIgnoredActor(this);
+	
+	bool bHit = GetWorld()->SweepSingleByChannel(
+	OutHit,
+	StartLocation,
+	EndLocation,
+	FQuat::Identity,
+	CollisionChannel,
+	FCollisionShape::MakeSphere(m_SphereCastRadius),
+	CollisionQueryParams);
+	
+	if(bHit)
+	{
+		DistanceToTarget = OutHit.Distance;
+ 		if(OutHit.GetActor() == m_Player)
+			return true;
+		else
+			return false;
+	}
+	
+	return true;
 }
+
+void AASDronePawn::TeleportDrone()
+{
+	FCollisionQueryParams QueryParams;
+	QueryParams.bTraceComplex = false; 
+	QueryParams.bReturnPhysicalMaterial = false;
+	QueryParams.AddIgnoredActor(this);
+	QueryParams.AddIgnoredActor(m_Player);
+	ECollisionChannel CollisionChannel = static_cast<ECollisionChannel>(StaticEnum<ECollisionChannel>()->GetValueByName(TEXT("Drone_Hit")));
+
+	FCollisionShape CollisionShape;
+	CollisionShape.SetSphere(m_SphereCastRadius);
+	
+	bool tpPointIsClear = false;
+	int32 numberOfTeleportation = 0;
+	FVector TeleportationLocation = GetActorLocation();
+	while(tpPointIsClear == false)
+	{
+		numberOfTeleportation++;
+
+		FVector Direction = (m_Player->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+		float TPDistance = (numberOfTeleportation * m_DistanceByTeleportationSphereCast);
+		FVector OverlapSphereLocation = GetActorLocation() +  Direction * TPDistance;
+
+		// Perform the overlap check
+		bool bHasOverlap = GetWorld()->OverlapBlockingTestByChannel(
+			OverlapSphereLocation,
+			FQuat::Identity,
+			CollisionChannel, 
+			CollisionShape,
+			QueryParams
+		);
+
+		if(!bHasOverlap)
+		{
+			TeleportationLocation = OverlapSphereLocation;
+			tpPointIsClear = true;
+		}
+		else if(numberOfTeleportation > m_NumberOfTPBeforeAbort)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("CANNOT TELEPORT THROUGH WALL"));
+			break;
+		}
+	}
+
+	SetActorLocation(TeleportationLocation);
+	ChangeBehaviour(EDroneBehaviour::CHASING);
+}
+
+void AASDronePawn::DroneMovement(float DeltaTime)
+{
+	FVector droneToPlayerVector = (m_Player->GetActorLocation() - GetActorLocation()).GetSafeNormal() * m_DroneToPlayerMult;
+
+	float DroneToFromPlayerSpeed = m_DroneToPlayerMult > 0 ? m_DroneToPlayerSpeed : m_DroneAwayFromPlayerSpeed;
+	
+	float dispersionEnableValue = 1;
+	if(!m_EnableDispersionBehaviour) dispersionEnableValue = 0;
+
+	float movementTowardsPlayerEnableValue = 1;
+	if(!m_EnableMovementTowardsPlayer || m_CurrentBehaviour != EDroneBehaviour::CHASING) movementTowardsPlayerEnableValue = 0;
+
+	FVector moveToPlayer = droneToPlayerVector * DroneToFromPlayerSpeed * movementTowardsPlayerEnableValue;
+	FVector dispersion = m_DispersionVector * m_DroneDispersionSpeed * dispersionEnableValue * m_DispersionFactor;
+	dispersion.Z = FMath::Clamp(dispersion.Z, 0, 1000);
+	FVector moveVector = GetActorLocation() + ( dispersion + moveToPlayer ) * DeltaTime;
+
+
+	FHitResult OutHit;
+	FVector StartLocation = GetActorLocation();
+	FVector EndLocation = GetActorLocation() + moveVector.GetSafeNormal() * m_DistanceToTeleport * .9;
+	ETraceTypeQuery TraceTypeQueryToValidate = UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel3);
+	TArray<AActor*> ActorsToIgnore {this};
+	
+
+	bool IsMovementAllowed =  m_IsStunned ? false : true;
+	if(IsMovementAllowed)
+	{
+		SetActorLocation(moveVector, true);
+	}
+}
+
+FVector AASDronePawn::DroneRelativeMoveDirection()
+{
+	TArray<AActor*> drones = m_DroneManager->GetDrones();
+	FVector averageDronesLocation = FVector::Zero();
+	
+	for(auto drone : drones)
+	{
+		if(drone != this && IsValid(drone))
+		{
+			FVector direction = (drone->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+			float evaluatedAmplitude = m_DroneDispersionCurve->GetFloatValue(FVector::Distance(GetActorLocation(), drone->GetActorLocation()) / 1000);
+			averageDronesLocation += direction * evaluatedAmplitude;
+		}
+	}
+	//if(averageDronesLocation .Length() > 1) averageDronesLocation  = averageDronesLocation .GetSafeNormal();
+	return -averageDronesLocation;
+}
+
+
+
 

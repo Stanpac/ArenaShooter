@@ -18,8 +18,14 @@ class ARENASHOOTER_API UGravitySwitchComponent : public UActorComponent
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GravitySwitchComponent|Settings", meta = (DisplayName = "Ability Cooldown"))
-	float m_AbilityCooldown = 5.0f;
+	float m_AbilityCooldown = 1.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GravitySwitchComponent|Settings", meta = (DisplayName = "Gravity Max Nbr of Charge"))
+	int m_MaxNbrOfCharge = 3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GravitySwitchComponent|Settings", meta = (DisplayName = "Gravity Charge Refill Time"))
+	float m_GravityChargeRefillTime = 10.f;
+	
 	UPROPERTY(visibleAnywhere, BlueprintReadOnly, Category = "GravitySwitchComponent|Settings", meta = (DisplayName = "Is Switching Gravity"))
 	bool bSwitchingGravity;
 
@@ -28,27 +34,48 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GravitySwitchComponent|Settings", meta = (DisplayName = "Character"))
 	AASCharacter* m_Character;
-	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "GravitySwitchComponent|Settings", meta = (DisplayName = "Gravity Nbr of Charge"))
+	int m_NbrOfCharge = 3;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "GravitySwitchComponent|Settings", meta = (DisplayName = "Refill Timer"))
+	float m_Timer = 0.f;
+
+	FTimerHandle m_RefillTimerHandle;
 public:
 	UPROPERTY(BlueprintAssignable)
-	FGravitySwitchComponent_Delegate OnSwitchGravity;
+	FGravitySwitchComponent_Delegate OnStartSwitchGravity;
 	
 	UPROPERTY(BlueprintAssignable)
 	FGravitySwitchComponent_Delegate OnSwitchGravityAbiltyCooldownEnd;
+
+	UPROPERTY(BlueprintAssignable)
+	FGravitySwitchComponent_Delegate OnGravityChargeRefill;
 	
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
 	UGravitySwitchComponent();
-
-	void SwitchGravity();
 	
+	UFUNCTION()
+	void SwitchGravity();
 
+	UFUNCTION()
+	void RefullllGravityCharge();
+	
+	UFUNCTION()
+	void RefullGravityCharge(int NbrToReset);
+	
 protected:
 	virtual void BeginPlay() override;
-
 	void EndSwitchGravity();
+	void RefillGravityCharge();
 
 public:
 	FORCEINLINE bool IsSwitchingGravity() const { return bSwitchingGravity; }
-	FVector GetBaseGravityDirection() const { return m_BaseGravityDirection; }
+	FORCEINLINE void SetSwitchingGravity(bool SwitchingGravity) { bSwitchingGravity = SwitchingGravity; }
+	FORCEINLINE FVector GetBaseGravityDirection() const { return m_BaseGravityDirection; }
+	FORCEINLINE float GetAbilityCooldown() const { return m_AbilityCooldown; }
+	FORCEINLINE int GetNbrOfCharge() const { return m_NbrOfCharge; }
+	FORCEINLINE float GetTimer() const { return m_Timer; }
+	FORCEINLINE float GetGravityChargeRefillTime() const { return m_GravityChargeRefillTime; }
 };

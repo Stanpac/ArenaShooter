@@ -15,19 +15,22 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "AASDroneSpawner", meta = (DisplayName = "AI Pawn Class To Spawn"))
 	TSubclassOf<APawn> m_AIPawnClassTOSpawn;
 
-	UPROPERTY(EditAnywhere, Category = "UASTurretSingleSpawner", meta = (DisplayName = "Spawn Delay"))
-	float m_SpawnDelay = 5.0f;
+	UPROPERTY(EditAnywhere, Category = "AASDroneSpawner", meta = (DisplayName = "Spawn Delay"))
+	float m_SpawnDelay = 10.f;
 
-	UPROPERTY(EditAnywhere, Category = "UASTurretSingleSpawner", meta = (DisplayName = "Max Spawn Count"))
-	int m_MaxSpawnCount = 5;
+	UPROPERTY(EditAnywhere, Category = "AASDroneSpawner", meta = (DisplayName = "Nbr Of Drone to Spawn at end of Spawn Delay"))
+	int m_NbrOfDroneToSpawn = 3;
+	
+	UPROPERTY(EditAnywhere, Category = "AASDroneSpawner", meta = (DisplayName = "Max Drone Spawn by the Spawner"))
+	int m_MaxSpawnCount = 15;
 
-	UPROPERTY(VisibleAnywhere, Category = "UASTurretSingleSpawner", meta = (DisplayName = "Current Actor Spawned"))
+	UPROPERTY(VisibleAnywhere, Category = "AASDroneSpawner", meta = (DisplayName = "Current Actor Spawned"))
 	TArray<AActor*> m_currentSpawnedActors;
 	
-	UPROPERTY(VisibleAnywhere, Category = "UASTurretSingleSpawner", meta = (DisplayName = "Spawn Count"))
+	UPROPERTY(VisibleAnywhere, Category = "AASDroneSpawner", meta = (DisplayName = "Spawn Count"))
 	int m_SpawnCount = 0;
 	
-	UPROPERTY(VisibleAnywhere, Category = "UASTurretSingleSpawner", meta = (DisplayName = "Spawn Delay Timer"))
+	UPROPERTY(VisibleAnywhere, Category = "AASDroneSpawner", meta = (DisplayName = "Spawn Delay Timer"))
 	bool CanSpawn = true;
 
 	/* ---------------------------------- FUNCTION -------------------------------------- */
@@ -45,6 +48,10 @@ private:
 	void BeginPlay() override;
 
 	void CanSpawnAgain();
+
 	
-	
+	/* ---------------------------------- GETSET -------------------------------------- */
+public :
+	FORCEINLINE bool IsCanSpawn() const { return CanSpawn; }
+	FORCEINLINE void SetCanSpawn(bool bCanSpawn) { CanSpawn = bCanSpawn; }
 };

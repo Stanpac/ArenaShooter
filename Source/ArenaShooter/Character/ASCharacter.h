@@ -11,6 +11,7 @@
 class USpringArmComponent;
 class UGravitySwitchComponent;
 class UASSpeedComponent;
+class UASDashComponent;
 class UASGlobalWidget;
 class UASHealthComponent;
 class UASEventWorldSubSystem;
@@ -46,6 +47,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Camera", meta = (DisplayName = "First Person Camera Component"))
 	UCameraComponent* m_FirstPersonCameraComponent;
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Camera", meta = (DisplayName = "Play Shake On taking Damage"))
+	bool bPlayShakeOntakingDamage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Camera", meta = (DisplayName = "Camera Shake Class"))
+	TSubclassOf<UCameraShakeBase> m_ShakeClass;
+
 	/** Health Component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Health", meta = (DisplayName = "Health Component"))
 	UASHealthComponent* m_HealthComponent;
@@ -53,15 +61,11 @@ protected:
 	/** Weapon Component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Weapon", meta = (DisplayName = "Weapon Component"))
 	UASWeaponComponent* m_WeaponComponent;
+
+	/** Dash Component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Speed", meta = (DisplayName = "DashComponent"))
+	UASDashComponent* m_DashComponent;
 	
-	/** Close Combat Component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Weapon", meta = (DisplayName = "Close Combat Component"))
-	UASCloseCombatComponent* m_CloseCombatComponent;
-
-	/** Speed Component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Speed", meta = (DisplayName = "SpeedComponent"))
-	UASSpeedComponent* m_SpeedComponent;
-
 	/** Gravity Switch Component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Speed", meta = (DisplayName = "GravitySwitchComponent"))
 	UGravitySwitchComponent* m_GravitySwitchComponent;
@@ -79,12 +83,17 @@ protected:
 	/** Fire Animation */
 	UPROPERTY(EditAnywhere, Category = "ASCharacter|Animation", meta = (DisplayName = "Fire Montage"))
 	TObjectPtr<UAnimMontage> m_FireMontage;
-
-	UPROPERTY(EditAnywhere, Category = "ASCharacter|Animation", meta = (DisplayName = "Reload Montage"))
-	TObjectPtr<UAnimMontage> m_CacAttackMontage;
 	
 	/** Event World SubSystem */
 	TObjectPtr<UASEventWorldSubSystem> m_EventWorldSubSystem;
+	
+	/* ----------------------------------- SOUND  -------------------------------*/
+
+	UPROPERTY(EditAnywhere, Category = "ASCharacter|Sound", meta = (DisplayName = "Sound On Death"))
+	TObjectPtr<USoundBase> m_SoundDeath;
+	
+	UPROPERTY(EditAnywhere, Category = "ASCharacter|Sound", meta = (DisplayName = "Sound On Hit"))
+	TObjectPtr<USoundBase> m_SoundHit;
 	
 	/* ---------------------- Input To move in component -------------------------------*/
 	
@@ -108,21 +117,19 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "Shoot Action"))
 	UInputAction* m_ShootAction;
 
-	/** Reload Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "Reload Action"))
-	UInputAction* m_ReloadAction;
-	
 	/** Close Combat Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "Close Combat Action"))
-	UInputAction* m_CloseCombatAction;
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "Dash Action"))
+	UInputAction* m_DashAction;
+	
 	/** Close Combat Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Input", meta = (DisplayName = "Switch Gravity Action"))
 	UInputAction* m_switchGravityAction;
-	
-	/** CheatSpeed bool */
-	bool SpeedCheatAllowed;
-	
+
+	UPROPERTY()
+	bool m_DisableMovements;
+
+
+
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
 	AASCharacter();
@@ -136,17 +143,13 @@ public:
 	UFUNCTION(Exec)
 	void DebugHealing(float amount);
 
-	UFUNCTION(Exec)
-	void CheatSpeed(bool Cheat);
-
 protected:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Shoot(const FInputActionValue& Value);
 	void Reload(const FInputActionValue& Value);
-	void Switch(const FInputActionValue& Value);
-	void CloseCombat(const FInputActionValue& Value);
 	void SwitchGravity(const FInputActionValue& Value);
+	void Dash(const FInputActionValue& Value);
 	
 	UFUNCTION()
 	virtual void OnStartDeath(AActor* OwningActor);
@@ -158,22 +161,18 @@ protected:
 	virtual void OnFire();
 
 	UFUNCTION()
-	virtual void OnAttack();
-
-	UFUNCTION()
 	virtual void OnChangeGravity();
 
 	UFUNCTION()
 	virtual void OnAbilityCooldownEnd();
 
 	UFUNCTION()
+	virtual void OnGravityChargeRefill();
+
+	UFUNCTION()
 	void OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer);
 
-	UFUNCTION()
-	void OnSpeedProfileChanged(int SpeedProfile);
-
-	UFUNCTION()
-	void OnSpeedChanged(float NewSpeed, float MaxSpeed);
+	void CheckPlayScreenShake();
 
 	void GetAllSubsystem();
 	void AddDefaultMappingContext();
@@ -183,4 +182,8 @@ public:
 	FORCEINLINE UASGlobalWidget* GetPlayerWidget() const { return M_PlayerWidget; }
 
 	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return m_Mesh1P; }
+
+	FORCEINLINE UCameraComponent* GetCameraComponent() const{ return m_FirstPersonCameraComponent; }
+
+	FORCEINLINE	void SetMovementsDisabled(bool DisableMovements) { m_DisableMovements = DisableMovements; }
 };

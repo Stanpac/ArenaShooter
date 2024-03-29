@@ -19,12 +19,6 @@ bool UASGlobalWidget::Initialize()
 	return Super::Initialize();
 }
 
-void UASGlobalWidget::SetSpeedBarPercent(float percent)
-{
-	if (m_SpeedBar) {
-		m_SpeedBar->SetPercent(percent);
-	}
-}
 
 void UASGlobalWidget::SethealthBarPercent(float percent)
 {
@@ -41,17 +35,24 @@ void UASGlobalWidget::ChangeCursorVisibility(bool visible)
 	}
 }
 
-void UASGlobalWidget::SetSpeedProfile(int profile)
-{
-	if (m_SpeedProfile) {
-		m_SpeedProfile->SetText(FText::FromString(FString::FromInt(profile)));
-	}
-}
-
 void UASGlobalWidget::SetGravityAbilityImageVisibility(bool visible)
 {
 	if (m_GravityAbilityImage) {
 		m_GravityAbilityImage->SetIsEnabled(visible);
+	}
+}
+
+void UASGlobalWidget::SetGravityChargeBarPercent(float percent)
+{
+	if (m_GravityAbilityRefillBar) {
+		m_GravityAbilityRefillBar->SetPercent(percent);
+	}
+}
+
+void UASGlobalWidget::SetNbrOfChargeText(int NbrOfCharge)
+{
+	if (m_NbrOfChargeText) {
+		m_NbrOfChargeText->SetText(FText::FromString(FString::FromInt(NbrOfCharge)));
 	}
 }
 
