@@ -58,9 +58,12 @@ AASCharacter::AASCharacter()
 
 	// Actor Components 
 	m_HealthComponent = CreateDefaultSubobject<UASHealthComponent>(TEXT("HealthComponent"));
+	
 	m_WeaponComponent = CreateDefaultSubobject<UASWeaponComponent>(TEXT("WeaponComponent"));
+	
 	m_GravitySwitchComponent = CreateDefaultSubobject<UGravitySwitchComponent>(TEXT("GravitySwitchComponent"));
 	m_DashComponent = CreateDefaultSubobject<UASDashComponent>(TEXT("DashComponent"));
+	
 }
 
 void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
