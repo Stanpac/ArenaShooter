@@ -245,7 +245,7 @@ void AASDronePawn::DroneMovement(float DeltaTime)
 	float movementTowardsPlayerEnableValue = 1;
 	if(!m_EnableMovementTowardsPlayer || m_CurrentBehaviour != EDroneBehaviour::CHASING) movementTowardsPlayerEnableValue = 0;
 
-	FVector moveToPlayer = droneToPlayerVector * DroneToFromPlayerSpeed * movementTowardsPlayerEnableValue;
+	FVector moveToPlayer = droneToPlayerVector * DroneToFromPlayerSpeed * movementTowardsPlayerEnableValue /*+ (GetActorLocation() - m_Player->GetActorLocation()).Size() * .1f*/;
 	FVector dispersion = m_DispersionVector * m_DroneDispersionSpeed * dispersionEnableValue * m_DispersionFactor;
 	dispersion.Z = FMath::Clamp(dispersion.Z, 0, 1000);
 	FVector moveVector = GetActorLocation() + ( dispersion + moveToPlayer ) * DeltaTime;

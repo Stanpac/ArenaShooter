@@ -152,7 +152,7 @@ AActor* UASDashComponent::DetectDashTarget()
 	TraceTypeQuery,
 	false,
 	ActorsToIgnore,
-	EDrawDebugTrace::ForOneFrame,
+	EDrawDebugTrace::None,
 	OutHits,
 	true,
 	debugColor);
