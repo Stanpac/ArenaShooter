@@ -3,6 +3,7 @@
 #include "ASDroneManager.h"
 #include "ArenaShooter/Components/ASHealthComponent.h"
 #include "ArenaShooter/Components/ASWeaponComponent.h"
+#include "ArenaShooter/Weapons/ASWeapon.h"
 #include "GameFramework/Character.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -53,6 +54,13 @@ void AASDronePawn::OnBehaviourStateEnter()
 		case EDroneBehaviour::CHASING:
 			break;
 		case EDroneBehaviour::SHOOTING:
+			m_WeaponComponent->m_PrimaryWeapon->m_IsReloading = true;
+			m_WeaponComponent->m_PrimaryWeapon->m_ReloadTimer = m_TimeToLockInTarget;
+			if(IsValid(m_LockInSound))
+			UGameplayStatics::PlaySoundAtLocation(
+			GetWorld(),
+			m_LockInSound,
+			GetOwner()->GetActorLocation());
 			break;
 		case EDroneBehaviour::TELEPORTING:
 			m_TeleportationTimer = m_TeleportationDuration;
@@ -245,7 +253,13 @@ void AASDronePawn::DroneMovement(float DeltaTime)
 	float movementTowardsPlayerEnableValue = 1;
 	if(!m_EnableMovementTowardsPlayer || m_CurrentBehaviour != EDroneBehaviour::CHASING) movementTowardsPlayerEnableValue = 0;
 
-	FVector moveToPlayer = droneToPlayerVector * DroneToFromPlayerSpeed * movementTowardsPlayerEnableValue /*+ (GetActorLocation() - m_Player->GetActorLocation()).Size() * .1f*/;
+	float distanceMult = m_DistanceSpeedCurve->FloatCurve.Eval(FMath::Clamp(FVector::Distance(m_Player->GetActorLocation(), GetActorLocation()), 0, m_MaxDistanceEvaluated) / m_MaxDistanceEvaluated) * m_DistanceSpeedMult;
+	if(m_CurrentBehaviour != EDroneBehaviour::CHASING)
+	{
+		distanceMult = 1;
+	}
+	
+	FVector moveToPlayer = droneToPlayerVector * DroneToFromPlayerSpeed * movementTowardsPlayerEnableValue * distanceMult;
 	FVector dispersion = m_DispersionVector * m_DroneDispersionSpeed * dispersionEnableValue * m_DispersionFactor;
 	dispersion.Z = FMath::Clamp(dispersion.Z, 0, 1000);
 	FVector moveVector = GetActorLocation() + ( dispersion + moveToPlayer ) * DeltaTime;

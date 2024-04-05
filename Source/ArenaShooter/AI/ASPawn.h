@@ -56,6 +56,9 @@ protected:
 	/** Is the pawn stunned **/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stun", meta=(DisplayName = "Is Stunned ?"))
 	bool m_IsStunned;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Signs and Feedbacks", DisplayName = "Lock in sound")
+	USoundBase* m_LockInSound;
 	
 	/** Event World SubSystem */
 	UPROPERTY()

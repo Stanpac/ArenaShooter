@@ -78,6 +78,18 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Min Variance of the factor on the dispersion Value")
 	float m_DispersionFactorMin = .8f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Curve of evolution of speed evaluated by distance")
+	UCurveFloat* m_DistanceSpeedCurve;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Speed multiplier to the distance between player and drone")
+	float m_DistanceSpeedMult = 100;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Max distance evaluated for the speed by distance multiplier")
+	float m_MaxDistanceEvaluated = 5000;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Time to lock on target")
+	float m_TimeToLockInTarget = 1;
+	
 	UPROPERTY()
 	float m_AITickTimer;
 
@@ -98,6 +110,8 @@ private:
 
 	UPROPERTY()
 	float m_DispersionFactor;
+
+
 	
 protected:
 	UPROPERTY()

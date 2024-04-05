@@ -5,6 +5,7 @@
 #include "ArenaShooter/AI/ASPawn.h"
 #include "ArenaShooter/Character/ASCharacter.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 
@@ -20,6 +21,7 @@ void UASDashComponent::BeginPlay()
 	m_StartGravity = m_Character->GetCharacterMovement()->GravityScale;
 	m_StartGroundFriction = m_Character->GetCharacterMovement()->GroundFriction;
 	m_Camera = m_Character->GetCameraComponent();
+	m_BaseFieldOfView = m_Camera->FieldOfView;
 }
 
 void UASDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -39,6 +41,7 @@ void UASDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 				m_Character->GetCharacterMovement()->GravityScale = m_StartGravity;
 				m_Character->GetCharacterMovement()->GroundFriction = m_StartGroundFriction;
 				m_Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+				UASHealthComponent::FindHealthComponent(GetOwner())->SetIsDamageable(true);
 			}
 			break;
 		case EDashStates::InCooldown:
@@ -64,6 +67,13 @@ void UASDashComponent::OnDash()
 {
 	if(m_CurrentDashState != EDashStates::Neutral && m_CurrentDashState != EDashStates::NoGravity) return;
 	m_HitTarget = DetectDashTarget();
+	if(IsValid(m_SoundDash))
+	{
+		UGameplayStatics::PlaySoundAtLocation(
+			GetWorld(),
+			m_SoundDash,
+			GetOwner()->GetActorLocation());
+	}
 	m_CurrentDashState = EDashStates::InDash;
 	m_DashDurationTimer = 0;
 	m_DashStartLocation = GetOwner()->GetActorLocation();
@@ -72,7 +82,6 @@ void UASDashComponent::OnDash()
 	m_Character->GetCharacterMovement()->MovementMode = MOVE_Flying;
 	m_Character->GetCharacterMovement()->DisableMovement();
 	UASHealthComponent::FindHealthComponent(GetOwner())->SetIsDamageable(false);
-
 	if(m_HitTarget == nullptr)
 	{
 		m_DashEndLocation = m_DashStartLocation + m_Camera->GetForwardVector() * m_DashDistance;
@@ -80,6 +89,7 @@ void UASDashComponent::OnDash()
 	else
 	{
 		m_DashEndLocation = m_HitTarget->GetActorLocation() + (m_HitTarget->GetActorLocation() - GetOwner()->GetActorLocation()).GetSafeNormal() * m_DashOffset;
+		m_HitTarget->SetActorEnableCollision(false);
 	}
 	//m_Character->GetCharacterMovement()->Launch(m_DashEndLocation - GetOwner()->GetActorLocation());
 }
@@ -96,9 +106,12 @@ void UASDashComponent::DashMovement(float DeltaTime)
 {
 	m_DashDurationTimer += DeltaTime / m_DashDuration;
 	GetOwner()->SetActorLocation(FMath::Lerp(m_DashStartLocation, m_DashEndLocation, m_DashSpeedCurve->GetFloatValue(m_DashDurationTimer)), true);
+	m_Camera->FieldOfView = FMath::Lerp(m_BaseFieldOfView, m_MaxFieldOfView, m_FOVevolutionCurve->GetFloatValue(m_DashDurationTimer));
+
 	if(m_DashDurationTimer >= 1)
 	{
 		GetOwner()->SetActorLocation(m_DashEndLocation, true);
+		m_Camera->FieldOfView = m_BaseFieldOfView;
 		if(IsValid(m_HitTarget))
 		{
 			UASHealthComponent* HealthComponent = UASHealthComponent::FindHealthComponent(m_HitTarget);
@@ -109,7 +122,6 @@ void UASDashComponent::DashMovement(float DeltaTime)
 					HealthComponent->Damage(m_DashDamage, GetOwner(), m_StunDuration);
 					m_CurrentDashState = EDashStates::NoGravity;
 					m_NoGravityTimer = m_NoGravityCooldown;
-					UASHealthComponent::FindHealthComponent(GetOwner())->SetIsDamageable(true);
 					return;
 				}
 				else
@@ -119,6 +131,7 @@ void UASDashComponent::DashMovement(float DeltaTime)
 			}
 		}
 
+		UASHealthComponent::FindHealthComponent(GetOwner())->SetIsDamageable(true);
 		m_Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 
 		m_CurrentDashState = EDashStates::InCooldown;
