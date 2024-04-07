@@ -111,9 +111,8 @@ private:
 	UPROPERTY()
 	float m_DispersionFactor;
 
-
-	
 protected:
+	/** Player Reference */
 	UPROPERTY()
 	ACharacter* m_Player;
 

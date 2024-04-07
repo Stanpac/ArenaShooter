@@ -26,11 +26,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Health")
 	float m_MaxHealth;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Health")
-	float m_MinhHealth;
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Healing")
 	uint8 m_UseMultiplicator : 1 = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Settings", meta = (DisplayName = "Is Invincible"))
+	uint8 m_IsInvincible : 1 = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Settings", meta = (DisplayName = "Executable life"))
+	float m_ExecutableLife = 15.f;
 	
 	/** Multiplicative For the healing
 	 *  @note 1.0f = 100% of the healing is applied
@@ -77,10 +80,11 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	float GetHealth() const { return m_Health; }
-
-	bool GetIsExecutable() const { return m_IsExecutable; }
-	
 	bool GetIsDamageable() const { return m_IsDamageable; }
 	void SetIsDamageable(bool isDamageable) { m_IsDamageable = isDamageable;}
+
+	FORCEINLINE float GetHealth() const { return m_Health; }
+	FORCEINLINE float GetMaxHealth() const { return m_MaxHealth; }
+	FORCEINLINE bool GetIsExecutable() const { return m_IsExecutable; }
+	FORCEINLINE void SetIsExecutable(bool bM_IsExecutable) { m_IsExecutable = bM_IsExecutable; }
 };

@@ -12,7 +12,7 @@ UASHealthComponent::UASHealthComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 	m_Health = m_MaxHealth;
-	m_MinhHealth = 0.0f;
+	m_IsExecutable = false;
 }
 
 void UASHealthComponent::BeginPlay()
@@ -32,7 +32,7 @@ void UASHealthComponent::healing(float amount)
 {
 	// previous health can be Use Later For Lerp maybe ?
 	float PreviousHealth = m_Health;
-	float NewHealth = FMath::Clamp(PreviousHealth + (amount * m_HealingMultiplicator), m_MinhHealth, m_MaxHealth);
+	float NewHealth = FMath::Clamp(PreviousHealth + (amount * m_HealingMultiplicator), m_IsInvincible ? 1 : 0, m_MaxHealth);
 	
 	m_Health = NewHealth;
 	OnHealthChanged.Broadcast(PreviousHealth, m_Health, m_MaxHealth, GetOwner());
@@ -51,21 +51,23 @@ void UASHealthComponent::Damage(float amount, AActor* DamageDealer, float stunDu
 		}
 		pawn->SetHitPosition(hitLocation);
 	}
-	
+
 	// previous health can be Use Later For Lerp maybe ?
 	const float PreviousHealth = m_Health;
-	const float NewHealth = FMath::Clamp(PreviousHealth - (amount * m_DamageMultiplicator), m_MinhHealth, m_MaxHealth);
+	const float NewHealth = FMath::Clamp(PreviousHealth - (amount * m_DamageMultiplicator), m_IsInvincible ? 1 : 0, m_MaxHealth);
 
-	if(GetOwner()->IsA<AASPawn>())
-	{
+	if(GetOwner()->IsA<AASPawn>()) {
 		Cast<AASPawn>(GetOwner())->Stun(stunDuration);
 	}
 	
 	m_Health = NewHealth;
-	if(m_Health <= 15)
-		m_IsExecutable = true;
-	OnHealthChanged.Broadcast(PreviousHealth, m_Health, m_MaxHealth, DamageDealer);
 
+	// TODO Modif 
+	if(m_Health <= m_ExecutableLife && !m_IsExecutable) {
+		m_IsExecutable = true;
+	}
+	
+	OnHealthChanged.Broadcast(PreviousHealth, m_Health, m_MaxHealth, DamageDealer);
 	
 	if (m_Health <= 0.0f) {
 		OnDeathStarted.Broadcast(GetOwner());

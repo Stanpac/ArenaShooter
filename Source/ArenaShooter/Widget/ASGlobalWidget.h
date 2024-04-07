@@ -6,11 +6,6 @@
 #include "Blueprint/UserWidget.h"
 #include "ASGlobalWidget.generated.h"
 
-class UTextBlock;
-class UImage;
-class UCanvasPanel;
-class UProgressBar;
-
 /**
  *  Class for the Widget that will be displayed on the screen
  *  All The gameplay UI will be in this widget
@@ -20,42 +15,24 @@ class ARENASHOOTER_API UASGlobalWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	/* ---------------------------------- MEMBERS --------------------------------------*/
-protected:
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
-	TObjectPtr<UCanvasPanel> m_BaseCanvasPanel;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
-	TObjectPtr<UProgressBar> m_HealthBar;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
-	TObjectPtr<UImage> m_CursorImage;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
-	TObjectPtr<UImage> m_GravityAbilityImage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
-	TObjectPtr<UTextBlock> m_NbrOfChargeText;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
-	TObjectPtr<UProgressBar> m_GravityAbilityRefillBar;
-	
-	/* ---------------------------------- FUNCTIOns --------------------------------------*/
+	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
-	UASGlobalWidget(const FObjectInitializer& ObjectInitializer);
-
-	virtual bool Initialize() override;
-
-	void SethealthBarPercent(float percent);
+	UASGlobalWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	
+	UFUNCTION(BlueprintImplementableEvent)
+	void SethealthBarPercent(float Health, float MaxHealth);
+
+	UFUNCTION(BlueprintImplementableEvent)
 	void ChangeCursorVisibility(bool visible);
-	
-	void SetGravityAbilityImageVisibility(bool visible);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetGravityAbilityWidget(bool visible);
+
+	UFUNCTION(BlueprintImplementableEvent)
 	void SetGravityChargeBarPercent(float percent);
-
-	void SetNbrOfChargeText(int NbrOfCharge);
 	
-protected:
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetNbrOfCharge(int NbrOfCharge);
 };
 

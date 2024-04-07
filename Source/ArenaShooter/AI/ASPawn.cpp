@@ -8,19 +8,20 @@
 #include "ArenaShooter/Components/ASHealthComponent.h"
 #include "ArenaShooter/Components/ASWeaponComponent.h"
 #include "ArenaShooter/SubSystem/ASEventWorldSubSystem.h"
-#include "ArenaShooter/Widget/ASEnemyWidget.h"
 #include "Components/CapsuleComponent.h"
-#include "Components/SphereComponent.h"
-#include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraDataInterfaceArrayFunctionLibrary.h"
+#include "Blueprint/UserWidget.h"
 
 
-
-AASPawn::AASPawn()
+AASPawn::AASPawn(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	m_RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+	SetRootComponent(m_RootComponent);
+	
 	m_CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
 	m_CapsuleComponent->SetCollisionProfileName("Pawn");
+	m_CapsuleComponent->SetupAttachment(m_RootComponent);
 
 	m_MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
 	m_MeshComponent->SetupAttachment(m_CapsuleComponent);
@@ -40,30 +41,40 @@ void AASPawn::BeginPlay()
 	Super::BeginPlay();
 	
 	m_EventWorldSubSystem = GetWorld()->GetSubsystem<UASEventWorldSubSystem>();
-	
+
 	m_HealthComponent->OnHealthChanged.AddDynamic(this, &AASPawn::OnHealthChanged);
 	m_HealthComponent->OnDeathStarted.AddDynamic(this, &AASPawn::OnDeath);
 
 	m_WeaponComponent->InitializeWeapon();
 	m_WeaponComponent->m_ASPawnOwner = this;
+	
+	/*if (m_IndicatorWidgetClass) {
+		m_IndicatorWidget = CreateWidget<UUserWidget>(GetWorld(), m_IndicatorWidgetClass);
+	}
+	
+	if(m_IndicatorWidget){
+		m_IndicatorWidget->AddToViewport(-1);
+		m_IndicatorWidget->SetColorAndOpacity(m_IndicatorBaseColor);
+	}*/
 }
 
 void AASPawn::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	if(m_IsStunned) StunTick(DeltaSeconds);
+	//ManageIndicatorWidget();
 }
 
 
 
 void AASPawn::OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer)
 {
+	if (PreviousHealth == CurrentHealth) return;
+	
 	// Find a Way to get the Indicate that you can one shoot the enemy
 	// Oeverlay Mat ?
 	
 	SpawnFloatingDamage(GetActorLocation(), GetActorRotation(), PreviousHealth - CurrentHealth);
-	
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), m_ImpactParticle, m_HitLocation);
 }
 
 void AASPawn::OnDeath(AActor* DeathDealer)
@@ -87,7 +98,28 @@ void AASPawn::StunTick(float DeltaTime)
 	}
 }
 
+void AASPawn::ManageIndicatorWidget()
+{
+	if(m_IndicatorWidget == nullptr) return;
+	
+	FVector2D lScreenPosition;
+	UGameplayStatics::ProjectWorldToScreen(GetWorld()->GetFirstPlayerController(), GetActorLocation(), lScreenPosition);
+	if (!WasRecentlyRendered(0.1f)) {
+		m_IndicatorWidget->SetVisibility(ESlateVisibility::Visible);
+	} else {
+		m_IndicatorWidget->SetVisibility(ESlateVisibility::Hidden);
+		GEngine->AddOnScreenDebugMessage(7, 0.1f, FColor::Red, "hidden");
+	}
+	
+	FVector2D lDesiredSize =FVector2D(GEngine->GameViewport->Viewport->GetSizeXY()) - m_IndicatorWidget->GetDesiredSize();
+	lScreenPosition.X = FMath::Clamp(lScreenPosition.X, 0, lDesiredSize.X);
+	lScreenPosition.Y = FMath::Clamp(lScreenPosition.Y, 0, lDesiredSize.Y);
+	
+	m_IndicatorWidget->SetPositionInViewport(lScreenPosition);
+}
+
 void AASPawn::SpawnFloatingDamage(const FVector& SpawnLocation, const FRotator& SpawnRotation, const float Damage)
+
 {
 	if (GetWorld() == nullptr) {
 		UE_LOG(LogTemp, Error,TEXT("%s, can't spawn floating damage. No context"), *GetNameSafe(this));
