@@ -31,7 +31,7 @@ void AASWeapon_PlayerPrimary::Fire(FVector FireOrigin, FVector FireDirection)
 		// Process the hit result
 		if (AActor* HitActor = HitResult.GetActor()) {
 			if(UASHealthComponent* HealthComponent = UASHealthComponent::FindHealthComponent(HitActor)) {
-				HealthComponent->Damage(m_DamageByBullet, GetOwner(), m_OnHitStunDuration);
+				HealthComponent->Damage(m_DamageByBullet, GetOwner(), m_OnHitStunDuration, HitResult.Location);
 			} else {
 				UGameplayStatics::SpawnDecalAtLocation(GetWorld(), m_DecalMaterial, m_DecalSize, FVector(HitResult.ImpactPoint), HitResult.ImpactNormal.Rotation().GetInverse(), 5.0f);
 			}

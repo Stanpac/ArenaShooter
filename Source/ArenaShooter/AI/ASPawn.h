@@ -56,10 +56,16 @@ protected:
 	/** Is the pawn stunned **/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stun", meta=(DisplayName = "Is Stunned ?"))
 	bool m_IsStunned;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Signs and Feedbacks", DisplayName = "Lock in sound")
+	USoundBase* m_LockInSound;
 	
 	/** Event World SubSystem */
 	UPROPERTY()
 	TObjectPtr<UASEventWorldSubSystem> m_EventWorldSubSystem;
+
+	UPROPERTY()
+	FVector m_HitLocation;
 	
 	// Timer
 	FTimerHandle m_HealthBarTimerHandle;
@@ -90,5 +96,6 @@ protected:
 
 public:
 	bool GetIsStunned() const { return m_IsStunned;}
-	
+
+	void SetHitPosition(FVector hitPosition) { m_HitLocation = hitPosition; }
 };

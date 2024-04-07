@@ -49,8 +49,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Dash Properties", DisplayName = "How long to complete dash")
 	float m_DashDuration = .3f;
 
-
-
 	UPROPERTY(EditAnywhere, Category = "Dash Properties", DisplayName = "Dash offset")
 	float m_DashOffset = 100;
 
@@ -66,6 +64,21 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Dash Detection Properties", DisplayName = "Detect radius")
 	float m_DashTargetDetectionRadius = 20;
 	
+	UPROPERTY(EditDefaultsOnly, Category = "Dash Detection Properties", DisplayName = "Current Dash State")
+	EDashStates m_CurrentDashState = EDashStates::Neutral;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Signs and Feedbacks", DisplayName = "Dash sound")
+	USoundBase* m_SoundDash;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Signs and Feedbacks", DisplayName = "FOV during dash")
+	float m_MaxFieldOfView = 150;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Signs and Feedbacks", DisplayName = "FOV change curve during dash")
+	UCurveFloat* m_FOVevolutionCurve;
+	
+	UPROPERTY()
+	float m_BaseFieldOfView;
+	
 	UPROPERTY()
 	float m_TickRefreshTimer = 0;
 
@@ -77,9 +90,6 @@ protected:
 
 	UPROPERTY()
 	float m_NoGravityTimer = 0;
-	
-	UPROPERTY(VisibleAnywhere, Category = "Dash Detection Properties", DisplayName = "Current Dash State")
-	EDashStates m_CurrentDashState = EDashStates::Neutral;
 	
 	UPROPERTY()
 	AActor* m_HitTarget = nullptr;
