@@ -117,7 +117,8 @@ void AASCharacter::BeginPlay()
 	M_PlayerWidget = CreateWidget<UASGlobalWidget>(GetWorld(), M_PlayerWidgetClass);
 	if (M_PlayerWidget) {
 		M_PlayerWidget->AddToViewport();
-		GetPlayerWidget()->SetNbrOfChargeText(m_GravitySwitchComponent->GetNbrOfCharge());
+		GetPlayerWidget()->SetNbrOfCharge(m_GravitySwitchComponent->GetNbrOfCharge());
+		GetPlayerWidget()->SethealthBarPercent(m_HealthComponent->GetHealth(), m_HealthComponent->GetMaxHealth());
 	}
 
 	m_HealthComponent->OnDeathStarted.AddDynamic(this, &AASCharacter::OnStartDeath);
@@ -243,24 +244,23 @@ void AASCharacter::OnFire()
 void AASCharacter::OnChangeGravity()
 {
 	// Call when the Gravity Switch Start
-	GetPlayerWidget()->SetGravityAbilityImageVisibility(false);
+	GetPlayerWidget()->SetGravityAbilityWidget(false);
 }
 
 void AASCharacter::OnAbilityCooldownEnd()
 {
-	//GetPlayerWidget()->SetNbrOfChargeText(m_GravitySwitchComponent->GetNbrOfCharge());
-	GetPlayerWidget()->SetGravityAbilityImageVisibility(true);
+	GetPlayerWidget()->SetGravityAbilityWidget(true);
 }
 
 void AASCharacter::OnGravityChargeRefill()
 {
 	GetPlayerWidget()->SetGravityChargeBarPercent(m_GravitySwitchComponent->GetTimer() / m_GravitySwitchComponent->GetGravityChargeRefillTime());
-	GetPlayerWidget()->SetNbrOfChargeText(m_GravitySwitchComponent->GetNbrOfCharge());
+	GetPlayerWidget()->SetNbrOfCharge(m_GravitySwitchComponent->GetNbrOfCharge());
 }
 
 void AASCharacter::OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth,AActor* DamageDealer)
 {
-	GetPlayerWidget()->SethealthBarPercent(CurrentHealth / MaxHealth);
+	GetPlayerWidget()->SethealthBarPercent(CurrentHealth,MaxHealth);
 	if (CurrentHealth < PreviousHealth) {
 		CheckPlayScreenShake();
 		if(m_SoundHit) {

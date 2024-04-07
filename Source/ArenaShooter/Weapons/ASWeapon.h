@@ -37,7 +37,7 @@ public:
 	float m_FireDelayTimer;
 	
 	/** Is the weapon waiting to shoot another bullet **/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Reload", meta=(DisplayName = "Is Reloading ?"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Reload", meta=(DisplayName = "Is Waiting For FireDelay ?"))
 	bool m_IsWaitingForFireDelay;
 	
 	/** Damage Multiplier by distance **/

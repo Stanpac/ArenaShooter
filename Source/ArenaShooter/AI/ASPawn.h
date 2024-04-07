@@ -24,6 +24,9 @@ class ARENASHOOTER_API AASPawn : public APawn
 	GENERATED_BODY()
 	/* ---------------------------------- MEMBERS --------------------------------------*/
 protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASPawn|Components", meta = (DisplayName = "RootComponent"))
+	USceneComponent* m_RootComponent;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASPawn|Components", meta = (DisplayName = "MeshComponent"))
 	UStaticMeshComponent* m_MeshComponent;

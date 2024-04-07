@@ -84,6 +84,7 @@ public:
 	void SetIsDamageable(bool isDamageable) { m_IsDamageable = isDamageable;}
 
 	FORCEINLINE float GetHealth() const { return m_Health; }
+	FORCEINLINE float GetMaxHealth() const { return m_MaxHealth; }
 	FORCEINLINE bool GetIsExecutable() const { return m_IsExecutable; }
 	FORCEINLINE void SetIsExecutable(bool bM_IsExecutable) { m_IsExecutable = bM_IsExecutable; }
 };

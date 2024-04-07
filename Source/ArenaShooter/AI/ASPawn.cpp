@@ -16,8 +16,12 @@
 
 AASPawn::AASPawn(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	m_RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+	SetRootComponent(m_RootComponent);
+	
 	m_CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
 	m_CapsuleComponent->SetCollisionProfileName("Pawn");
+	m_CapsuleComponent->SetupAttachment(m_RootComponent);
 
 	m_MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
 	m_MeshComponent->SetupAttachment(m_CapsuleComponent);
@@ -44,23 +48,21 @@ void AASPawn::BeginPlay()
 	m_WeaponComponent->InitializeWeapon();
 	m_WeaponComponent->m_ASPawnOwner = this;
 	
-	if (m_IndicatorWidgetClass) {
+	/*if (m_IndicatorWidgetClass) {
 		m_IndicatorWidget = CreateWidget<UUserWidget>(GetWorld(), m_IndicatorWidgetClass);
 	}
 	
 	if(m_IndicatorWidget){
 		m_IndicatorWidget->AddToViewport(-1);
 		m_IndicatorWidget->SetColorAndOpacity(m_IndicatorBaseColor);
-	}
+	}*/
 }
 
 void AASPawn::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	if(m_IsStunned) StunTick(DeltaSeconds);
-	ManageIndicatorWidget();
-	
-	
+	//ManageIndicatorWidget();
 }
 
 
