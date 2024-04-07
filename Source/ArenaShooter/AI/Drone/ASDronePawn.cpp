@@ -262,15 +262,7 @@ void AASDronePawn::DroneMovement(float DeltaTime)
 	FVector dispersion = m_DispersionVector * m_DroneDispersionSpeed * dispersionEnableValue * m_DispersionFactor;
 	dispersion.Z = FMath::Clamp(dispersion.Z, 0, 1000);
 	FVector moveVector = GetActorLocation() + ( dispersion + moveToPlayer ) * DeltaTime;
-
 	
-	FHitResult OutHit;
-	FVector StartLocation = GetActorLocation();
-	FVector EndLocation = GetActorLocation() + moveVector.GetSafeNormal() * m_DistanceToTeleport * .9;
-	ETraceTypeQuery TraceTypeQueryToValidate = UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel3);
-	TArray<AActor*> ActorsToIgnore {this};
-	
-
 	bool IsMovementAllowed =  m_IsStunned ? false : true;
 	if(IsMovementAllowed)
 	{
