@@ -87,11 +87,7 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* m_FireMuzzleComponent;
 
-protected:	
-	/* Particle System when shot is fired */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feedback", meta=(DisplayName = "Fire Particle System"))
-	UNiagaraSystem* m_Niagara_ShotFired;
-
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category = "Feedback", meta=(DisplayName = "Fire Shoot Pos"))
 	USceneComponent* m_FireShootPos;
 
@@ -115,10 +111,9 @@ protected:
 	virtual void FireDelayTick(float DeltaTime);
 	
 public:
-
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	
+
 	UFUNCTION(BlueprintCallable, Category="Gameplay")
 	virtual void Fire(FVector fireOrigin, FVector fireDirection);
 
