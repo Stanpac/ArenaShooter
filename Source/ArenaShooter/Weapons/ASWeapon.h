@@ -80,10 +80,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feedback", meta=(DisplayName = "Fire Sound"))
 	USoundBase* m_Sound_ShotFired;
 
-	/** Particle System when shot is fired **/
-	/*UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feedback", meta=(DisplayName = "Fire Particle System"))
-	UNiagaraSystem* m_PSys_ShotFired;*/
-
 	/** Determines if the weapon will be set hidden at start **/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feedback", meta=(DisplayName = "Is the Weapon Shown"))
 	bool m_ShowWeapon;
@@ -115,17 +111,8 @@ protected:
 	virtual void FireDelayTick(float DeltaTime);
 	
 public:
-
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	/** Equip the weapon to the owning Pawns **/
-	UFUNCTION(BlueprintCallable, Category="Gameplay")
-	void Equip();
-
-	/** Stach the weapon to the owning Pawns **/
-	UFUNCTION(BlueprintCallable, Category="Gameplay")
-	void Stach();
 
 	UFUNCTION(BlueprintCallable, Category="Gameplay")
 	virtual void Fire(FVector fireOrigin, FVector fireDirection);
