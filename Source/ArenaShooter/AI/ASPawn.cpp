@@ -70,7 +70,11 @@ void AASPawn::Tick(float DeltaSeconds)
 void AASPawn::OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer)
 {
 	if (PreviousHealth == CurrentHealth) return;
-	
+
+	if(m_ImpactParticle != nullptr)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), m_ImpactParticle, m_HitLocation, m_HitRotation);
+	}
 	// Find a Way to get the Indicate that you can one shoot the enemy
 	// Oeverlay Mat ?
 	
@@ -142,6 +146,16 @@ void AASPawn::SpawnFloatingDamage(const FVector& SpawnLocation, const FRotator& 
 	
 	/*Set the damage value into the system, it will use to compute where the texture number should take float*/
 	UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVector4Value(lNiagaraComp, FName("DamageInfo"), 0, lDamageData, false);
+}
+
+void AASPawn::SetHitPosition(const FVector& hitPosition)
+{
+	m_HitLocation = hitPosition;
+}
+
+void AASPawn::SetHitRotation(const FRotator& hitRotation)
+{
+	m_HitRotation = hitRotation;
 }
 
 

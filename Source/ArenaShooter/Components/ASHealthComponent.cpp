@@ -38,7 +38,7 @@ void UASHealthComponent::healing(float amount)
 	OnHealthChanged.Broadcast(PreviousHealth, m_Health, m_MaxHealth, GetOwner());
 }
 
-void UASHealthComponent::Damage(float amount, AActor* DamageDealer, float stunDuration, FVector hitLocation)
+void UASHealthComponent::Damage(float amount, AActor* DamageDealer, float stunDuration, FVector hitLocation, FRotator hitRotation)
 {
 	if(!m_IsDamageable) return;
 

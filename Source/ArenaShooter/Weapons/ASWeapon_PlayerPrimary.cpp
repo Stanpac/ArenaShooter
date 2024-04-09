@@ -1,4 +1,6 @@
 #include "ASWeapon_PlayerPrimary.h"
+
+#include "ArenaShooter/AI/ASPawn.h"
 #include "ArenaShooter/Components/ASHealthComponent.h"
 #include "Components/DecalComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -30,15 +32,21 @@ void AASWeapon_PlayerPrimary::Fire(FVector FireOrigin, FVector FireDirection)
 
 	if (bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult,FireOrigin,FireOrigin + FireDirection * 1000000,ECC_Visibility, CollisionParams)) {
 		// Process the hit result
-		if (AActor* HitActor = HitResult.GetActor()) {
-			if(UASHealthComponent* HealthComponent = UASHealthComponent::FindHealthComponent(HitActor)) {
-				HealthComponent->Damage(m_DamageByBullet, GetOwner(), m_OnHitStunDuration);
-			} else {
+		if (AActor* HitActor = HitResult.GetActor())
+			{
+				if(UASHealthComponent* HealthComponent = UASHealthComponent::FindHealthComponent(HitActor))
+				{
+					HealthComponent->Damage(m_DamageByBullet, GetOwner(), m_OnHitStunDuration, HitResult.Location, FireDirection.Rotation());
+				}
+			else
+			{
 				UDecalComponent* lDecal = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), m_DecalMaterial, m_DecalSize, FVector(HitResult.ImpactPoint), HitResult.ImpactNormal.Rotation().GetInverse(), 5.0f);
 				lDecal->SetFadeScreenSize(0.001f);
 			}
 		} 
-	} else {
+	}
+	else
+	{
 		// nothing is Hit
 	}
 }

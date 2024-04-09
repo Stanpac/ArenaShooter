@@ -192,7 +192,7 @@ AActor* UASDashComponent::DetectDashTarget()
 			{
 				if(OutHit.GetActor()->IsA<AASPawn>())
 				{
-					GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Black, OutHit.GetActor()->GetName());
+					//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Black, OutHit.GetActor()->GetName());
 					FRotator rot = (GetOwner()->GetActorLocation() - OutHit.Location).Rotation();
 					DrawDebugCrosshairs(GetWorld(), OutHit.GetActor()->GetActorLocation(), rot, 100, FColor::Red, false, m_TickRefreshRate);
 					return OutHit.GetActor();;

@@ -73,7 +73,7 @@ public:
 	void healing(float amount);
 	
 	UFUNCTION(BlueprintCallable)
-	void Damage(float amount, AActor* DamageDealer, float stunAmount = 0, FVector hitLocation = FVector::ZeroVector);
+	void Damage(float amount, AActor* DamageDealer, float stunAmount = 0, FVector hitLocation = FVector::ZeroVector, FRotator hitRotation = FRotator::ZeroRotator);
 
 	
 protected:

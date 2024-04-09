@@ -79,6 +79,9 @@ protected:
 
 	UPROPERTY()
 	FVector m_HitLocation;
+
+	UPROPERTY()
+	FRotator m_HitRotation;
 	
 	// Timer
 	FTimerHandle m_HealthBarTimerHandle;
@@ -112,6 +115,7 @@ protected:
 
 public:
 	bool GetIsStunned() const { return m_IsStunned;}
-	void SetHitPosition(FVector hitPosition) { m_HitLocation = hitPosition; }
+	void SetHitPosition(const FVector& hitPosition);
+	void SetHitRotation(const FRotator& hitRotation);
 
 };

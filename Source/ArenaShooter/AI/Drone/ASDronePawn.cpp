@@ -87,6 +87,7 @@ void AASDronePawn::OnBehaviourStateTick(float DeltaTime)
 		case EDroneBehaviour::CHASING:
 			break;
 		case EDroneBehaviour::SHOOTING:
+			if(m_EnableShooting) m_WeaponComponent->Fire(GetActorLocation(), GetActorForwardVector());
 			break;
 		case EDroneBehaviour::TELEPORTING:
 			m_TeleportationTimer -= DeltaTime;
@@ -101,6 +102,7 @@ void AASDronePawn::OnBehaviourStateTick(float DeltaTime)
 void AASDronePawn::OnBehaviourAIStateTick()
 {
 	m_DroneToPlayerMult = 0;
+
 	switch(m_CurrentBehaviour)
 	{
 		case EDroneBehaviour::CHASING:
@@ -122,7 +124,6 @@ void AASDronePawn::OnBehaviourAIStateTick()
 			{
 				ChangeBehaviour(EDroneBehaviour::CHASING);
 			}
-			else if(m_EnableShooting) m_WeaponComponent->Fire(GetActorLocation(), GetActorForwardVector());
 			break;
 		}
 		case EDroneBehaviour::TELEPORTING:
@@ -159,6 +160,10 @@ void AASDronePawn::ChasingBehaviour()
 	else if(distanceToTarget < m_DistanceToTeleport)
 	{
 		ChangeBehaviour(EDroneBehaviour::TELEPORTING);
+	}
+	else
+	{
+		m_DroneToPlayerMult = 1;
 	}
 }
 
@@ -242,10 +247,9 @@ void AASDronePawn::TeleportDrone()
 
 void AASDronePawn::DroneMovement(float DeltaTime)
 {
-	FVector droneToPlayerVector = (m_Player->GetActorLocation() - GetActorLocation()).GetSafeNormal() * m_DroneToPlayerMult;
+	const FVector droneToPlayerVector = (m_Player->GetActorLocation() - GetActorLocation()).GetSafeNormal() * m_DroneToPlayerMult;
 
-	float DroneToFromPlayerSpeed = m_DroneToPlayerMult > 0 ? m_DroneToPlayerSpeed : m_DroneAwayFromPlayerSpeed;
-	
+	const float DroneToFromPlayerSpeed = m_DroneToPlayerMult > 0 ? m_DroneToPlayerSpeed : m_DroneAwayFromPlayerSpeed;
 	float dispersionEnableValue = 1;
 	if(!m_EnableDispersionBehaviour) dispersionEnableValue = 0;
 
@@ -253,7 +257,7 @@ void AASDronePawn::DroneMovement(float DeltaTime)
 	if(!m_EnableMovementTowardsPlayer || m_CurrentBehaviour != EDroneBehaviour::CHASING) movementTowardsPlayerEnableValue = 0;
 
 	float distanceMult = m_DistanceSpeedCurve->FloatCurve.Eval(FMath::Clamp(FVector::Distance(m_Player->GetActorLocation(), GetActorLocation()), 0, m_MaxDistanceEvaluated) / m_MaxDistanceEvaluated) * m_DistanceSpeedMult;
-	if(m_CurrentBehaviour != EDroneBehaviour::CHASING)
+	if(m_CurrentBehaviour != EDroneBehaviour::CHASING || m_DroneToPlayerMult < 0)
 	{
 		distanceMult = 1;
 	}
@@ -262,7 +266,7 @@ void AASDronePawn::DroneMovement(float DeltaTime)
 	FVector dispersion = m_DispersionVector * m_DroneDispersionSpeed * dispersionEnableValue * m_DispersionFactor;
 	dispersion.Z = FMath::Clamp(dispersion.Z, 0, 1000);
 	FVector moveVector = GetActorLocation() + ( dispersion + moveToPlayer ) * DeltaTime;
-	
+
 	bool IsMovementAllowed =  m_IsStunned ? false : true;
 	if(IsMovementAllowed)
 	{
