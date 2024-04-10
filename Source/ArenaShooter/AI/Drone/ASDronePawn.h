@@ -89,6 +89,18 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Time to lock on target")
 	float m_TimeToLockInTarget = 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Signs and Feedbacks", DisplayName = "Max Move Speed to calibrate move sound")
+	float m_MaxMoveSpeed = 100;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Signs and Feedbacks", DisplayName = "Move Sound modulation curve")
+	UCurveFloat* m_MoveSoundCurve;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Signs and Feedbacks", DisplayName = "Move Sound")
+	USoundCue* m_SoundMove;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Signs and Feedbacks", DisplayName = "Teleportation Sound")
+	USoundCue* m_SoundTeleportation;
 	
 	UPROPERTY()
 	float m_AITickTimer;
@@ -121,10 +133,14 @@ protected:
 
 	/*---------------------------------- FUNCTIONS --------------------------------------*/
 public:
-	AASDronePawn();
+	AASDronePawn(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+	
 
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void OnDeath(AActor* DeathDealer) override;
 	
 	UFUNCTION()
 	virtual void LookAtPlayer(float DeltaTime);

@@ -15,6 +15,7 @@
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Sound/SoundCue.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -190,7 +191,14 @@ void AASCharacter::SwitchGravity(const FInputActionValue& Value)
 
 void AASCharacter::Dash(const FInputActionValue& Value)
 {
-	m_DashComponent->OnDash();
+	if(m_DashComponent->OnDash())
+	{
+		UAnimInstance* AnimInstance = GetMesh1P()->GetAnimInstance();
+		if (IsValid(AnimInstance) && IsValid(m_DashMontage))
+		{
+			AnimInstance->Montage_Play(m_DashMontage, 1.3f, EMontagePlayReturnType::MontageLength, 0.0f, true);
+		}
+	}
 }
 
 void AASCharacter::OnStartDeath(AActor* OwningActor)
@@ -256,6 +264,21 @@ void AASCharacter::OnGravityChargeRefill()
 {
 	GetPlayerWidget()->SetGravityChargeBarPercent(m_GravitySwitchComponent->GetTimer() / m_GravitySwitchComponent->GetGravityChargeRefillTime());
 	GetPlayerWidget()->SetNbrOfCharge(m_GravitySwitchComponent->GetNbrOfCharge());
+}
+
+void AASCharacter::OnDashValidate()
+{
+	GetPlayerWidget()->SetDashAbilityWidget(false);
+}
+
+void AASCharacter::OnDashAbilityCooldownEnd()
+{
+	GetPlayerWidget()->SetDashAbilityWidget(true);
+}
+
+void AASCharacter::OnDashRechargeTick(float percent)
+{
+	GetPlayerWidget()->SetDashChargeBarPercent(percent);
 }
 
 void AASCharacter::OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth,AActor* DamageDealer)

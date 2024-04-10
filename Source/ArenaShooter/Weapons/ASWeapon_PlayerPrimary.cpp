@@ -4,6 +4,7 @@
 #include "ArenaShooter/Components/ASHealthComponent.h"
 #include "Components/DecalComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 
 void AASWeapon_PlayerPrimary::Fire(FVector FireOrigin, FVector FireDirection)

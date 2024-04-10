@@ -68,7 +68,7 @@ protected:
 	EDashStates m_CurrentDashState = EDashStates::Neutral;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Signs and Feedbacks", DisplayName = "Dash sound")
-	USoundBase* m_SoundDash;
+	USoundCue* m_SoundDash;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Signs and Feedbacks", DisplayName = "FOV during dash")
 	float m_MaxFieldOfView = 150;
@@ -118,7 +118,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION()
-	void OnDash();
+	bool OnDash();
 
 	UFUNCTION()
 	void SlowTick(float DeltaTime);

@@ -64,6 +64,7 @@ void AASWeapon::Fire(FVector fireOrigin, FVector fireDirection)
 	FireDelayProc();
 	
 	if (m_Niagara_ShotFiredComponent){
+		m_Niagara_ShotFiredComponent->DeactivateImmediate();
 		m_Niagara_ShotFiredComponent->Activate();
 	}
 	
