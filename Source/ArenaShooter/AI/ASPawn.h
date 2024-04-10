@@ -60,8 +60,7 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASPawn|Components", meta = (DisplayName = "Indicator Widget"))
 	UUserWidget* m_IndicatorWidget;
-
-
+	
 	/** How much time is left to end stun **/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stun", meta=(DisplayName = "Current Stun Timer"))
 	float m_StunTimer;
