@@ -24,6 +24,9 @@ public:
 
 	//TODO Introduce a curve variable for how the damage multiplier by distance is Evaluated
 
+	UPROPERTY()
+	FVector m_Offset;
+	
 	/** Damage by bullet **/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gun Play", meta=(DisplayName = "Damage By Bullet"))
 	float m_DamageByBullet;

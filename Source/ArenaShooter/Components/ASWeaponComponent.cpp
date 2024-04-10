@@ -13,7 +13,7 @@ void UASWeaponComponent::Fire(FVector fireOrigin, FVector fireDirection)
 	if(IsValid(m_CurrentEquipedWeapon)) {
 		if(!m_CurrentEquipedWeapon->m_IsReloading && !m_CurrentEquipedWeapon->m_IsWaitingForFireDelay && (!IsValid(m_ASPawnOwner) || !m_ASPawnOwner->GetIsStunned()))
 		{
-			m_CurrentEquipedWeapon->Fire(fireOrigin, fireDirection);
+			m_CurrentEquipedWeapon->Fire(fireOrigin + m_PositionOffset, fireDirection);
 			
 			OnFireEvent.Broadcast();
 		}
@@ -57,6 +57,7 @@ void UASWeaponComponent::InitializeWeapon()
 				m_PrimaryWeapon->SetActorLocation(GetOwner()->GetActorLocation() + m_PositionOffset);
 			}
 			m_CurrentEquipedWeapon = m_PrimaryWeapon;
+			m_CurrentEquipedWeapon->m_Offset = m_RotationOffset;
 		} else {
 			UE_LOG(LogTemp, Error, TEXT("No Primary Weapon Spawned"));
 			return;

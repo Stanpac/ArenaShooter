@@ -18,6 +18,8 @@ AASWeapon::AASWeapon()
 	M_WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>("WeaponMesh");
 	M_WeaponMesh->SetupAttachment(m_FireMuzzleComponent);
 
+
+	
 	m_FireShootPos = CreateDefaultSubobject<USceneComponent>("FireShootPosition");
 	m_FireShootPos->SetupAttachment(M_WeaponMesh, "FireShootPosition");
 	
@@ -30,6 +32,11 @@ void AASWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 	if(!m_ShowWeapon) SetHidden(true);
+	FRotator CurrentRotation = M_WeaponMesh->GetComponentRotation();
+	CurrentRotation.Roll += m_Offset.X;
+	CurrentRotation.Pitch += m_Offset.Y;
+	CurrentRotation.Yaw += m_Offset.Z;
+	M_WeaponMesh->SetWorldRotation(CurrentRotation);
 }
 
 // Called every frame

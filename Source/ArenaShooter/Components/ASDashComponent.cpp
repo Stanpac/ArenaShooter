@@ -39,6 +39,7 @@ void UASDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 			if(m_NoGravityTimer <= 0)
 			{
 				m_CurrentDashState = EDashStates::Neutral;
+				UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1);
 				m_Character->GetCharacterMovement()->GravityScale = m_StartGravity;
 				m_Character->GetCharacterMovement()->GroundFriction = m_StartGroundFriction;
 				m_Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
@@ -52,6 +53,13 @@ void UASDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 			{
 				m_CurrentDashState = EDashStates::Neutral;
 				m_Character->OnDashAbilityCooldownEnd();
+				if(IsValid(m_SoundDashAvailable))
+				{
+					UGameplayStatics::PlaySoundAtLocation(
+						GetWorld(),
+						m_SoundDashAvailable,
+						GetOwner()->GetActorLocation());
+				}
 			}
 			break;
 		case EDashStates::Neutral:
@@ -70,6 +78,7 @@ bool UASDashComponent::OnDash()
 {
 	if(m_CurrentDashState != EDashStates::Neutral && m_CurrentDashState != EDashStates::NoGravity) return false;
 	m_HitTarget = DetectDashTarget();
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1);
 	if(IsValid(m_SoundDash))
 	{
 		UGameplayStatics::PlaySoundAtLocation(
@@ -128,7 +137,15 @@ void UASDashComponent::DashMovement(float DeltaTime)
 					HealthComponent->Damage(m_DashDamage, GetOwner(), m_StunDuration);
 					m_CurrentDashState = EDashStates::NoGravity;
 					m_NoGravityTimer = m_NoGravityCooldown;
+					if(IsValid(m_SoundDash))
+					{
+						UGameplayStatics::PlaySoundAtLocation(
+							GetWorld(),
+							m_SoundDashAvailable,
+							GetOwner()->GetActorLocation());
+					}
 					m_Character->OnDashAbilityCooldownEnd();
+					UGameplayStatics::SetGlobalTimeDilation(GetWorld(), m_TimeSlowValue);
 					return;
 				}
 				else

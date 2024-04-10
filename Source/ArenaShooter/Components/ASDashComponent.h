@@ -58,6 +58,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Dash Properties", DisplayName = "Refresh rate of the sphere cast to detect AASPawns")
 	float m_TickRefreshRate = .1f;
 
+	UPROPERTY(EditAnywhere, Category = "Dash Properties", DisplayName = "Speed of time after successful dash")
+	float m_TimeSlowValue = .5f;
+	
 	UPROPERTY(EditAnywhere, Category = "Dash Detection Properties", DisplayName = "Range in which ASPawns are detected")
 	float m_DashTargetDetectionRange = 2000;
 
@@ -75,6 +78,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Signs and Feedbacks", DisplayName = "FOV change curve during dash")
 	UCurveFloat* m_FOVevolutionCurve;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Signs and Feedbacks", DisplayName = "Dash Available sound")
+	USoundCue* m_SoundDashAvailable;
 	
 	UPROPERTY()
 	float m_BaseFieldOfView;

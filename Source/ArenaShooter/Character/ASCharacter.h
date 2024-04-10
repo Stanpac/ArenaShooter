@@ -97,6 +97,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category = "ASCharacter|Sound", meta = (DisplayName = "Sound On Hit"))
 	TObjectPtr<USoundCue> m_SoundHit;
+
+	UPROPERTY(EditAnywhere, Category = "ASCharacter|Sound", meta = (DisplayName = "Sound On Gravity Available"))
+	TObjectPtr<USoundCue> m_SoundGravityAvailable;
 	
 	/* ---------------------- Input To move in component -------------------------------*/
 	

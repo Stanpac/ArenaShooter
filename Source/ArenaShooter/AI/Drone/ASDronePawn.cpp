@@ -28,7 +28,7 @@ void AASDronePawn::BeginPlay()
 	m_DispersionFactor = FMath::Lerp(m_DispersionFactorMin, m_DispersionFactorMax, FMath::FRand());
 	if(IsValid(m_SoundMove))
 	{
-		UGameplayStatics::PlaySoundAtLocation( GetWorld(), m_SoundMove, GetActorLocation());
+		//UGameplayStatics::PlaySoundAtLocation( GetWorld(), m_SoundMove, GetActorLocation());
 	}
 }
 
@@ -110,6 +110,10 @@ void AASDronePawn::OnBehaviourStateTick(float DeltaTime)
 			if(m_TeleportationTimer <= 0)
 			{
 				TeleportDrone();
+				if(IsValid(m_SoundTeleportation))
+				{
+					UGameplayStatics::PlaySoundAtLocation( GetWorld(), m_SoundTeleportation, GetActorLocation());
+				}
 			}
 			break;
 	}
@@ -176,10 +180,6 @@ void AASDronePawn::ChasingBehaviour()
 	else if(distanceToTarget < m_DistanceToTeleport)
 	{
 		m_TeleportationTimer = m_TeleportationDuration;
-		if(IsValid(m_SoundTeleportation))
-		{
-			UGameplayStatics::PlaySoundAtLocation( GetWorld(), m_SoundTeleportation, GetActorLocation());
-		}
 		ChangeBehaviour(EDroneBehaviour::TELEPORTING);
 	}
 	else
@@ -309,7 +309,6 @@ void AASDronePawn::DroneMovement(float DeltaTime)
 		FCollisionResponseParams::DefaultResponseParam
 		);
 
-	DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Black, false, 1);
 	if(!m_IsStunned && !bHit)
 	{
 		SetActorLocation(moveVector, true);

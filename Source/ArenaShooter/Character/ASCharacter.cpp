@@ -258,6 +258,9 @@ void AASCharacter::OnChangeGravity()
 void AASCharacter::OnAbilityCooldownEnd()
 {
 	GetPlayerWidget()->SetGravityAbilityWidget(true);
+	if(m_SoundGravityAvailable) {
+		UGameplayStatics::PlaySoundAtLocation( GetWorld(), m_SoundGravityAvailable,GetOwner()->GetActorLocation());
+	}
 }
 
 void AASCharacter::OnGravityChargeRefill()
