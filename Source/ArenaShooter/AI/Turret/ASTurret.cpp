@@ -4,9 +4,13 @@
 #include "ASTurret.h"
 
 #include "NiagaraComponent.h"
+#include "ArenaShooter/Character/ASCharacter.h"
 #include "ArenaShooter/Components/ASHealthComponent.h"
 #include "ArenaShooter/Components/ASWeaponComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "Components/BillboardComponent.h"
+#include "ArenaShooter/Widget/ASTurretWidget.h"
+#include "GameFramework/PawnMovementComponent.h"
 
 
 AASTurret::AASTurret(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -35,6 +39,12 @@ AASTurret::AASTurret(const FObjectInitializer& ObjectInitializer) : Super(Object
 void AASTurret::BeginPlay()
 {
 	Super::BeginPlay();
+	if (m_WidgetClass) {
+		m_Widget = CreateWidget<UASTurretWidget>(GetWorld(), m_WidgetClass);
+		m_Widget->AddToViewport();
+		m_Widget->SetHealthBarPercent(m_HealthComponent->GetHealth(), m_HealthComponent->GetMaxHealth());
+	}
+	m_MovingMeshComponent->OnComponentBeginOverlap.AddDynamic(this, &AASTurret::OnOverlapBegin);
 }
 
 void AASTurret::OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer)
@@ -47,15 +57,26 @@ void AASTurret::OnHealthChanged(float PreviousHealth, float CurrentHealth, float
 		}
 		GetWorldTimerManager().SetTimer(m_TakeDamageTimerHandle, this, &AASTurret::ResetTakeDamage, m_TimeToResetTakeDamage, false);
 	}
+
+	if (m_Widget) {
+		m_Widget->SetHealthBarPercent(CurrentHealth, MaxHealth);
+	}
 }
 
 void AASTurret::Shoot()
 {
 	m_WeaponComponent->Fire(m_ShootingPoint->GetComponentLocation(), m_ShootingPoint->GetForwardVector());
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Shoot"));
 }
 
 void AASTurret::ResetTakeDamage()
 {
 	m_HaveTakeDamageRecently = false;
+}
+
+void AASTurret::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor->IsA<AASCharacter>()) {
+		AASCharacter* lCharacter = Cast<AASCharacter>(OtherActor);
+		lCharacter->LaunchCharacter(lCharacter->GetActorLocation()-GetActorLocation() * m_BumpForce, true, true);
+	}
 }

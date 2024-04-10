@@ -15,6 +15,7 @@ void AASWeapon_Turret::Fire(FVector FireOrigin, FVector FireDirection)
 	params.ObjectFlags |= RF_Transient;
 	params.bNoFail = true;
 	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	
 	if(IsValid(m_BulletBP) && IsValid(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)))
 	{
 		if(m_Sound_ShotFired) {
@@ -25,7 +26,8 @@ void AASWeapon_Turret::Fire(FVector FireOrigin, FVector FireDirection)
 		}
 		const ACharacter* m_Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 		const FVector LookAtLocation = m_Character->GetActorLocation();
-		const FRotator LookAtRotation = (LookAtLocation - FireOrigin).Rotation();
+		//const FRotator LookAtRotation = (LookAtLocation - FireOrigin).Rotation();
+		const FRotator LookAtRotation = FireDirection.Rotation();
 		AASTurretBullet* bullet = GetWorld()->SpawnActor<AASTurretBullet>(m_BulletBP, FireOrigin ,LookAtRotation, params);
 		bullet->m_bulletSpeed = m_bulletSpeed;
 	}
