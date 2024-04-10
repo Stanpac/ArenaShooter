@@ -121,7 +121,7 @@ protected:
 
 	/*---------------------------------- FUNCTIONS --------------------------------------*/
 public:
-	AASDronePawn();
+	AASDronePawn(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 	virtual void BeginPlay() override;
