@@ -124,10 +124,10 @@ void UASDashComponent::DashMovement(float DeltaTime)
 
 	if(m_DashDurationTimer >= 1)
 	{
-		GetOwner()->SetActorLocation(m_DashEndLocation, false);
 		m_Camera->FieldOfView = m_BaseFieldOfView;
 		if(IsValid(m_HitTarget))
 		{
+			GetOwner()->SetActorLocation(m_DashEndLocation, false);
 			UASHealthComponent* HealthComponent = UASHealthComponent::FindHealthComponent(m_HitTarget);
 			if(HealthComponent != nullptr)
 			{
@@ -152,6 +152,10 @@ void UASDashComponent::DashMovement(float DeltaTime)
 					HealthComponent->Damage(m_DashDamage, GetOwner(), m_StunDuration);
 				}
 			}
+		}
+		else
+		{
+			GetOwner()->SetActorLocation(m_DashEndLocation, true);
 		}
 		UASHealthComponent::FindHealthComponent(GetOwner())->SetIsDamageable(true);
 		m_Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
