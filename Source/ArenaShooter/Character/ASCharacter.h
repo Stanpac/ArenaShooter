@@ -135,6 +135,11 @@ protected:
 	UPROPERTY()
 	bool m_DisableMovements;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASCharacter|Widget", meta = (DisplayName = "Lock Widget Actor Class"))
+	TSubclassOf<AActor> M_LockWidgetActorClass;
+
+	UPROPERTY()
+	AActor* M_LockWidgetActor;
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
 	AASCharacter();
@@ -173,6 +178,9 @@ protected:
 
 	UFUNCTION()
 	virtual void OnGravityChargeRefill();
+
+	UFUNCTION()
+	virtual void OnHitTargetChange(AActor* HitTarget);
 
 public:
 	UFUNCTION()

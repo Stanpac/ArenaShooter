@@ -131,6 +131,12 @@ void AASCharacter::BeginPlay()
 	m_GravitySwitchComponent->OnStartSwitchGravity.AddDynamic(this, &AASCharacter::OnChangeGravity);
 	m_GravitySwitchComponent->OnSwitchGravityAbiltyCooldownEnd.AddDynamic(this, &AASCharacter::OnAbilityCooldownEnd);
 	m_GravitySwitchComponent->OnGravityChargeRefill.AddDynamic(this, &AASCharacter::OnGravityChargeRefill);
+
+	m_DashComponent->OnHitTargetChange.AddDynamic(this, &AASCharacter::OnHitTargetChange);
+
+	if (M_LockWidgetActorClass) {
+		M_LockWidgetActor = GetWorld()->SpawnActor<AActor>(M_LockWidgetActorClass);
+	}
 }
 
 void AASCharacter::GetAllSubsystem()
@@ -271,6 +277,20 @@ void AASCharacter::OnGravityChargeRefill()
 {
 	GetPlayerWidget()->SetGravityChargeBarPercent(m_GravitySwitchComponent->GetTimer() / m_GravitySwitchComponent->GetGravityChargeRefillTime());
 	GetPlayerWidget()->SetNbrOfCharge(m_GravitySwitchComponent->GetNbrOfCharge());
+}
+
+void AASCharacter::OnHitTargetChange(AActor* Target)
+{
+	GetPlayerWidget()->ManageCursor(Target);
+	
+	if (M_LockWidgetActor == nullptr) return;
+	
+	if (Target == nullptr) {
+		M_LockWidgetActor->SetActorHiddenInGame(true);
+	} else {
+		M_LockWidgetActor->SetActorLocation(Target->GetActorLocation());
+		M_LockWidgetActor->SetActorHiddenInGame(false);
+	}
 }
 
 void AASCharacter::OnDashValidate()
