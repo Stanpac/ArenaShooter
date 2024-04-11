@@ -137,6 +137,7 @@ void AASCharacter::BeginPlay()
 	if (M_LockWidgetActorClass) {
 		M_LockWidgetActor = GetWorld()->SpawnActor<AActor>(M_LockWidgetActorClass);
 	}
+
 }
 
 void AASCharacter::GetAllSubsystem()
@@ -291,6 +292,7 @@ void AASCharacter::OnHitTargetChange(AActor* Target)
 		M_LockWidgetActor->SetActorLocation(Target->GetActorLocation());
 		M_LockWidgetActor->SetActorHiddenInGame(false);
 	}
+
 }
 
 void AASCharacter::OnDashValidate()

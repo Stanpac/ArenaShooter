@@ -81,7 +81,7 @@ void AASTurret::OnHealthChanged(float PreviousHealth, float CurrentHealth, float
 
 void AASTurret::Shoot()
 {
-	//GEngine->AddOnScreenDebugMessage(6, 1, FColor::Black, TEXT("Shoot"));
+	GEngine->AddOnScreenDebugMessage(6, 1, FColor::Black, TEXT("Shoot"));
 	m_WeaponComponent->Fire(m_ShootingPoint->GetComponentLocation(), m_ShootingPoint->GetForwardVector());
 }
 
