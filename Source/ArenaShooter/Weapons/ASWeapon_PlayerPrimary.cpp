@@ -106,7 +106,7 @@ void AASWeapon_PlayerPrimary::SpawnBullet(FVector FireOrigin, FVector FireDirect
 		//const FRotator LookAtRotation = (LookAtLocation - FireOrigin).Rotation();
 		const FRotator LookAtRotation = FireDirection.Rotation();
 		AASBasicBullet* bullet = GetWorld()->SpawnActor<AASBasicBullet>(m_BulletBP, GetActorLocation() ,LookAtRotation, params);
-		bullet->m_bulletSpeed = 50;
+		bullet->m_bulletSpeed = 200;
 	}
 }
 

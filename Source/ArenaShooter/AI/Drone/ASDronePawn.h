@@ -79,6 +79,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Min Variance of the factor on the dispersion Value")
 	float m_DispersionFactorMin = .8f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Max Distance to account for dispersion")
+	float m_DispersionMaxValue = 1000;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "AI Behaviour", DisplayName = "Curve of evolution of speed evaluated by distance")
 	UCurveFloat* m_DistanceSpeedCurve;
 	
