@@ -7,6 +7,8 @@
 #include "ASTurret.generated.h"
 
 class UNiagaraComponent;
+class UASTurretWidget;
+class UBillboardComponent;
 
 UENUM(BlueprintType, Blueprintable)
 enum class ETurretState : uint8
@@ -56,11 +58,20 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASTurret|Settings", meta = (DisplayName = "Turret Laser Particule System"))
 	UNiagaraComponent* m_TurretLaserParticleSystem;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASTurret|Settings", meta = (DisplayName = "Widget Class"))
+	TSubclassOf<UASTurretWidget> m_WidgetClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASTurret|Settings", meta = (DisplayName = "Widget"))
+	UASTurretWidget* m_Widget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASTurret|Settings", meta = (DisplayName = "Bump Force"))
+	float m_BumpForce = 10.f;
 	
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
 	AASTurret(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-
+	
 	virtual void BeginPlay() override;
 	virtual void OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer) override;
 
@@ -70,6 +81,9 @@ public:
 protected:
 	UFUNCTION()
 	void ResetTakeDamage();
+
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 	/* ---------------------------------- Get / Set --------------------------------------*/
 public:

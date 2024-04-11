@@ -12,7 +12,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraDataInterfaceArrayFunctionLibrary.h"
 #include "Blueprint/UserWidget.h"
-
+#include "Sound/SoundCue.h"
 
 AASPawn::AASPawn(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -39,6 +39,7 @@ void AASPawn::Stun(float stunDuration)
 void AASPawn::BeginPlay()
 {
 	Super::BeginPlay();
+
 	
 	m_EventWorldSubSystem = GetWorld()->GetSubsystem<UASEventWorldSubSystem>();
 
@@ -75,6 +76,12 @@ void AASPawn::OnHealthChanged(float PreviousHealth, float CurrentHealth, float M
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), m_ImpactParticle, m_HitLocation, m_HitRotation);
 	}
+
+	if(IsValid(m_SoundHit))
+	{
+		UGameplayStatics::PlaySoundAtLocation( GetWorld(), m_SoundHit, GetActorLocation());
+	}
+	
 	// Find a Way to get the Indicate that you can one shoot the enemy
 	// Oeverlay Mat ?
 	
@@ -86,8 +93,16 @@ void AASPawn::OnDeath(AActor* DeathDealer)
 	if (m_EventWorldSubSystem) {
 		m_EventWorldSubSystem->BroadcastEnemyDeath();
 	}
+
+	if(IsValid(m_SoundDeath))
+	{
+		UGameplayStatics::PlaySoundAtLocation( GetWorld(), m_SoundDeath, GetActorLocation());
+	}
 	
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), m_DeathParticle, GetActorLocation());
+	if(IsValid(m_DeathParticle))
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), m_DeathParticle, GetActorLocation());
+	}
 	
 	SetLifeSpan(0.1f);
 	SetActorHiddenInGame(true);

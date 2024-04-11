@@ -8,6 +8,7 @@
 class UCameraComponent;
 class UCharacterMovementComponent;
 class AASCharacter;
+class USoundCue;
 
 UENUM(BlueprintType)
 enum class EDashStates : uint8
@@ -58,6 +59,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Dash Properties", DisplayName = "Refresh rate of the sphere cast to detect AASPawns")
 	float m_TickRefreshRate = .1f;
 
+	UPROPERTY(EditAnywhere, Category = "Dash Properties", DisplayName = "Speed of time after successful dash")
+	float m_TimeSlowValue = .5f;
+	
 	UPROPERTY(EditAnywhere, Category = "Dash Detection Properties", DisplayName = "Range in which ASPawns are detected")
 	float m_DashTargetDetectionRange = 2000;
 
@@ -68,13 +72,16 @@ protected:
 	EDashStates m_CurrentDashState = EDashStates::Neutral;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Signs and Feedbacks", DisplayName = "Dash sound")
-	USoundBase* m_SoundDash;
+	USoundCue* m_SoundDash;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Signs and Feedbacks", DisplayName = "FOV during dash")
 	float m_MaxFieldOfView = 150;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Signs and Feedbacks", DisplayName = "FOV change curve during dash")
 	UCurveFloat* m_FOVevolutionCurve;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Signs and Feedbacks", DisplayName = "Dash Available sound")
+	USoundCue* m_SoundDashAvailable;
 	
 	UPROPERTY()
 	float m_BaseFieldOfView;
@@ -118,7 +125,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION()
-	void OnDash();
+	bool OnDash();
 
 	UFUNCTION()
 	void SlowTick(float DeltaTime);

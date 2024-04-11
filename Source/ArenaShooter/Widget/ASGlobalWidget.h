@@ -34,5 +34,11 @@ public:
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetNbrOfCharge(int NbrOfCharge);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetDashAbilityWidget(bool visible);
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetDashChargeBarPercent(float percent);
 };
 

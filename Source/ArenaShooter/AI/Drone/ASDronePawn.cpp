@@ -4,11 +4,13 @@
 #include "ArenaShooter/Components/ASHealthComponent.h"
 #include "ArenaShooter/Components/ASWeaponComponent.h"
 #include "ArenaShooter/Weapons/ASWeapon.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/Character.h"
+#include "Sound/SoundCue.h"
 #include "Kismet/GameplayStatics.h"
 // Sets default values
 
-AASDronePawn::AASDronePawn()
+AASDronePawn::AASDronePawn(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -17,12 +19,26 @@ void AASDronePawn::BeginPlay()
 {
 	Super::BeginPlay();
 	m_Player = GetWorld()->GetFirstPlayerController()->GetCharacter();
+	m_DroneToPlayerMult = 1;
 	check(m_Player);
 	m_CurrentBehaviour = EDroneBehaviour::CHASING;
 	OnBehaviourStateEnter();
 	m_DroneManager = GetWorld()->GetSubsystem<UASDroneManager>();
 	m_DroneManager->AddDrone(this);
 	m_DispersionFactor = FMath::Lerp(m_DispersionFactorMin, m_DispersionFactorMax, FMath::FRand());
+	if(IsValid(m_SoundMove))
+	{
+		//UGameplayStatics::PlaySoundAtLocation( GetWorld(), m_SoundMove, GetActorLocation());
+	}
+}
+
+void AASDronePawn::OnDeath(AActor* DeathDealer)
+{
+	Super::OnDeath(DeathDealer);
+	if(IsValid(m_SoundMove))
+	{
+		m_SoundMove->VolumeMultiplier = 0;
+	}
 }
 
 void AASDronePawn::Tick(float DeltaTime)
@@ -94,6 +110,10 @@ void AASDronePawn::OnBehaviourStateTick(float DeltaTime)
 			if(m_TeleportationTimer <= 0)
 			{
 				TeleportDrone();
+				if(IsValid(m_SoundTeleportation))
+				{
+					UGameplayStatics::PlaySoundAtLocation( GetWorld(), m_SoundTeleportation, GetActorLocation());
+				}
 			}
 			break;
 	}
@@ -159,6 +179,7 @@ void AASDronePawn::ChasingBehaviour()
 	}
 	else if(distanceToTarget < m_DistanceToTeleport)
 	{
+		m_TeleportationTimer = m_TeleportationDuration;
 		ChangeBehaviour(EDroneBehaviour::TELEPORTING);
 	}
 	else
@@ -217,7 +238,7 @@ void AASDronePawn::TeleportDrone()
 		numberOfTeleportation++;
 
 		FVector Direction = (m_Player->GetActorLocation() - GetActorLocation()).GetSafeNormal();
-		float TPDistance = (numberOfTeleportation * m_DistanceByTeleportationSphereCast);
+		float TPDistance = (numberOfTeleportation * m_DistanceByTeleportationSphereCast) + m_DistanceToTeleport;
 		FVector OverlapSphereLocation = GetActorLocation() +  Direction * TPDistance;
 
 		// Perform the overlap check
@@ -267,8 +288,28 @@ void AASDronePawn::DroneMovement(float DeltaTime)
 	dispersion.Z = FMath::Clamp(dispersion.Z, 0, 1000);
 	FVector moveVector = GetActorLocation() + ( dispersion + moveToPlayer ) * DeltaTime;
 
-	bool IsMovementAllowed =  m_IsStunned ? false : true;
-	if(IsMovementAllowed)
+	if(IsValid(m_SoundMove) && IsValid(m_MoveSoundCurve))
+	{
+		m_SoundMove->VolumeMultiplier = m_MoveSoundCurve->FloatCurve.Eval(FMath::Max(moveToPlayer.Length() / m_MaxMoveSpeed, m_MaxMoveSpeed));
+	}
+
+	FHitResult OutHit;
+	FVector StartLocation = GetActorLocation();
+	FVector EndLocation = StartLocation + (moveVector - StartLocation).GetSafeNormal() * m_DistanceToTeleport *.8f;
+	ECollisionChannel CollisionChannel = ECC_Visibility;
+	FCollisionQueryParams CollisionQueryParams = FCollisionQueryParams(SCENE_QUERY_STAT(SphereCast), true) ;
+	CollisionQueryParams.AddIgnoredActor(this);
+	
+	bool bHit = GetWorld()->LineTraceSingleByChannel(
+		OutHit,
+		StartLocation,
+		EndLocation,
+		CollisionChannel,
+		CollisionQueryParams,
+		FCollisionResponseParams::DefaultResponseParam
+		);
+
+	if(!m_IsStunned && !bHit)
 	{
 		SetActorLocation(moveVector, true);
 	}

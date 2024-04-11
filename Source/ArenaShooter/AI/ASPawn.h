@@ -15,6 +15,7 @@ class UUserWidget;
 class UASEventWorldSubSystem;
 class UASWeaponComponent;
 class USceneComponent;
+class USoundCue;
 class UNiagaraSystem;
 
 
@@ -70,7 +71,13 @@ protected:
 	bool m_IsStunned;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Signs and Feedbacks", DisplayName = "Lock in sound")
-	USoundBase* m_LockInSound;
+	USoundCue* m_LockInSound;
+
+	UPROPERTY(EditAnywhere, Category = "Signs and Feedbacks", meta = (DisplayName = "Sound On Death"))
+	USoundCue* m_SoundDeath;
+	
+	UPROPERTY(EditAnywhere, Category = "Signs and Feedbacks", meta = (DisplayName = "Sound On Hit"))
+	USoundCue* m_SoundHit;
 	
 	/** Event World SubSystem */
 	UPROPERTY()

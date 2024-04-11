@@ -21,6 +21,7 @@ class UCameraComponent;
 class UASWeaponComponent;
 class UASCloseCombatComponent;
 class USkeletalMeshComponent;
+class USoundCue;
 class UAnimMontage;
 struct FInputActionValue;
 
@@ -82,6 +83,10 @@ protected:
 	/** Fire Animation */
 	UPROPERTY(EditAnywhere, Category = "ASCharacter|Animation", meta = (DisplayName = "Fire Montage"))
 	TObjectPtr<UAnimMontage> m_FireMontage;
+
+	/** Dash Animation */
+	UPROPERTY(EditAnywhere, Category = "ASCharacter|Animation", meta = (DisplayName = "Dash Montage"))
+	TObjectPtr<UAnimMontage> m_DashMontage;
 	
 	/** Event World SubSystem */
 	TObjectPtr<UASEventWorldSubSystem> m_EventWorldSubSystem;
@@ -89,10 +94,13 @@ protected:
 	/* ----------------------------------- SOUND  -------------------------------*/
 
 	UPROPERTY(EditAnywhere, Category = "ASCharacter|Sound", meta = (DisplayName = "Sound On Death"))
-	TObjectPtr<USoundBase> m_SoundDeath;
+	USoundCue* m_SoundDeath;
 	
 	UPROPERTY(EditAnywhere, Category = "ASCharacter|Sound", meta = (DisplayName = "Sound On Hit"))
-	TObjectPtr<USoundBase> m_SoundHit;
+	USoundCue* m_SoundHit;
+
+	UPROPERTY(EditAnywhere, Category = "ASCharacter|Sound", meta = (DisplayName = "Sound On Gravity Available"))
+	USoundCue* m_SoundGravityAvailable;
 	
 	/* ---------------------- Input To move in component -------------------------------*/
 	
@@ -166,6 +174,16 @@ protected:
 	UFUNCTION()
 	virtual void OnGravityChargeRefill();
 
+public:
+	UFUNCTION()
+	virtual void OnDashValidate();
+	
+	UFUNCTION()
+	virtual void OnDashAbilityCooldownEnd();
+
+	UFUNCTION()
+	virtual void OnDashRechargeTick(float percent);
+	
 	UFUNCTION()
 	void OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer);
 

@@ -6,6 +6,10 @@
 #include "ASWeapon.h"
 #include "ASWeapon_PlayerPrimary.generated.h"
 
+class AASBasicBullet;
+class UNiagaraComponent;
+class UNiagaraSystem;
+class UNiagaraFunctionLibrary;
 class UMaterialInterface;
 
 UCLASS()
@@ -31,6 +35,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASWeapon|Primary", meta = (DisplayName = "Time to reset consecutive shots count"))
 	float m_TimeToResetCS = 1;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="ASWeapon|Primary")
+	TSubclassOf<AASBasicBullet> m_BulletBP;
+
+	UPROPERTY(EditDefaultsOnly, Category="ASWeapon|Primary")
+	FVector m_ShootPoint;
+	
 	UPROPERTY()
 	float m_CurrentTimeToResetCS;
 	
@@ -46,6 +56,11 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
-	void OnResetCS();
+	UFUNCTION()
+	void SpawnBullet(FVector FireOrigin, FVector FireDirection);
 	
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnFire(FVector FireOrigin, FVector FireDestination);
+	
+	void OnResetCS();
 };

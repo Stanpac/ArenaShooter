@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Sound/SoundCue.h"
 
 
 UASDashComponent::UASDashComponent()
@@ -38,6 +39,7 @@ void UASDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 			if(m_NoGravityTimer <= 0)
 			{
 				m_CurrentDashState = EDashStates::Neutral;
+				UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1);
 				m_Character->GetCharacterMovement()->GravityScale = m_StartGravity;
 				m_Character->GetCharacterMovement()->GroundFriction = m_StartGroundFriction;
 				m_Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
@@ -46,9 +48,18 @@ void UASDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 			break;
 		case EDashStates::InCooldown:
 			m_DashCooldownTimer -= DeltaTime;
+			m_Character->OnDashRechargeTick(1 - m_DashCooldownTimer / m_DashCooldown);
 			if(m_DashCooldownTimer <= 0)
 			{
 				m_CurrentDashState = EDashStates::Neutral;
+				m_Character->OnDashAbilityCooldownEnd();
+				if(IsValid(m_SoundDashAvailable))
+				{
+					UGameplayStatics::PlaySoundAtLocation(
+						GetWorld(),
+						m_SoundDashAvailable,
+						GetOwner()->GetActorLocation());
+				}
 			}
 			break;
 		case EDashStates::Neutral:
@@ -63,10 +74,11 @@ void UASDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	}
 }
 
-void UASDashComponent::OnDash()
+bool UASDashComponent::OnDash()
 {
-	if(m_CurrentDashState != EDashStates::Neutral && m_CurrentDashState != EDashStates::NoGravity) return;
+	if(m_CurrentDashState != EDashStates::Neutral && m_CurrentDashState != EDashStates::NoGravity) return false;
 	m_HitTarget = DetectDashTarget();
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1);
 	if(IsValid(m_SoundDash))
 	{
 		UGameplayStatics::PlaySoundAtLocation(
@@ -81,15 +93,18 @@ void UASDashComponent::OnDash()
 	//m_Character->GetCharacterMovement()->GravityScale = 1;
 	m_Character->GetCharacterMovement()->MovementMode = MOVE_Flying;
 	m_Character->GetCharacterMovement()->DisableMovement();
+	m_Character->OnDashValidate();
 	UASHealthComponent::FindHealthComponent(GetOwner())->SetIsDamageable(false);
 	if(m_HitTarget == nullptr)
 	{
 		m_DashEndLocation = m_DashStartLocation + m_Camera->GetForwardVector() * m_DashDistance;
+		return false;
 	}
 	else
 	{
 		m_DashEndLocation = m_HitTarget->GetActorLocation() + (m_HitTarget->GetActorLocation() - GetOwner()->GetActorLocation()).GetSafeNormal() * m_DashOffset;
 		m_HitTarget->SetActorEnableCollision(false);
+		return true;
 	}
 	//m_Character->GetCharacterMovement()->Launch(m_DashEndLocation - GetOwner()->GetActorLocation());
 }
@@ -122,6 +137,15 @@ void UASDashComponent::DashMovement(float DeltaTime)
 					HealthComponent->Damage(m_DashDamage, GetOwner(), m_StunDuration);
 					m_CurrentDashState = EDashStates::NoGravity;
 					m_NoGravityTimer = m_NoGravityCooldown;
+					if(IsValid(m_SoundDash))
+					{
+						UGameplayStatics::PlaySoundAtLocation(
+							GetWorld(),
+							m_SoundDashAvailable,
+							GetOwner()->GetActorLocation());
+					}
+					m_Character->OnDashAbilityCooldownEnd();
+					UGameplayStatics::SetGlobalTimeDilation(GetWorld(), m_TimeSlowValue);
 					return;
 				}
 				else
@@ -130,7 +154,6 @@ void UASDashComponent::DashMovement(float DeltaTime)
 				}
 			}
 		}
-
 		UASHealthComponent::FindHealthComponent(GetOwner())->SetIsDamageable(true);
 		m_Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 
@@ -140,7 +163,6 @@ void UASDashComponent::DashMovement(float DeltaTime)
 		m_DashCooldownTimer = m_DashCooldown;
 		m_Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		UASHealthComponent::FindHealthComponent(GetOwner())->SetIsDamageable(true);
-
 	}
 }
 

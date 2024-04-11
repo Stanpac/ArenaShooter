@@ -24,6 +24,9 @@ public:
 
 	//TODO Introduce a curve variable for how the damage multiplier by distance is Evaluated
 
+	UPROPERTY()
+	FVector m_Offset;
+	
 	/** Damage by bullet **/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gun Play", meta=(DisplayName = "Damage By Bullet"))
 	float m_DamageByBullet;
@@ -78,7 +81,7 @@ public:
 	
 	/** Sound when shot is fired **/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feedback", meta=(DisplayName = "Fire Sound"))
-	USoundBase* m_Sound_ShotFired;
+	USoundCue* m_Sound_ShotFired;
 
 	/** Determines if the weapon will be set hidden at start **/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feedback", meta=(DisplayName = "Is the Weapon Shown"))
