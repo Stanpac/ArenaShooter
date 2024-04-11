@@ -10,6 +10,9 @@ class UCharacterMovementComponent;
 class AASCharacter;
 class USoundCue;
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHitTargetChange, AActor*, HitTarget);
+
 UENUM(BlueprintType)
 enum class EDashStates : uint8
 {
@@ -23,11 +26,11 @@ UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARENASHOOTER_API UASDashComponent : public UActorComponent
 {
 	GENERATED_BODY()
-
-
-	
 public:	
 	UASDashComponent();
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnHitTargetChange OnHitTargetChange;
 
 protected:
 	virtual void BeginPlay() override;
@@ -118,8 +121,6 @@ protected:
 
 	UPROPERTY()
 	float m_StartGroundFriction = 0;
-
-
 	
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

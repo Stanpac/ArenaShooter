@@ -131,6 +131,8 @@ void AASCharacter::BeginPlay()
 	m_GravitySwitchComponent->OnStartSwitchGravity.AddDynamic(this, &AASCharacter::OnChangeGravity);
 	m_GravitySwitchComponent->OnSwitchGravityAbiltyCooldownEnd.AddDynamic(this, &AASCharacter::OnAbilityCooldownEnd);
 	m_GravitySwitchComponent->OnGravityChargeRefill.AddDynamic(this, &AASCharacter::OnGravityChargeRefill);
+
+	m_DashComponent->OnHitTargetChange.AddDynamic(this, &AASCharacter::OnHitTargetChange);
 }
 
 void AASCharacter::GetAllSubsystem()
@@ -271,6 +273,11 @@ void AASCharacter::OnGravityChargeRefill()
 {
 	GetPlayerWidget()->SetGravityChargeBarPercent(m_GravitySwitchComponent->GetTimer() / m_GravitySwitchComponent->GetGravityChargeRefillTime());
 	GetPlayerWidget()->SetNbrOfCharge(m_GravitySwitchComponent->GetNbrOfCharge());
+}
+
+void AASCharacter::OnHitTargetChange(AActor* Target)
+{
+	GetPlayerWidget()->ManageCursor(Target);
 }
 
 void AASCharacter::OnDashValidate()

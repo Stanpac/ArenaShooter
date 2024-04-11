@@ -72,6 +72,7 @@ void UASDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		SlowTick(DeltaTime);
 		m_TickRefreshTimer = m_TickRefreshRate;
 	}
+	OnHitTargetChange.Broadcast(m_HitTarget);
 }
 
 bool UASDashComponent::OnDash()
@@ -90,7 +91,6 @@ bool UASDashComponent::OnDash()
 	m_DashDurationTimer = 0;
 	m_DashStartLocation = GetOwner()->GetActorLocation();
 	m_Character->GetCharacterMovement()->GroundFriction = 0;
-	//m_Character->GetCharacterMovement()->GravityScale = 1;
 	m_Character->GetCharacterMovement()->MovementMode = MOVE_Flying;
 	m_Character->GetCharacterMovement()->DisableMovement();
 	m_Character->OnDashValidate();
@@ -106,7 +106,6 @@ bool UASDashComponent::OnDash()
 		m_HitTarget->SetActorEnableCollision(false);
 		return true;
 	}
-	//m_Character->GetCharacterMovement()->Launch(m_DashEndLocation - GetOwner()->GetActorLocation());
 }
 
 void UASDashComponent::SlowTick(float DeltaTime)

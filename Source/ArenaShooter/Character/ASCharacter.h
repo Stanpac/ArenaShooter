@@ -174,6 +174,9 @@ protected:
 	UFUNCTION()
 	virtual void OnGravityChargeRefill();
 
+	UFUNCTION()
+	virtual void OnHitTargetChange(AActor* HitTarget);
+
 public:
 	UFUNCTION()
 	virtual void OnDashValidate();

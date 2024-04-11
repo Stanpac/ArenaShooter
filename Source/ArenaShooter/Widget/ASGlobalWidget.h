@@ -24,7 +24,7 @@ public:
 	void SethealthBarPercent(float Health, float MaxHealth);
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void ChangeCursorVisibility(bool visible);
+	void ManageCursor(AActor* Target);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetGravityAbilityWidget(bool visible);

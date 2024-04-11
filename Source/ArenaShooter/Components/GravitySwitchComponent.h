@@ -47,6 +47,7 @@ protected:
 	USoundCue* m_SoundOnGravitySwitch;
 	
 	FTimerHandle m_RefillTimerHandle;
+	
 public:
 	UPROPERTY(BlueprintAssignable)
 	FGravitySwitchComponent_Delegate OnStartSwitchGravity;
