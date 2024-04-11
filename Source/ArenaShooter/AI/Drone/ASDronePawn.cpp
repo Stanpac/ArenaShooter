@@ -325,7 +325,7 @@ FVector AASDronePawn::DroneRelativeMoveDirection()
 		if(drone != this && IsValid(drone))
 		{
 			FVector direction = (drone->GetActorLocation() - GetActorLocation()).GetSafeNormal();
-			float evaluatedAmplitude = m_DroneDispersionCurve->GetFloatValue(FVector::Distance(GetActorLocation(), drone->GetActorLocation()) / 1000);
+			float evaluatedAmplitude = m_DroneDispersionCurve->GetFloatValue(FVector::Distance(GetActorLocation(), drone->GetActorLocation()) / m_DispersionMaxValue);
 			averageDronesLocation += direction * evaluatedAmplitude;
 		}
 	}

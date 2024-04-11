@@ -26,6 +26,6 @@ void AASBasicBullet::Tick(float DeltaTime)
 		const FVector startPosition = GetActorLocation();
 		const FVector endPosition = startPosition + GetActorForwardVector() * 100;
 		const FVector newPosition = FMath::Lerp(startPosition, endPosition, DeltaTime * m_bulletSpeed);
-		SetActorLocation(newPosition);
+		SetActorLocation(newPosition, true);
 }
 

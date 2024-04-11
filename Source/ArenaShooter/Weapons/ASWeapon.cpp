@@ -32,11 +32,11 @@ void AASWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 	if(!m_ShowWeapon) SetHidden(true);
-	FRotator CurrentRotation = M_WeaponMesh->GetComponentRotation();
-	CurrentRotation.Roll += m_Offset.X;
-	CurrentRotation.Pitch += m_Offset.Y;
-	CurrentRotation.Yaw += m_Offset.Z;
-	M_WeaponMesh->SetWorldRotation(CurrentRotation);
+	//FRotator CurrentRotation = M_WeaponMesh->GetComponentRotation();
+	//CurrentRotation.Roll += m_Offset.X;
+	//CurrentRotation.Pitch += m_Offset.Y;
+	//CurrentRotation.Yaw += m_Offset.Z;		
+	//M_WeaponMesh->SetWorldRotation(CurrentRotation);
 }
 
 // Called every frame

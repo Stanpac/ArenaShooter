@@ -39,14 +39,15 @@ void AASWeapon_PlayerPrimary::Fire(FVector FireOrigin, FVector FireDirection)
 
 	if (bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult,FireOrigin,FireOrigin + FireDirection * 1000000,ECC_Visibility, CollisionParams)) {
 		// Process the hit result
-		if (AActor* HitActor = HitResult.GetActor())
-			{
-				if(UASHealthComponent* HealthComponent = UASHealthComponent::FindHealthComponent(HitActor))
-				{
-					HealthComponent->Damage(m_DamageByBullet, GetOwner(), m_OnHitStunDuration, HitResult.Location, FireDirection.Rotation());
-				}
-			else
-			{
+
+		if (HitResult.GetComponent()->ComponentHasTag(TEXT("BlockHit"))) {
+			return;
+		}
+		
+		if (AActor* HitActor = HitResult.GetActor()) {
+			if(UASHealthComponent* HealthComponent = UASHealthComponent::FindHealthComponent(HitActor)) {
+				HealthComponent->Damage(m_DamageByBullet, GetOwner(), m_OnHitStunDuration, HitResult.Location, FireDirection.Rotation());
+			} else {
 				UDecalComponent* lDecal = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), m_DecalMaterial, m_DecalSize, FVector(HitResult.ImpactPoint), HitResult.ImpactNormal.Rotation().GetInverse(), 5.0f);
 				lDecal->SetFadeScreenSize(0.001f);
 			}
@@ -106,7 +107,7 @@ void AASWeapon_PlayerPrimary::SpawnBullet(FVector FireOrigin, FVector FireDirect
 		//const FRotator LookAtRotation = (LookAtLocation - FireOrigin).Rotation();
 		const FRotator LookAtRotation = FireDirection.Rotation();
 		AASBasicBullet* bullet = GetWorld()->SpawnActor<AASBasicBullet>(m_BulletBP, GetActorLocation() ,LookAtRotation, params);
-		bullet->m_bulletSpeed = 50;
+		bullet->m_bulletSpeed = 200;
 	}
 }
 

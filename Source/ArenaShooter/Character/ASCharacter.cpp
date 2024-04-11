@@ -167,7 +167,11 @@ void AASCharacter::Look(const FInputActionValue& Value)
 	}
 
 	if (LookAxisVector.Y != 0.0f) {
-		m_SpringArmComponent->AddRelativeRotation(FRotator(FMath::Clamp(-LookAxisVector.Y, -85, 85), 0.0f, 0.0f));
+		FRotator NewRotation = m_SpringArmComponent->GetRelativeRotation();
+		NewRotation.Pitch += -LookAxisVector.Y;
+		NewRotation.Pitch = FMath::ClampAngle(NewRotation.Pitch, -85, 85);
+		NewRotation.Pitch = FRotator::ClampAxis(NewRotation.Pitch);
+		m_SpringArmComponent->SetRelativeRotation(NewRotation);
 	}
 }
 
