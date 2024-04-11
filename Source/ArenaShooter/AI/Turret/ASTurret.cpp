@@ -45,21 +45,28 @@ void AASTurret::BeginPlay()
 		m_Widget->SetHealthBarPercent(m_HealthComponent->GetHealth(), m_HealthComponent->GetMaxHealth());
 	}
 	m_MovingMeshComponent->OnComponentBeginOverlap.AddDynamic(this, &AASTurret::OnOverlapBegin);
+	m_CurrentPhase = 0;
+	m_HealthComponent->SetIsInvincible(true);
 }
 
 void AASTurret::OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer)
 {
 	Super::OnHealthChanged(PreviousHealth, CurrentHealth, MaxHealth, DamageDealer);
+	
 	if (PreviousHealth > CurrentHealth) {
-		m_HaveTakeDamageRecently = true;
 		if (GetWorldTimerManager().IsTimerActive(m_TakeDamageTimerHandle)) {
 			GetWorldTimerManager().ClearTimer(m_TakeDamageTimerHandle);
 		}
-		GetWorldTimerManager().SetTimer(m_TakeDamageTimerHandle, this, &AASTurret::ResetTakeDamage, m_TimeToResetTakeDamage, false);
+		GetWorldTimerManager().SetTimer(m_TakeDamageTimerHandle, this, &AASTurret::EndTakeDamage, m_TimeToResetTakeDamage, false);
+		m_TurretState = ETurretState::ETS_Defence;
 	}
 
 	if (m_Widget) {
 		m_Widget->SetHealthBarPercent(CurrentHealth, MaxHealth);
+	}
+
+	if(CurrentHealth == 1 && m_HealthComponent->GetIsInvincible()) {
+		ChangePhase();
 	}
 }
 
@@ -68,9 +75,37 @@ void AASTurret::Shoot()
 	m_WeaponComponent->Fire(m_ShootingPoint->GetComponentLocation(), m_ShootingPoint->GetForwardVector());
 }
 
-void AASTurret::ResetTakeDamage()
+void AASTurret::EndTakeDamage()
 {
-	m_HaveTakeDamageRecently = false;
+	if (m_TurretState == ETurretState::ETS_Healing) {
+		return;
+	}
+	m_TurretState = ETurretState::ETS_Attack;
+}
+
+void AASTurret::ChangePhase()
+{
+	m_CurrentPhase++;
+	if (m_CurrentPhase > m_TurretPhases.Num()) {
+		return;
+	}
+	m_TurretState = ETurretState::ETS_Healing;
+	m_HealthComponent->SetIsDamageable(false);
+	m_HealthComponent->SetMaxHealth(m_TurretPhases[m_CurrentPhase].m_TurrerHPMax);
+	GetWorldTimerManager().SetTimer(m_HealingTimerHandle, this, &AASTurret::Healing, 0.1f, true);
+}
+
+void AASTurret::Healing()
+{
+	m_HealthComponent->healing(m_HealthComponent->GetMaxHealth() / 50 );
+	if (m_HealthComponent->GetHealth() == m_HealthComponent->GetMaxHealth()) {
+		GetWorldTimerManager().ClearTimer(m_HealingTimerHandle);
+		m_HealthComponent->SetIsDamageable(true);
+		if (m_CurrentPhase == m_TurretPhases.Num() - 1) {
+			m_HealthComponent->SetIsInvincible(false);
+		}
+		m_TurretState = ETurretState::ETS_Attack;
+	}
 }
 
 void AASTurret::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

@@ -85,6 +85,10 @@ public:
 
 	FORCEINLINE float GetHealth() const { return m_Health; }
 	FORCEINLINE float GetMaxHealth() const { return m_MaxHealth; }
+	FORCEINLINE void SetMaxHealth(float MaxHealth) { m_MaxHealth = MaxHealth; }
 	FORCEINLINE bool GetIsExecutable() const { return m_IsExecutable; }
 	FORCEINLINE void SetIsExecutable(bool bM_IsExecutable) { m_IsExecutable = bM_IsExecutable; }
+
+	FORCEINLINE uint8 GetIsInvincible() const { return m_IsInvincible; }
+	FORCEINLINE void SetIsInvincible(uint8 M_IsInvincible) { m_IsInvincible = M_IsInvincible; }
 };
