@@ -61,8 +61,7 @@ void UASHealthComponent::Damage(float amount, AActor* DamageDealer, float stunDu
 	}
 	
 	m_Health = NewHealth;
-
-	// TODO Modif 
+	
 	if(m_Health <= m_ExecutableLife && !m_IsExecutable) {
 		m_IsExecutable = true;
 	}
