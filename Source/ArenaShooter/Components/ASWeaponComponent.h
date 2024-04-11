@@ -40,6 +40,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Gameplay")
 	bool m_isPrimaryWeaponEquiped;
 
+	
 	UPROPERTY()
 	AASWeapon* m_PrimaryWeapon;
 

@@ -2,9 +2,10 @@
 
 
 #include "GravitySwitchComponent.h"
-
+#include "Sound/SoundCue.h"
 #include "ArenaShooter/Character/ASCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // TODO : Fix Gravity image visibility problm
 
@@ -28,6 +29,15 @@ void UGravitySwitchComponent::SwitchGravity()
 	SetSwitchingGravity(true);
 	m_NbrOfCharge--;
 
+	m_Character->GetCharacterMovement()->Velocity = FVector(m_Character->GetCharacterMovement()->Velocity.X, m_Character->GetCharacterMovement()->Velocity.Y, 0);
+	if(IsValid(m_SoundOnGravitySwitch))
+	{
+		UGameplayStatics::PlaySoundAtLocation(
+			GetWorld(),
+			m_SoundOnGravitySwitch,
+			GetOwner()->GetActorLocation());
+	}
+	
 	if (!GetWorld()->GetTimerManager().IsTimerActive(m_RefillTimerHandle)) {
 		GetWorld()->GetTimerManager().SetTimer(m_RefillTimerHandle, this, &UGravitySwitchComponent::RefillGravityCharge,0.1f, true);
 	}

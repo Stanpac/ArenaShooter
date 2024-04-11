@@ -14,7 +14,6 @@ void UASWeaponComponent::Fire(FVector fireOrigin, FVector fireDirection)
 		if(!m_CurrentEquipedWeapon->m_IsReloading && !m_CurrentEquipedWeapon->m_IsWaitingForFireDelay && (!IsValid(m_ASPawnOwner) || !m_ASPawnOwner->GetIsStunned()))
 		{
 			m_CurrentEquipedWeapon->Fire(fireOrigin + m_PositionOffset, fireDirection);
-			
 			OnFireEvent.Broadcast();
 		}
 	}

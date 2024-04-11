@@ -285,7 +285,14 @@ void AASDronePawn::DroneMovement(float DeltaTime)
 	
 	FVector moveToPlayer = droneToPlayerVector * DroneToFromPlayerSpeed * movementTowardsPlayerEnableValue * distanceMult;
 	FVector dispersion = m_DispersionVector * m_DroneDispersionSpeed * dispersionEnableValue * m_DispersionFactor;
-	dispersion.Z = FMath::Clamp(dispersion.Z, 0, 1000);
+	if(m_Player->GetGravityDirection().Z > 0)
+	{
+		dispersion.Z = FMath::Clamp(dispersion.Z, -1000, 0);
+	}
+	else
+	{
+		dispersion.Z = FMath::Clamp(dispersion.Z, 0, 1000);
+	}
 	FVector moveVector = GetActorLocation() + ( dispersion + moveToPlayer ) * DeltaTime;
 
 	if(IsValid(m_SoundMove) && IsValid(m_MoveSoundCurve))

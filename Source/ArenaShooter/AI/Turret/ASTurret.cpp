@@ -7,6 +7,7 @@
 #include "ArenaShooter/Character/ASCharacter.h"
 #include "ArenaShooter/Components/ASHealthComponent.h"
 #include "ArenaShooter/Components/ASWeaponComponent.h"
+#include "ArenaShooter/Weapons/ASWeapon.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/BillboardComponent.h"
 #include "ArenaShooter/Widget/ASTurretWidget.h"
@@ -45,6 +46,14 @@ void AASTurret::BeginPlay()
 		m_Widget->SetHealthBarPercent(m_HealthComponent->GetHealth(), m_HealthComponent->GetMaxHealth());
 	}
 	m_MovingMeshComponent->OnComponentBeginOverlap.AddDynamic(this, &AASTurret::OnOverlapBegin);
+	m_WeaponComponent->m_PrimaryWeapon->OnFireEvent.AddDynamic(this, &AASTurret::OnFire);
+}
+
+void AASTurret::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	//Shoot();
+	
 }
 
 void AASTurret::OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer)
@@ -65,7 +74,14 @@ void AASTurret::OnHealthChanged(float PreviousHealth, float CurrentHealth, float
 
 void AASTurret::Shoot()
 {
+	//GEngine->AddOnScreenDebugMessage(6, 1, FColor::Black, TEXT("Shoot"));
 	m_WeaponComponent->Fire(m_ShootingPoint->GetComponentLocation(), m_ShootingPoint->GetForwardVector());
+}
+
+void AASTurret::OnFire(FVector EndPosition)
+{
+	m_TurretLaserParticleSystem->SetVariableVec3(FName("Beam End"), EndPosition);
+	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Black, FString::Printf(TEXT("%f, %f, %f"), EndPosition.X, EndPosition.Y, EndPosition.Z));
 }
 
 void AASTurret::ResetTakeDamage()

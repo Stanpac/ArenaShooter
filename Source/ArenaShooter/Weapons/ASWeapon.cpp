@@ -11,7 +11,7 @@
 AASWeapon::AASWeapon()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	m_FireMuzzleComponent = CreateDefaultSubobject<USceneComponent>("SceneComponent");
 
@@ -69,7 +69,7 @@ void AASWeapon::FireDelayTick(float DeltaTime)
 void AASWeapon::Fire(FVector fireOrigin, FVector fireDirection)
 {
 	FireDelayProc();
-	
+
 	if (m_Niagara_ShotFiredComponent){
 		m_Niagara_ShotFiredComponent->DeactivateImmediate();
 		m_Niagara_ShotFiredComponent->Activate();

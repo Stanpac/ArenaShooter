@@ -125,7 +125,7 @@ void UASDashComponent::DashMovement(float DeltaTime)
 
 	if(m_DashDurationTimer >= 1)
 	{
-		GetOwner()->SetActorLocation(m_DashEndLocation, true);
+		GetOwner()->SetActorLocation(m_DashEndLocation, false);
 		m_Camera->FieldOfView = m_BaseFieldOfView;
 		if(IsValid(m_HitTarget))
 		{

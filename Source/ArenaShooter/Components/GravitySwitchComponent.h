@@ -7,6 +7,7 @@
 #include "GravitySwitchComponent.generated.h"
 
 class AASCharacter;
+class USoundCue;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGravitySwitchComponent_Delegate);
 
@@ -41,6 +42,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "GravitySwitchComponent|Settings", meta = (DisplayName = "Refill Timer"))
 	float m_Timer = 0.f;
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GravitySwitchComponent|Signs and Feedbacks")
+	USoundCue* m_SoundOnGravitySwitch;
+	
 	FTimerHandle m_RefillTimerHandle;
 public:
 	UPROPERTY(BlueprintAssignable)

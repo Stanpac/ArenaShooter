@@ -67,17 +67,23 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASTurret|Settings", meta = (DisplayName = "Bump Force"))
 	float m_BumpForce = 10.f;
-	
+
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
 	AASTurret(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	
 	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaSeconds) override;
+	
 	virtual void OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth, AActor* DamageDealer) override;
 
 	UFUNCTION(BlueprintCallable)
 	void Shoot();
 
+	UFUNCTION()
+	void OnFire(FVector EndPosition);
+	
 protected:
 	UFUNCTION()
 	void ResetTakeDamage();

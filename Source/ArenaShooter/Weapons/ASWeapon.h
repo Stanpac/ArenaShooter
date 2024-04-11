@@ -6,6 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "ASWeapon.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FWeaponTurret_OnFireEvent, FVector, EndPosition);
+
+
 class UNiagaraComponent;
 class UNiagaraSystem;
 class UNiagaraFunctionLibrary;
@@ -90,6 +93,9 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* m_FireMuzzleComponent;
 
+	UPROPERTY(BlueprintAssignable)
+	FWeaponTurret_OnFireEvent OnFireEvent;
+	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category = "Feedback", meta=(DisplayName = "Fire Shoot Pos"))
 	USceneComponent* m_FireShootPos;
