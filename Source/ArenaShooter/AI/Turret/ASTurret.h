@@ -8,6 +8,7 @@
 
 class UNiagaraComponent;
 class UASTurretWidget;
+class UBillboardComponent;
 
 UENUM(BlueprintType, Blueprintable)
 enum class ETurretState : uint8

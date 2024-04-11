@@ -8,6 +8,7 @@
 class UCameraComponent;
 class UCharacterMovementComponent;
 class AASCharacter;
+class USoundCue;
 
 UENUM(BlueprintType)
 enum class EDashStates : uint8

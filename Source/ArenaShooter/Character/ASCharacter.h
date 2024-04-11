@@ -21,6 +21,7 @@ class UCameraComponent;
 class UASWeaponComponent;
 class UASCloseCombatComponent;
 class USkeletalMeshComponent;
+class USoundCue;
 class UAnimMontage;
 struct FInputActionValue;
 
@@ -93,13 +94,13 @@ protected:
 	/* ----------------------------------- SOUND  -------------------------------*/
 
 	UPROPERTY(EditAnywhere, Category = "ASCharacter|Sound", meta = (DisplayName = "Sound On Death"))
-	TObjectPtr<USoundCue> m_SoundDeath;
+	USoundCue* m_SoundDeath;
 	
 	UPROPERTY(EditAnywhere, Category = "ASCharacter|Sound", meta = (DisplayName = "Sound On Hit"))
-	TObjectPtr<USoundCue> m_SoundHit;
+	USoundCue* m_SoundHit;
 
 	UPROPERTY(EditAnywhere, Category = "ASCharacter|Sound", meta = (DisplayName = "Sound On Gravity Available"))
-	TObjectPtr<USoundCue> m_SoundGravityAvailable;
+	USoundCue* m_SoundGravityAvailable;
 	
 	/* ---------------------- Input To move in component -------------------------------*/
 	

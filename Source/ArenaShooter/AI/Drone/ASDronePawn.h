@@ -10,6 +10,7 @@
 class UASHealthComponent;
 class UASWeaponComponent;
 class UASDroneManager;
+class USoundCue;
 
 UENUM(BlueprintType) // Makes the enum available in Blueprints
 enum class EDroneBehaviour : uint8
