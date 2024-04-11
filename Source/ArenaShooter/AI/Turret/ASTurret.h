@@ -9,13 +9,30 @@
 class UNiagaraComponent;
 class UASTurretWidget;
 class UBillboardComponent;
+class USceneComponent;
 
 UENUM(BlueprintType, Blueprintable)
 enum class ETurretState : uint8
 {
 	ETS_Attack,
 	ETS_Defence,
+	ETS_Healing,
 	ETS_Invalid
+};
+
+USTRUCT(BlueprintType, Blueprintable)
+struct FTurretPhase
+{
+	GENERATED_USTRUCT_BODY()
+	
+	UPROPERTY(EditAnywhere)
+	float m_BaseRotationSpeed = 10.f;
+
+	UPROPERTY(EditAnywhere)
+	float m_RotationSpeedToAdd = 10.f;
+
+	UPROPERTY(EditAnywhere)
+	float m_TurrerHPMax = 100.f;
 };
 
 UCLASS()
@@ -45,9 +62,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASTurret|Settings", meta = (DisplayName = "Turret Rotation Speed"))
 	float m_TurretRotationSpeed = 1.f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASTurret|Settings", meta = (DisplayName = "Have Take damage recently"))
-	bool m_HaveTakeDamageRecently = false;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASTurret|Settings", meta = (DisplayName = "Time to reset take damage"))
 	float m_TimeToResetTakeDamage = 1.f;
 	
@@ -68,6 +82,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASTurret|Settings", meta = (DisplayName = "Bump Force"))
 	float m_BumpForce = 10.f;
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASTurret|Settings", meta = (DisplayName = "Turret Phases"))
+	TArray<FTurretPhase> m_TurretPhases;
+
+	UPROPERTY()
+	int m_CurrentPhase = 0;
+
+	FTimerHandle m_HealingTimerHandle;
+	
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
 	AASTurret(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
@@ -86,17 +109,22 @@ public:
 	
 protected:
 	UFUNCTION()
-	void ResetTakeDamage();
+	void EndTakeDamage();
+
+	UFUNCTION()
+	void ChangePhase();
+
+	UFUNCTION()
+	void Healing();
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 	/* ---------------------------------- Get / Set --------------------------------------*/
 public:
-	FORCEINLINE bool Get_HaveTakeDamageRecently() const { return m_HaveTakeDamageRecently; }
 	
 	FORCEINLINE ETurretState Get_TurretState() const { return m_TurretState; }
 	FORCEINLINE void Set_TurretState(ETurretState state) { m_TurretState = state; }
 
-	FORCEINLINE TObjectPtr<USceneComponent> GetM_RotationRootPoint() const { return m_RotationRootPoint; }
+	FORCEINLINE TObjectPtr<USceneComponent> GetRotationRootPoint() const { return m_RotationRootPoint; }
 };
