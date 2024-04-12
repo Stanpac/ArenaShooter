@@ -85,6 +85,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Signs and Feedbacks", DisplayName = "Dash Available sound")
 	USoundCue* m_SoundDashAvailable;
+
+
+	UPROPERTY()
+	FVector m_Inertia;
 	
 	UPROPERTY()
 	float m_BaseFieldOfView;

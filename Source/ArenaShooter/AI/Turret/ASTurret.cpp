@@ -81,14 +81,12 @@ void AASTurret::OnHealthChanged(float PreviousHealth, float CurrentHealth, float
 
 void AASTurret::Shoot()
 {
-	GEngine->AddOnScreenDebugMessage(6, 1, FColor::Black, TEXT("Shoot"));
 	m_WeaponComponent->Fire(m_ShootingPoint->GetComponentLocation(), m_ShootingPoint->GetForwardVector());
 }
 
 void AASTurret::OnFire(FVector EndPosition)
 {
 	m_TurretLaserParticleSystem->SetVariableVec3(FName("Beam End"), EndPosition);
-	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Black, FString::Printf(TEXT("%f, %f, %f"), EndPosition.X, EndPosition.Y, EndPosition.Z));
 }
 
 
