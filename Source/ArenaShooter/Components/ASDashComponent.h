@@ -32,11 +32,14 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnHitTargetChange OnHitTargetChange;
 
-protected:
+public:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, Category = "CombatProperties", DisplayName = "Amount of damage of the dash")
-	float m_DashDamage = 15;
+	UPROPERTY(EditAnywhere, Category = "CombatProperties", DisplayName = "Amount of damage of the base dash")
+	float m_BaseDashDamage = 10;
+
+	UPROPERTY(EditAnywhere, Category = "CombatProperties", DisplayName = "Amount of damage of the dash when boosted")
+	float m_BoostedDashDamage = 15;
 	
 	UPROPERTY(EditAnywhere, Category = "CombatProperties", DisplayName = "Stun duration on ennemy of the dash")
 	float m_StunDuration = 2;
@@ -70,6 +73,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Dash Detection Properties", DisplayName = "Detect radius")
 	float m_DashTargetDetectionRadius = 20;
+
+	UPROPERTY(EditAnywhere, Category = "Dash Detection Properties", DisplayName = "How much longer surtension lasts when kill drone")
+	float m_SurtensionExtensionDuration = 1;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Dash Detection Properties", DisplayName = "Current Dash State")
 	EDashStates m_CurrentDashState = EDashStates::Neutral;
@@ -86,7 +92,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Signs and Feedbacks", DisplayName = "Dash Available sound")
 	USoundCue* m_SoundDashAvailable;
 
-
+	UPROPERTY()
+	float m_DashDamage;
+	
 	UPROPERTY()
 	FVector m_Inertia;
 	

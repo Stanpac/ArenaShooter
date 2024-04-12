@@ -61,7 +61,8 @@ protected:
 	/** Weapon Component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Weapon", meta = (DisplayName = "Weapon Component"))
 	UASWeaponComponent* m_WeaponComponent;
-	
+
+public:
 	/** Dash Component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Speed", meta = (DisplayName = "DashComponent"))
 	UASDashComponent* m_DashComponent;
@@ -70,6 +71,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Speed", meta = (DisplayName = "GravitySwitchComponent"))
 	UGravitySwitchComponent* m_GravitySwitchComponent;
 
+protected:
 	/** Player Widget */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASCharacter|Widget", meta = (DisplayName = "Player Widget"))
 	UASGlobalWidget* M_PlayerWidget;

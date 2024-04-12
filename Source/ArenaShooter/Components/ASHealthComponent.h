@@ -49,6 +49,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Health", meta = (DisplayName = "Is Executatble"))
 	bool m_IsExecutable;
+
+	UPROPERTY()
+	AASCharacter* m_Character;
 	
 	UPROPERTY()
 	bool m_IsDamageable = true;
@@ -78,6 +81,8 @@ public:
 	
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
 	bool GetIsDamageable() const { return m_IsDamageable; }

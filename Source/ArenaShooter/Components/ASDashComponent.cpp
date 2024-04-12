@@ -1,6 +1,7 @@
 #include "ASDashComponent.h"
 
 #include "ASHealthComponent.h"
+#include "GravitySwitchComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "ArenaShooter/AI/ASPawn.h"
 #include "ArenaShooter/Character/ASCharacter.h"
@@ -23,6 +24,7 @@ void UASDashComponent::BeginPlay()
 	m_StartGroundFriction = m_Character->GetCharacterMovement()->GroundFriction;
 	m_Camera = m_Character->GetCameraComponent();
 	m_BaseFieldOfView = m_Camera->FieldOfView;
+	m_DashDamage = m_BaseDashDamage;
 }
 
 void UASDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -105,8 +107,15 @@ bool UASDashComponent::OnDash()
 	}
 	else
 	{
-		m_DashEndLocation = m_HitTarget->GetActorLocation() + (m_HitTarget->GetActorLocation() - GetOwner()->GetActorLocation()).GetSafeNormal() * m_DashOffset;
-		m_HitTarget->SetActorEnableCollision(false);
+		if(UASHealthComponent::FindHealthComponent(m_HitTarget)->GetIsExecutable())
+		{
+			m_DashEndLocation = m_HitTarget->GetActorLocation() + (m_HitTarget->GetActorLocation() - GetOwner()->GetActorLocation()).GetSafeNormal() * m_DashOffset;
+			m_HitTarget->SetActorEnableCollision(false);
+		}
+		else
+		{
+			m_DashEndLocation = m_HitTarget->GetActorLocation() + (m_HitTarget->GetActorLocation() - GetOwner()->GetActorLocation()).GetSafeNormal() * -m_DashOffset;
+		}
 		return true;
 	}
 }
@@ -148,6 +157,11 @@ void UASDashComponent::DashMovement(float DeltaTime)
 							GetOwner()->GetActorLocation());
 					}
 					m_Character->OnDashAbilityCooldownEnd();
+					if(m_Character->m_GravitySwitchComponent->m_IsInSurtension)
+					{
+						m_Character->m_GravitySwitchComponent->m_SurtensionTimer += m_SurtensionExtensionDuration;
+						m_Character->m_GravitySwitchComponent->m_SurtensionTimer = FMath::Max(m_Character->m_GravitySwitchComponent->m_SurtensionTimer, m_Character->m_GravitySwitchComponent->m_SurtensionDuration);
+					}
 					UGameplayStatics::SetGlobalTimeDilation(GetWorld(), m_TimeSlowValue);
 					return;
 				}
