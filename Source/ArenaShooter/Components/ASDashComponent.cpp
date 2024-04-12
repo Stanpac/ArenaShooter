@@ -78,6 +78,9 @@ void UASDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 bool UASDashComponent::OnDash()
 {
 	if(m_CurrentDashState != EDashStates::Neutral && m_CurrentDashState != EDashStates::NoGravity) return false;
+
+	if(m_CurrentDashState != EDashStates::NoGravity)
+		m_Inertia = m_Character->GetCharacterMovement()->Velocity;
 	m_HitTarget = DetectDashTarget();
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1);
 	if(IsValid(m_SoundDash))
@@ -135,6 +138,7 @@ void UASDashComponent::DashMovement(float DeltaTime)
 				{
 					HealthComponent->Damage(m_DashDamage, GetOwner(), m_StunDuration);
 					m_CurrentDashState = EDashStates::NoGravity;
+					UASHealthComponent::FindHealthComponent(m_Character)->healing(3);
 					m_NoGravityTimer = m_NoGravityCooldown;
 					if(IsValid(m_SoundDash))
 					{
@@ -156,6 +160,7 @@ void UASDashComponent::DashMovement(float DeltaTime)
 		else
 		{
 			GetOwner()->SetActorLocation(m_DashEndLocation, true);
+			m_Character->GetCharacterMovement()->Velocity = m_Inertia;
 		}
 		UASHealthComponent::FindHealthComponent(GetOwner())->SetIsDamageable(true);
 		m_Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
