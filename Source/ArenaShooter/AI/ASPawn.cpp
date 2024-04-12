@@ -113,7 +113,6 @@ void AASPawn::ManageIndicatorWidget()
 		m_IndicatorWidget->SetVisibility(ESlateVisibility::Visible);
 	} else {
 		m_IndicatorWidget->SetVisibility(ESlateVisibility::Hidden);
-		GEngine->AddOnScreenDebugMessage(7, 0.1f, FColor::Red, "hidden");
 	}
 	
 	FVector2D lDesiredSize =FVector2D(GEngine->GameViewport->Viewport->GetSizeXY()) - m_IndicatorWidget->GetDesiredSize();

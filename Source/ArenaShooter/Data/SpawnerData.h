@@ -29,9 +29,7 @@ private:
 	TMap<FSpawnerData> m_SpawnerData;*/
 
 public:
-	UFUNCTION()
 	FORCEINLINE FSpawnerParam GetSpawnerData(int SpawnerDataIndex);
 
-	UFUNCTION()
 	FORCEINLINE int GetSpawnerDataCount() const { return m_SpawnerData.Num(); }
 };

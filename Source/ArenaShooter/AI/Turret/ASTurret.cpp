@@ -12,6 +12,8 @@
 #include "Components/BillboardComponent.h"
 #include "ArenaShooter/Widget/ASTurretWidget.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 
 AASTurret::AASTurret(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -127,6 +129,13 @@ void AASTurret::ChangePhase()
 	m_HealthComponent->SetIsDamageable(false);
 	m_HealthComponent->SetMaxHealth(m_TurretPhases[m_CurrentPhase].m_TurrerHPMax);
 	GetWorldTimerManager().SetTimer(m_HealingTimerHandle, this, &AASTurret::Healing, 0.1f, true);
+	if(IsValid(m_SoundHealing))
+	{
+		UGameplayStatics::PlaySoundAtLocation(
+		GetWorld(),
+		m_SoundHealing,
+		GetActorLocation());
+	}
 }
 
 void AASTurret::Healing()

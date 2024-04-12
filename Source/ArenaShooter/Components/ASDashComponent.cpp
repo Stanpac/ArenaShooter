@@ -4,6 +4,7 @@
 #include "GravitySwitchComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "ArenaShooter/AI/ASPawn.h"
+#include "ArenaShooter/AI/Drone/ASDronePawn.h"
 #include "ArenaShooter/Character/ASCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -234,9 +235,8 @@ AActor* UASDashComponent::DetectDashTarget()
 			true);
 			if(bHitValidation)
 			{
-				if(OutHit.GetActor()->IsA<AASPawn>())
+				if(OutHit.GetActor()->IsA<AASDronePawn>())
 				{
-					//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Black, OutHit.GetActor()->GetName());
 					FRotator rot = (GetOwner()->GetActorLocation() - OutHit.Location).Rotation();
 					DrawDebugCrosshairs(GetWorld(), OutHit.GetActor()->GetActorLocation(), rot, 100, FColor::Red, false, m_TickRefreshRate);
 					return OutHit.GetActor();;
