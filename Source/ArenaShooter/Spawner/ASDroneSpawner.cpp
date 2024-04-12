@@ -19,6 +19,7 @@ void AASDroneSpawner::SpawnAI()
 	AActor* Actor = GetWorld()->SpawnActor<AActor>(m_AIPawnClassTOSpawn, GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
 	if (Actor != nullptr) {
 		m_currentSpawnedActors.Add(Actor);
+		Actor->OnDestroyed.AddDynamic(this, &AASDroneSpawner::OnCurrentSpawnedActorDestroyed);
 		m_SpawnCount++;
 		if (m_SpawnCount >= m_NbrOfDroneToSpawn) {
 			SetCanSpawn(false);
