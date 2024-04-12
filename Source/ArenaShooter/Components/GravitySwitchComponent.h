@@ -19,10 +19,10 @@ class ARENASHOOTER_API UGravitySwitchComponent : public UActorComponent
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GravitySwitchComponent|Settings", meta = (DisplayName = "Ability Cooldown"))
-	float m_AbilityCooldown = 1.f;
+	float m_AbilityCooldown = 0.5f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GravitySwitchComponent|Settings", meta = (DisplayName = "Gravity Max Nbr of Charge"))
-	int m_MaxNbrOfCharge = 3;
+	int m_MaxNbrOfCharge = 4;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GravitySwitchComponent|Settings", meta = (DisplayName = "Gravity Charge Refill Time"))
 	float m_GravityChargeRefillTime = 10.f;
@@ -37,7 +37,7 @@ protected:
 	AASCharacter* m_Character;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "GravitySwitchComponent|Settings", meta = (DisplayName = "Gravity Nbr of Charge"))
-	int m_NbrOfCharge = 3;
+	int m_NbrOfCharge = 4;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "GravitySwitchComponent|Settings", meta = (DisplayName = "Refill Timer"))
 	float m_Timer = 0.f;
@@ -93,6 +93,7 @@ public:
 	FORCEINLINE FVector GetBaseGravityDirection() const { return m_BaseGravityDirection; }
 	FORCEINLINE float GetAbilityCooldown() const { return m_AbilityCooldown; }
 	FORCEINLINE int GetNbrOfCharge() const { return m_NbrOfCharge; }
+	FORCEINLINE int GetMaxNbrOfCharge() const { return m_MaxNbrOfCharge; }
 	FORCEINLINE float GetTimer() const { return m_Timer; }
 	FORCEINLINE float GetGravityChargeRefillTime() const { return m_GravityChargeRefillTime; }
 };

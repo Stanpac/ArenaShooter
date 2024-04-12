@@ -70,9 +70,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ASTurret|Settings", meta = (DisplayName = "Turret State"))
 	ETurretState m_TurretState = ETurretState::ETS_Attack;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASTurret|Settings", meta = (DisplayName = "Turret Laser Particule System"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASTurret|Settings", meta = (DisplayName = "Turret Laser Particule System"))
 	UNiagaraComponent* m_TurretLaserParticleSystem;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASTurret|Settings", meta = (DisplayName = "Turret Load Laser Particule System"))
+	UNiagaraComponent* m_TurretLoadingParticleSystem;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASTurret|Settings", meta = (DisplayName = "Widget Class"))
 	TSubclassOf<UASTurretWidget> m_WidgetClass;
 
@@ -135,4 +138,6 @@ public:
 	FORCEINLINE TObjectPtr<USceneComponent> GetRotationRootPoint() const { return m_RotationRootPoint; }
 
 	FORCEINLINE UNiagaraComponent* GetM_TurretLaserParticleSystem() const { return m_TurretLaserParticleSystem; }
+
+	FORCEINLINE UNiagaraComponent* GetM_TurretLoadingParticleSystem() const { return m_TurretLoadingParticleSystem; }
 };

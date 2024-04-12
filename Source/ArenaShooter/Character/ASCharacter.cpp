@@ -276,7 +276,7 @@ void AASCharacter::OnAbilityCooldownEnd()
 
 void AASCharacter::OnGravityChargeRefill()
 {
-	GetPlayerWidget()->SetGravityChargeBarPercent(m_GravitySwitchComponent->GetTimer() / m_GravitySwitchComponent->GetGravityChargeRefillTime());
+	GetPlayerWidget()->SetGravityChargeBarPercent(m_GravitySwitchComponent->GetTimer() / m_GravitySwitchComponent->GetGravityChargeRefillTime(), m_GravitySwitchComponent->GetNbrOfCharge(), m_GravitySwitchComponent->GetMaxNbrOfCharge());
 	GetPlayerWidget()->SetNbrOfCharge(m_GravitySwitchComponent->GetNbrOfCharge());
 }
 
