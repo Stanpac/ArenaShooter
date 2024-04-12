@@ -97,7 +97,7 @@ public:
 	AASPawn(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	UFUNCTION(BlueprintCallable, Category="Gameplay")
-	void Stun(float stunDuration) ;
+	void Stun(float stunDuration);
 
 protected:
 	virtual void BeginPlay() override;
@@ -116,7 +116,7 @@ protected:
 	UFUNCTION()
 	void ManageIndicatorWidget();
 	
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintImplementableEvent)
 	void SpawnFloatingDamage(const FVector& SpawnLocation, const FRotator& SpawnRotation, const float Damage);
 
 public:

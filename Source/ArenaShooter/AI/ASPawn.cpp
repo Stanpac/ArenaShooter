@@ -49,21 +49,12 @@ void AASPawn::BeginPlay()
 	m_WeaponComponent->InitializeWeapon();
 	m_WeaponComponent->m_ASPawnOwner = this;
 	
-	/*if (m_IndicatorWidgetClass) {
-		m_IndicatorWidget = CreateWidget<UUserWidget>(GetWorld(), m_IndicatorWidgetClass);
-	}
-	
-	if(m_IndicatorWidget){
-		m_IndicatorWidget->AddToViewport(-1);
-		m_IndicatorWidget->SetColorAndOpacity(m_IndicatorBaseColor);
-	}*/
 }
 
 void AASPawn::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	if(m_IsStunned) StunTick(DeltaSeconds);
-	//ManageIndicatorWidget();
 }
 
 
@@ -81,9 +72,6 @@ void AASPawn::OnHealthChanged(float PreviousHealth, float CurrentHealth, float M
 	{
 		UGameplayStatics::PlaySoundAtLocation( GetWorld(), m_SoundHit, GetActorLocation());
 	}
-	
-	// Find a Way to get the Indicate that you can one shoot the enemy
-	// Oeverlay Mat ?
 	
 	SpawnFloatingDamage(GetActorLocation(), GetActorRotation(), PreviousHealth - CurrentHealth);
 }
@@ -137,31 +125,17 @@ void AASPawn::ManageIndicatorWidget()
 	m_IndicatorWidget->SetPositionInViewport(lScreenPosition);
 }
 
-void AASPawn::SpawnFloatingDamage(const FVector& SpawnLocation, const FRotator& SpawnRotation, const float Damage)
-
+/*(const FVector& SpawnLocation, const FRotator& SpawnRotation, const float Damage)
 {
-	if (GetWorld() == nullptr) {
-		UE_LOG(LogTemp, Error,TEXT("%s, can't spawn floating damage. No context"), *GetNameSafe(this));
-		return;
-	}
-
-	if (m_floatingDamageSystem == nullptr) {
-		UE_LOG(LogTemp, Error,TEXT("%s, can't spawn floating damage. The system is null"), *GetNameSafe(this));
-		return;
-	}
-
-	UNiagaraComponent* lNiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_floatingDamageSystem, SpawnLocation, SpawnRotation, FVector::One(), true, true);
 	
+	UNiagaraComponent* lNiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_floatingDamageSystem, SpawnLocation, SpawnRotation, FVector::One(), true, true);
 	FVector4 lDamageData = FVector4();
-
 	lDamageData.X = SpawnLocation.X;
 	lDamageData.Y = SpawnLocation.Y;
 	lDamageData.Z = SpawnLocation.Z;
 	lDamageData.W = Damage;
-	
-	/*Set the damage value into the system, it will use to compute where the texture number should take float*/
 	UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVector4Value(lNiagaraComp, FName("DamageInfo"), 0, lDamageData, false);
-}
+}*/
 
 void AASPawn::SetHitPosition(const FVector& hitPosition)
 {
