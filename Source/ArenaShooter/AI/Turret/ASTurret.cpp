@@ -30,6 +30,9 @@ AASTurret::AASTurret(const FObjectInitializer& ObjectInitializer) : Super(Object
 	m_TurretLaserParticleSystem = CreateDefaultSubobject<UNiagaraComponent>(TEXT("TurretLaserParticleSystem"));
 	m_TurretLaserParticleSystem->SetupAttachment(m_ShootingPoint);
 
+	m_TurretLoadingParticleSystem = CreateDefaultSubobject<UNiagaraComponent>(TEXT("TurretLoadingParticleSystem"));
+	m_TurretLoadingParticleSystem->SetupAttachment(m_ShootingPoint);
+
 #if WITH_EDITOR
 	m_DebugShootPoint = CreateDefaultSubobject<UBillboardComponent>(TEXT("DebugShootPoint"));
 	m_DebugShootPoint->SetupAttachment(m_ShootingPoint);

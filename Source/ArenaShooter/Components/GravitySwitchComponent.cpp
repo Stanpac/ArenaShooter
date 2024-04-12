@@ -21,6 +21,7 @@ void UGravitySwitchComponent::BeginPlay()
 	Super::BeginPlay();
 	m_Character = CastChecked<AASCharacter>(GetOwner());
 	m_BaseGravityDirection = m_Character->GetGravityDirection();
+	m_NbrOfCharge = m_MaxNbrOfCharge;
 }
 
 void UGravitySwitchComponent::TickComponent(float DeltaTime, ELevelTick TickType,

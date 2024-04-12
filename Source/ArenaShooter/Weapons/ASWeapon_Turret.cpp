@@ -49,7 +49,7 @@ void AASWeapon_Turret::Fire(FVector fireOrigin, FVector fireDirection)
 	TraceTypeQuery,
 	false,
 	ActorsToIgnore,
-	EDrawDebugTrace::ForOneFrame,
+	EDrawDebugTrace::None,
 	OutHit,
 	true,
 	FColor::Black

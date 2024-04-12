@@ -30,7 +30,7 @@ public:
 	void SetGravityAbilityWidget(bool visible);
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void SetGravityChargeBarPercent(float percent);
+	void SetGravityChargeBarPercent(float percent, int NbrOfCharge, int MaxNbrOfCharge);
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetNbrOfCharge(int NbrOfCharge);
