@@ -55,6 +55,20 @@ void AASWeapon_Turret::Fire(FVector fireOrigin, FVector fireDirection)
 	FColor::Black
 	);
 
+	bool bHit2 = UKismetSystemLibrary::SphereTraceSingle(
+GetWorld(),
+fireOrigin,
+fireOrigin + fireDirection * 1000000,
+15,
+TraceTypeQuery,
+false,
+ActorsToIgnore,
+EDrawDebugTrace::None,
+OutHit,
+true,
+FColor::Black
+);
+
 	if(bHit)
 	{
 		OnFireEvent.Broadcast(OutHit.Location);
@@ -62,7 +76,12 @@ void AASWeapon_Turret::Fire(FVector fireOrigin, FVector fireDirection)
 		{
 			UASHealthComponent::FindHealthComponent(pawn)->Damage(100, this);
 		}
-		else if(OutHit.GetActor() == m_Character)
+
+	}
+
+	if(bHit2)
+	{
+		if(OutHit.GetActor() == m_Character)
 		{
 			UASHealthComponent::FindHealthComponent(m_Character)->Damage(m_Deltatime * m_DamageByBullet, this);
 		}

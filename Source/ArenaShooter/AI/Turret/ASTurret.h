@@ -10,6 +10,7 @@ class UNiagaraComponent;
 class UASTurretWidget;
 class UBillboardComponent;
 class USceneComponent;
+class USoundCue;
 
 UENUM(BlueprintType, Blueprintable)
 enum class ETurretState : uint8
@@ -82,6 +83,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASTurret|Settings", meta = (DisplayName = "Widget"))
 	UASTurretWidget* m_Widget;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASTurret|Settings", meta = (DisplayName = "Sound Healing"))
+	USoundCue* m_SoundHealing;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASTurret|Settings", meta = (DisplayName = "Bump Force"))
 	float m_BumpForce = 10.f;
 
