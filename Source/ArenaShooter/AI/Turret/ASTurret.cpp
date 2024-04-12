@@ -89,6 +89,22 @@ void AASTurret::OnFire(FVector EndPosition)
 	m_TurretLaserParticleSystem->SetVariableVec3(FName("Beam End"), EndPosition);
 }
 
+float AASTurret::GetBaseRotationSpeed() const
+{
+	if (m_TurretPhases.Num() == 0) {
+		return 10.f;
+	}
+	return m_TurretPhases[m_CurrentPhase].m_BaseRotationSpeed;
+}
+
+float AASTurret::GetRotationSpeedToAdd() const
+{
+	if (m_TurretPhases.Num() == 0) {
+		return 1.f;
+	}
+	return m_TurretPhases[m_CurrentPhase].m_RotationSpeedToAdd;
+}
+
 
 void AASTurret::EndTakeDamage()
 {
