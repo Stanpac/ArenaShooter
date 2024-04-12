@@ -3,6 +3,7 @@
 
 #include "ArenaShooter/Components/ASHealthComponent.h"	
 
+#include "ASDashComponent.h"
 #include "ArenaShooter/AI/ASPawn.h"
 #include "ArenaShooter/Character/ASCharacter.h"
 #include "ArenaShooter/Widget/ASGlobalWidget.h"
@@ -10,7 +11,7 @@
 
 UASHealthComponent::UASHealthComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 	m_Health = m_MaxHealth;
 	m_IsExecutable = false;
 }
@@ -24,8 +25,24 @@ void UASHealthComponent::BeginPlay()
 		m_DamageMultiplicator = 1.0f;
 		m_HealingMultiplicator = 1.0f;
 	}
+
+	m_Character = Cast<AASCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0));
 	
 	OnHealthChanged.Broadcast(0, m_Health, m_MaxHealth, GetOwner());
+}
+
+void UASHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType,
+	FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if(m_Health <= m_Character->m_DashComponent->m_DashDamage)
+	{
+		m_IsExecutable = true;
+	}
+	else
+	{
+		m_IsExecutable = false;
+	}
 }
 
 void UASHealthComponent::healing(float amount)
@@ -42,6 +59,8 @@ void UASHealthComponent::Damage(float amount, AActor* DamageDealer, float stunDu
 {
 	if(!m_IsDamageable) return;
 
+
+	
 	if(GetOwner()->IsA<AASPawn>())
 	{
 		AASPawn* pawn = Cast<AASPawn>(GetOwner());
@@ -62,9 +81,9 @@ void UASHealthComponent::Damage(float amount, AActor* DamageDealer, float stunDu
 	
 	m_Health = NewHealth;
 	
-	if(m_Health <= m_ExecutableLife && !m_IsExecutable) {
+	/*if(m_Health <= m_ExecutableLife && !m_IsExecutable) {
 		m_IsExecutable = true;
-	}
+	}*/
 	
 	OnHealthChanged.Broadcast(PreviousHealth, m_Health, m_MaxHealth, DamageDealer);
 	

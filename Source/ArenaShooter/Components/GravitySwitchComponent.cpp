@@ -2,6 +2,8 @@
 
 
 #include "GravitySwitchComponent.h"
+
+#include "ASDashComponent.h"
 #include "Sound/SoundCue.h"
 #include "ArenaShooter/Character/ASCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -11,7 +13,7 @@
 
 UGravitySwitchComponent::UGravitySwitchComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 }
 
 void UGravitySwitchComponent::BeginPlay()
@@ -19,6 +21,22 @@ void UGravitySwitchComponent::BeginPlay()
 	Super::BeginPlay();
 	m_Character = CastChecked<AASCharacter>(GetOwner());
 	m_BaseGravityDirection = m_Character->GetGravityDirection();
+}
+
+void UGravitySwitchComponent::TickComponent(float DeltaTime, ELevelTick TickType,
+	FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if(m_IsInSurtension)
+	{
+		m_SurtensionTimer -= DeltaTime;
+		if(m_SurtensionTimer <= 0)
+		{
+			m_IsInSurtension = false;
+			auto dash = Cast<AASCharacter>(GetOwner())->m_DashComponent;
+			dash->m_DashDamage = dash->m_BaseDashDamage;
+		}
+	}
 }
 
 void UGravitySwitchComponent::SwitchGravity()
@@ -29,6 +47,11 @@ void UGravitySwitchComponent::SwitchGravity()
 	SetSwitchingGravity(true);
 	m_NbrOfCharge--;
 
+	m_IsInSurtension = true;
+	m_SurtensionTimer = m_SurtensionDuration;
+	auto dash = Cast<AASCharacter>(GetOwner())->m_DashComponent;
+	dash->m_DashDamage = dash->m_BoostedDashDamage;
+	
 	m_Character->GetCharacterMovement()->Velocity = FVector(m_Character->GetCharacterMovement()->Velocity.X, m_Character->GetCharacterMovement()->Velocity.Y, 0);
 	if(IsValid(m_SoundOnGravitySwitch))
 	{

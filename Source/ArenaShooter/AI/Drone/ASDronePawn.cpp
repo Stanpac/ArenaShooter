@@ -35,10 +35,10 @@ void AASDronePawn::BeginPlay()
 void AASDronePawn::OnDeath(AActor* DeathDealer)
 {
 	Super::OnDeath(DeathDealer);
-	if(IsValid(m_SoundMove))
+	/*if(IsValid(m_SoundMove))
 	{
 		m_SoundMove->VolumeMultiplier = 0;
-	}
+	}*/
 }
 
 void AASDronePawn::Tick(float DeltaTime)

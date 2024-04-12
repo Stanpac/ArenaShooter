@@ -42,6 +42,16 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "GravitySwitchComponent|Settings", meta = (DisplayName = "Refill Timer"))
 	float m_Timer = 0.f;
 
+public:
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "GravitySwitchComponent|Settings", meta = (DisplayName = "Refill Timer"))
+	float m_SurtensionDuration = 4.f;
+
+	UPROPERTY()
+	float m_SurtensionTimer = 4.f;
+
+	UPROPERTY()
+	bool m_IsInSurtension = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GravitySwitchComponent|Signs and Feedbacks")
 	USoundCue* m_SoundOnGravitySwitch;
@@ -73,6 +83,7 @@ public:
 	
 protected:
 	virtual void BeginPlay() override;
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	void EndSwitchGravity();
 	void RefillGravityCharge();
 

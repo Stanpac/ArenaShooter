@@ -14,6 +14,7 @@ class UNiagaraSystem;
 class UNiagaraFunctionLibrary;
 class UStaticMeshComponent;
 class USoundBase;
+class USoundCue;
 
 
 UCLASS()
