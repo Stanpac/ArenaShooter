@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagAssetInterface.h"
 #include "GameFramework/Pawn.h"
 #include "ASPawn.generated.h"
 
@@ -20,7 +21,7 @@ class UNiagaraSystem;
 
 
 UCLASS()
-class ARENASHOOTER_API AASPawn : public APawn
+class ARENASHOOTER_API AASPawn : public APawn, public IGameplayTagAssetInterface
 {
 	GENERATED_BODY()
 	/* ---------------------------------- MEMBERS --------------------------------------*/
@@ -91,6 +92,9 @@ protected:
 	
 	// Timer
 	FTimerHandle m_HealthBarTimerHandle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameplayTags")
+	FGameplayTagContainer GameplayTags;
 	
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
@@ -98,6 +102,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Gameplay")
 	void Stun(float stunDuration);
+
 
 protected:
 	virtual void BeginPlay() override;
@@ -124,4 +129,5 @@ public:
 	void SetHitPosition(const FVector& hitPosition);
 	void SetHitRotation(const FRotator& hitRotation);
 
+	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override { TagContainer = GameplayTags; }
 };

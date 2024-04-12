@@ -106,6 +106,12 @@ public:
 
 	UFUNCTION()
 	void OnFire(FVector EndPosition);
+
+	UFUNCTION(BlueprintCallable)
+	float GetBaseRotationSpeed() const;
+
+	UFUNCTION(BlueprintCallable)
+	float GetRotationSpeedToAdd() const;
 	
 protected:
 	UFUNCTION()
@@ -127,4 +133,6 @@ public:
 	FORCEINLINE void Set_TurretState(ETurretState state) { m_TurretState = state; }
 
 	FORCEINLINE TObjectPtr<USceneComponent> GetRotationRootPoint() const { return m_RotationRootPoint; }
+
+	FORCEINLINE UNiagaraComponent* GetM_TurretLaserParticleSystem() const { return m_TurretLaserParticleSystem; }
 };

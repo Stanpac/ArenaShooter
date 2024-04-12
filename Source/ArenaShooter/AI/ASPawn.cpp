@@ -3,14 +3,12 @@
 
 #include "ArenaShooter/AI/ASPawn.h"
 
-#include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "ArenaShooter/Components/ASHealthComponent.h"
 #include "ArenaShooter/Components/ASWeaponComponent.h"
 #include "ArenaShooter/SubSystem/ASEventWorldSubSystem.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "NiagaraDataInterfaceArrayFunctionLibrary.h"
 #include "Blueprint/UserWidget.h"
 #include "Sound/SoundCue.h"
 
