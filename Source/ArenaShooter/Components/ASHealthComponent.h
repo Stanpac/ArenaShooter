@@ -6,9 +6,14 @@
 #include "Components/ActorComponent.h"
 #include "ASHealthComponent.generated.h"
 
-
 class AASCharacter;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHealthComponent_DeathEvent, AActor*, OwningActor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FHealthComponent_HealthChangeEvent, float, Oldvalue, float, NewValue, float, MaxHealth, AActor*, DamageDealer);
+
+/**
+ * Actor Component that manage the health of an actor
+ */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ARENASHOOTER_API UASHealthComponent : public UActorComponent
 {
@@ -23,6 +28,12 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Healing")
 	uint8 m_UseMultiplicator : 1 = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Settings", meta = (DisplayName = "Is Invincible"))
+	uint8 m_IsInvincible : 1 = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Settings", meta = (DisplayName = "Executable life"))
+	float m_ExecutableLife = 15.f;
 	
 	/** Multiplicative For the healing
 	 *  @note 1.0f = 100% of the healing is applied
@@ -35,6 +46,24 @@ protected:
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Healing|Multiplicator", meta = (EditCondition = "m_UseMultiplicator"))
 	float m_DamageMultiplicator;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASHealthComponent|Health", meta = (DisplayName = "Is Executatble"))
+	bool m_IsExecutable;
+
+	UPROPERTY()
+	AASCharacter* m_Character;
+	
+	UPROPERTY()
+	bool m_IsDamageable = true;
+
+public:
+	// Delegate call when the Death Start
+	UPROPERTY(BlueprintAssignable)
+	FHealthComponent_DeathEvent OnDeathStarted;
+	
+	// Delegate call when the Health Change
+	UPROPERTY(BlueprintAssignable)
+	FHealthComponent_HealthChangeEvent OnHealthChanged;
 	
 	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
@@ -43,17 +72,28 @@ public:
 	UFUNCTION(BlueprintPure, Category = "ASHealthComponent|Health")
 	static UASHealthComponent* FindHealthComponent(const AActor* Actor) { return (Actor ? Actor->FindComponentByClass<UASHealthComponent>() : nullptr) ;}
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void healing(float amount);
 	
-	UFUNCTION()
-	void Damage(float amount);
+	UFUNCTION(BlueprintCallable)
+	void Damage(float amount, AActor* DamageDealer, float stunAmount = 0, FVector hitLocation = FVector::ZeroVector, FRotator hitRotation = FRotator::ZeroRotator);
+
 	
 protected:
 	virtual void BeginPlay() override;
 
-	void UpdateWidget();
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
-	float GetHealth() const { return m_Health; }
+	bool GetIsDamageable() const { return m_IsDamageable; }
+	void SetIsDamageable(bool isDamageable) { m_IsDamageable = isDamageable;}
+
+	FORCEINLINE float GetHealth() const { return m_Health; }
+	FORCEINLINE float GetMaxHealth() const { return m_MaxHealth; }
+	FORCEINLINE void SetMaxHealth(float MaxHealth) { m_MaxHealth = MaxHealth; }
+	FORCEINLINE bool GetIsExecutable() const { return m_IsExecutable; }
+	FORCEINLINE void SetIsExecutable(bool bM_IsExecutable) { m_IsExecutable = bM_IsExecutable; }
+
+	FORCEINLINE uint8 GetIsInvincible() const { return m_IsInvincible; }
+	FORCEINLINE void SetIsInvincible(uint8 M_IsInvincible) { m_IsInvincible = M_IsInvincible; }
 };

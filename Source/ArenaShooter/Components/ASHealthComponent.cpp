@@ -3,13 +3,17 @@
 
 #include "ArenaShooter/Components/ASHealthComponent.h"	
 
+#include "ASDashComponent.h"
+#include "ArenaShooter/AI/ASPawn.h"
 #include "ArenaShooter/Character/ASCharacter.h"
 #include "ArenaShooter/Widget/ASGlobalWidget.h"
+#include "Kismet/GameplayStatics.h"
 
 UASHealthComponent::UASHealthComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 	m_Health = m_MaxHealth;
+	m_IsExecutable = false;
 }
 
 void UASHealthComponent::BeginPlay()
@@ -21,17 +25,23 @@ void UASHealthComponent::BeginPlay()
 		m_DamageMultiplicator = 1.0f;
 		m_HealingMultiplicator = 1.0f;
 	}
+
+	m_Character = Cast<AASCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0));
 	
-	UpdateWidget();
+	OnHealthChanged.Broadcast(0, m_Health, m_MaxHealth, GetOwner());
 }
 
-void UASHealthComponent::UpdateWidget()
+void UASHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType,
+	FActorComponentTickFunction* ThisTickFunction)
 {
-	// TODO : Change this to have a Widget Comp on Charcter, this way player abd AI can have a widget
-	if (AASCharacter* Character = Cast<AASCharacter>(GetOwner())) {
-		if (UASGlobalWidget* Widget = Character->GetPlayerWidget()) {
-			Widget->UpdatehealthBar(m_Health / m_MaxHealth);
-		}
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if(m_Health <= m_Character->m_DashComponent->m_DashDamage)
+	{
+		m_IsExecutable = true;
+	}
+	else
+	{
+		m_IsExecutable = false;
 	}
 }
 
@@ -39,28 +49,48 @@ void UASHealthComponent::healing(float amount)
 {
 	// previous health can be Use Later For Lerp maybe ?
 	float PreviousHealth = m_Health;
-	float NewHealth = PreviousHealth + (amount * m_HealingMultiplicator);
-	
-	if (NewHealth > m_MaxHealth) {
-		NewHealth = m_MaxHealth;
-	}
+	float NewHealth = FMath::Clamp(PreviousHealth + (amount * m_HealingMultiplicator), m_IsInvincible ? 1 : 0, m_MaxHealth);
 	
 	m_Health = NewHealth;
-	UpdateWidget();
+	OnHealthChanged.Broadcast(PreviousHealth, m_Health, m_MaxHealth, GetOwner());
 }
 
-void UASHealthComponent::Damage(float amount)
+void UASHealthComponent::Damage(float amount, AActor* DamageDealer, float stunDuration, FVector hitLocation, FRotator hitRotation)
 {
-	// previous health can be Use Later For Lerp maybe ?
-	float PreviousHealth = m_Health;
-	float NewHealth = PreviousHealth - (amount * m_DamageMultiplicator);
+	if(!m_IsDamageable) return;
 
-	if (NewHealth < 0.0f) {
-		NewHealth = 0.0f;
+
+	
+	if(GetOwner()->IsA<AASPawn>())
+	{
+		AASPawn* pawn = Cast<AASPawn>(GetOwner());
+		if(hitLocation == FVector::ZeroVector)
+		{
+			hitLocation = pawn->GetActorLocation();
+		}
+		pawn->SetHitPosition(hitLocation);
 	}
 
+	// previous health can be Use Later For Lerp maybe ?
+	const float PreviousHealth = m_Health;
+	const float NewHealth = FMath::Clamp(PreviousHealth - (amount * m_DamageMultiplicator), m_IsInvincible ? 1 : 0, m_MaxHealth);
+
+	if(GetOwner()->IsA<AASPawn>()) {
+		Cast<AASPawn>(GetOwner())->Stun(stunDuration);
+	}
+	
 	m_Health = NewHealth;
-	UpdateWidget();
+	
+	/*if(m_Health <= m_ExecutableLife && !m_IsExecutable) {
+		m_IsExecutable = true;
+	}*/
+	
+	OnHealthChanged.Broadcast(PreviousHealth, m_Health, m_MaxHealth, DamageDealer);
+	
+	if (m_Health <= 0.0f) {
+		OnDeathStarted.Broadcast(GetOwner());
+	}
 }
+
 
 

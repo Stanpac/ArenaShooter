@@ -6,6 +6,17 @@
 #include "GameFramework/Actor.h"
 #include "ASWeapon.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FWeaponTurret_OnFireEvent, FVector, EndPosition);
+
+
+class UNiagaraComponent;
+class UNiagaraSystem;
+class UNiagaraFunctionLibrary;
+class UStaticMeshComponent;
+class USoundBase;
+class USoundCue;
+
+
 UCLASS()
 class ARENASHOOTER_API AASWeapon : public AActor
 {
@@ -17,6 +28,9 @@ public:
 
 	//TODO Introduce a curve variable for how the damage multiplier by distance is Evaluated
 
+	UPROPERTY()
+	FVector m_Offset;
+	
 	/** Damage by bullet **/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gun Play", meta=(DisplayName = "Damage By Bullet"))
 	float m_DamageByBullet;
@@ -30,7 +44,7 @@ public:
 	float m_FireDelayTimer;
 	
 	/** Is the weapon waiting to shoot another bullet **/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Reload", meta=(DisplayName = "Is Reloading ?"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Reload", meta=(DisplayName = "Is Waiting For FireDelay ?"))
 	bool m_IsWaitingForFireDelay;
 	
 	/** Damage Multiplier by distance **/
@@ -65,13 +79,41 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Reload", meta=(DisplayName = "Is Reloading ?"))
 	bool m_IsReloading;
 
+	/** How long will targets be stunned when hit **/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stun", meta=(DisplayName = "Ennemy Stun Duration On Hit"))
+	float m_OnHitStunDuration = 0;
+	
+	/** Sound when shot is fired **/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feedback", meta=(DisplayName = "Fire Sound"))
+	USoundCue* m_Sound_ShotFired;
+
+	/** Determines if the weapon will be set hidden at start **/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feedback", meta=(DisplayName = "Is the Weapon Shown"))
+	bool m_ShowWeapon;
+
+	UPROPERTY(VisibleAnywhere)
+	USceneComponent* m_FireMuzzleComponent;
+
+	UPROPERTY(BlueprintAssignable)
+	FWeaponTurret_OnFireEvent OnFireEvent;
+	
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category = "Feedback", meta=(DisplayName = "Fire Shoot Pos"))
+	USceneComponent* m_FireShootPos;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feedback", meta=(DisplayName = "Fire Shoot Niagara Component"))
+	UNiagaraComponent* m_Niagara_ShotFiredComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Feedback", meta=(DisplayName = "Weapon Mesh"))
+	UStaticMeshComponent* M_WeaponMesh;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
 	virtual void ReloadTick(float DeltaTime);
-
+	
 	UFUNCTION()
 	virtual void FireDelayProc();
 
@@ -79,17 +121,8 @@ protected:
 	virtual void FireDelayTick(float DeltaTime);
 	
 public:
-
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	/** Equip the weapon to the owning Pawns **/
-	UFUNCTION(BlueprintCallable, Category="Gameplay")
-	void Equip();
-
-	/** Stach the weapon to the owning Pawns **/
-	UFUNCTION(BlueprintCallable, Category="Gameplay")
-	void Stach();
 
 	UFUNCTION(BlueprintCallable, Category="Gameplay")
 	virtual void Fire(FVector fireOrigin, FVector fireDirection);

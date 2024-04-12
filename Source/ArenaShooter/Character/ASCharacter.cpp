@@ -4,18 +4,22 @@
 #include "ArenaShooter/Character/ASCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "NinjaCharacterMovementComponent.h"
+#include "ArenaShooter/Components/ASDashComponent.h"
 #include "ArenaShooter/Components/ASHealthComponent.h"
 #include "ArenaShooter/Components/ASWeaponComponent.h"
+#include "ArenaShooter/Components/GravitySwitchComponent.h"
 #include "ArenaShooter/SubSystem/ASEventWorldSubSystem.h"
 #include "ArenaShooter/Widget/ASGlobalWidget.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Sound/SoundCue.h"
+#include "Kismet/GameplayStatics.h"
 
 
-AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+AASCharacter::AASCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	PrimaryActorTick.bStartWithTickEnabled = false;
@@ -23,13 +27,7 @@ AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(
 	UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
 	check(CapsuleComp);
 	CapsuleComp->InitCapsuleSize(40.0f, 90.0f);
-
-	USkeletalMeshComponent* MeshComp = GetMesh();
-	check(MeshComp);
-	MeshComp->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));  // Rotate mesh to be X forward since it is exported as Y forward.
-	MeshComp->SetRelativeLocation(FVector(0, 0, -90));
-	MeshComp->SetupAttachment(GetCapsuleComponent());
-
+	
 	// Character Movement (Lyra Params)
 	UCharacterMovementComponent* MoveComp = CastChecked<UCharacterMovementComponent>(GetCharacterMovement());
 	MoveComp->GravityScale = 1.0f;
@@ -38,29 +36,35 @@ AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(
 	MoveComp->BrakingFriction = 6.0f;
 	MoveComp->GroundFriction = 8.0f;
 	MoveComp->BrakingDecelerationWalking = 1400.0f;
-	MoveComp->bUseControllerDesiredRotation = false;
+	MoveComp->bUseControllerDesiredRotation = true;
 	MoveComp->bOrientRotationToMovement = false;
 	MoveComp->RotationRate = FRotator(0.0f, 720.0f, 0.0f);
 	MoveComp->bAllowPhysicsRotationDuringAnimRootMotion = false;
-	MoveComp->GetNavAgentPropertiesRef().bCanCrouch = true;
-	MoveComp->bCanWalkOffLedgesWhenCrouching = true;
-	MoveComp->SetCrouchedHalfHeight(65.0f);
-
-	// Ninja Component (Temp)
-	UNinjaCharacterMovementComponent* NinjaMoveComp = CastChecked<UNinjaCharacterMovementComponent>(GetCharacterMovement());
-	NinjaMoveComp->SetAlignGravityToBase(true);
-	NinjaMoveComp->SetAlignComponentToGravity(true);
-	NinjaMoveComp->bAlwaysRotateAroundCenter = true;
-
+	
+	m_SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
+	m_SpringArmComponent->SetupAttachment(CapsuleComp);
+	m_SpringArmComponent->bUsePawnControlRotation = true;
+	m_SpringArmComponent->TargetArmLength = 0.f;
+	
 	m_FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-	m_FirstPersonCameraComponent->SetupAttachment(MeshComp, TEXT("head"));
-	m_FirstPersonCameraComponent->SetRelativeLocation(FVector(0, 10.f, 0));
-	m_FirstPersonCameraComponent->SetRelativeRotation(FRotator(-90, 0, 90));
-	m_FirstPersonCameraComponent->bUsePawnControlRotation = true;
+	m_FirstPersonCameraComponent->SetupAttachment(m_SpringArmComponent, USpringArmComponent::SocketName);
+	
+	m_Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
+	m_Mesh1P->SetOnlyOwnerSee(true);
+	m_Mesh1P->SetupAttachment(m_FirstPersonCameraComponent);
+	m_Mesh1P->bCastDynamicShadow = false;
+	m_Mesh1P->CastShadow = false;
+	
+	m_Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
+	// Actor Components 
 	m_HealthComponent = CreateDefaultSubobject<UASHealthComponent>(TEXT("HealthComponent"));
-
+	
 	m_WeaponComponent = CreateDefaultSubobject<UASWeaponComponent>(TEXT("WeaponComponent"));
+	
+	m_GravitySwitchComponent = CreateDefaultSubobject<UGravitySwitchComponent>(TEXT("GravitySwitchComponent"));
+	m_DashComponent = CreateDefaultSubobject<UASDashComponent>(TEXT("DashComponent"));
+	
 }
 
 void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -80,11 +84,11 @@ void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		// Shooting
 		EnhancedInputComponent->BindAction(m_ShootAction, ETriggerEvent::Triggered, this, &AASCharacter::Shoot);
 
-		// Reload
-		EnhancedInputComponent->BindAction(m_ReloadAction, ETriggerEvent::Triggered, this, &AASCharacter::Reload);
-		
-		// Switching Weapon
-		//EnhancedInputComponent->BindAction(m_switchWeaponAction, ETriggerEvent::Triggered, this, &AASCharacter::SwitchWeapon);
+		//GravitySwitch
+		EnhancedInputComponent->BindAction(m_switchGravityAction, ETriggerEvent::Triggered, this, &AASCharacter::SwitchGravity);
+
+		//Dash
+		EnhancedInputComponent->BindAction(m_DashAction, ETriggerEvent::Triggered, this, &AASCharacter::Dash);
 		
 	} else {
 		UE_LOG(LogTemp, Error, TEXT("'%s' Don't Find EnhancedInputComponent."), *GetNameSafe(this));
@@ -94,7 +98,7 @@ void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 void AASCharacter::DebugDamage(float amount)
 {
 	if (m_HealthComponent) {
-		m_HealthComponent->Damage(amount);
+		m_HealthComponent->Damage(amount, GetOwner());
 	}
 }
 
@@ -114,9 +118,26 @@ void AASCharacter::BeginPlay()
 	M_PlayerWidget = CreateWidget<UASGlobalWidget>(GetWorld(), M_PlayerWidgetClass);
 	if (M_PlayerWidget) {
 		M_PlayerWidget->AddToViewport();
+		GetPlayerWidget()->SetNbrOfCharge(m_GravitySwitchComponent->GetNbrOfCharge());
+		GetPlayerWidget()->SethealthBarPercent(m_HealthComponent->GetHealth(), m_HealthComponent->GetMaxHealth());
 	}
 
+	m_HealthComponent->OnDeathStarted.AddDynamic(this, &AASCharacter::OnStartDeath);
+	m_HealthComponent->OnHealthChanged.AddDynamic(this, &AASCharacter::OnHealthChanged);
+	
 	m_WeaponComponent->InitializeWeapon();
+	m_WeaponComponent->OnFireEvent.AddDynamic(this, &AASCharacter::OnFire);
+
+	m_GravitySwitchComponent->OnStartSwitchGravity.AddDynamic(this, &AASCharacter::OnChangeGravity);
+	m_GravitySwitchComponent->OnSwitchGravityAbiltyCooldownEnd.AddDynamic(this, &AASCharacter::OnAbilityCooldownEnd);
+	m_GravitySwitchComponent->OnGravityChargeRefill.AddDynamic(this, &AASCharacter::OnGravityChargeRefill);
+
+	m_DashComponent->OnHitTargetChange.AddDynamic(this, &AASCharacter::OnHitTargetChange);
+
+	if (M_LockWidgetActorClass) {
+		M_LockWidgetActor = GetWorld()->SpawnActor<AActor>(M_LockWidgetActorClass);
+	}
+
 }
 
 void AASCharacter::GetAllSubsystem()
@@ -127,7 +148,7 @@ void AASCharacter::GetAllSubsystem()
 void AASCharacter::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
-
+	
 	if (Controller != nullptr) {
 		if (MovementVector.X != 0.0f) {
 			AddMovementInput(GetActorRightVector(), MovementVector.X);
@@ -142,15 +163,22 @@ void AASCharacter::Move(const FInputActionValue& Value)
 void AASCharacter::Look(const FInputActionValue& Value)
 {
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
-
-	if (Controller != nullptr) {
-		if (LookAxisVector.X != 0.0f) {
-			AddControllerYawInput(LookAxisVector.X);
+	if (m_GravitySwitchComponent) {
+		if (GetGravityDirection() != m_GravitySwitchComponent->GetBaseGravityDirection()) {
+			LookAxisVector = FVector2D(-LookAxisVector.X, -LookAxisVector.Y);
 		}
+	}
+	
+	if (LookAxisVector.X != 0.0f) {
+		AddControllerYawInput(LookAxisVector.X);
+	}
 
-		if (LookAxisVector.Y != 0.0f) {
-			AddControllerPitchInput(LookAxisVector.Y);
-		}
+	if (LookAxisVector.Y != 0.0f) {
+		FRotator NewRotation = m_SpringArmComponent->GetRelativeRotation();
+		NewRotation.Pitch += -LookAxisVector.Y;
+		NewRotation.Pitch = FMath::ClampAngle(NewRotation.Pitch, -85, 85);
+		NewRotation.Pitch = FRotator::ClampAxis(NewRotation.Pitch);
+		m_SpringArmComponent->SetRelativeRotation(NewRotation);
 	}
 }
 
@@ -165,18 +193,31 @@ void AASCharacter::Reload(const FInputActionValue& Value)
 	m_WeaponComponent->Reload();
 }
 
-void AASCharacter::Switch(const FInputActionValue& Value) const
+void AASCharacter::SwitchGravity(const FInputActionValue& Value)
 {
-	m_WeaponComponent->SwitchWeapon();		
+	if (m_GravitySwitchComponent) {
+		m_GravitySwitchComponent->SwitchGravity();
+	}
 }
 
-void AASCharacter::OnStartDeath()
+void AASCharacter::Dash(const FInputActionValue& Value)
 {
-	//TODO : Should be moved In a Player Class if there is
+	if(m_DashComponent->OnDash())
+	{
+		UAnimInstance* AnimInstance = GetMesh1P()->GetAnimInstance();
+		if (IsValid(AnimInstance) && IsValid(m_DashMontage))
+		{
+			AnimInstance->Montage_Play(m_DashMontage, 1.3f, EMontagePlayReturnType::MontageLength, 0.0f, true);
+		}
+	}
+}
+
+void AASCharacter::OnStartDeath(AActor* OwningActor)
+{
 	if (m_EventWorldSubSystem) {
 		m_EventWorldSubSystem->BroadcastPlayerStartDeath();
 	}
-	//end
+	
 	if (Controller) {
 		Controller->SetIgnoreMoveInput(true);
 	}
@@ -186,20 +227,110 @@ void AASCharacter::OnStartDeath()
 	CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 
-	UCharacterMovementComponent* LyraMoveComp = GetCharacterMovement();
-	LyraMoveComp->StopMovementImmediately();
-	LyraMoveComp->DisableMovement();
+	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
+	MoveComp->StopMovementImmediately();
+	MoveComp->DisableMovement();
+	
+	if(m_SoundDeath) {
+		UGameplayStatics::PlaySoundAtLocation( GetWorld(), m_SoundDeath, GetOwner()->GetActorLocation());
+	}
+	
+	// TODO : Add Death Animation and Call OnEndDeath at the end of the animation
+	OnEndDeath();
 }
 
 void AASCharacter::OnEndDeath()
 {
-	//TODO : Should be moved In a Player Class if there is
+	UWorld* World = GetWorld();
+	if (!World) return;
+	
+	SetLifeSpan(0.1f);
+	SetActorHiddenInGame(true);
+	
 	if (m_EventWorldSubSystem) {
 		m_EventWorldSubSystem->BroadcastPlayerEndDeath();
 	}
-	//end
-	SetLifeSpan(0.1f);
-	SetActorHiddenInGame(true);
+}
+
+void AASCharacter::OnFire()
+{
+	UAnimInstance* AnimInstance = GetMesh1P()->GetAnimInstance();
+	if (!IsValid(AnimInstance)) return;
+	
+	const float MontageLength = AnimInstance->Montage_Play(m_FireMontage, 1.0f, EMontagePlayReturnType::MontageLength, 0.0f, true);
+}
+
+void AASCharacter::OnChangeGravity()
+{
+	// Call when the Gravity Switch Start
+	GetPlayerWidget()->SetGravityAbilityWidget(false);
+}
+
+void AASCharacter::OnAbilityCooldownEnd()
+{
+	GetPlayerWidget()->SetGravityAbilityWidget(true);
+	if(m_SoundGravityAvailable) {
+		UGameplayStatics::PlaySoundAtLocation( GetWorld(), m_SoundGravityAvailable,GetOwner()->GetActorLocation());
+	}
+}
+
+void AASCharacter::OnGravityChargeRefill()
+{
+	GetPlayerWidget()->SetGravityChargeBarPercent(m_GravitySwitchComponent->GetTimer() / m_GravitySwitchComponent->GetGravityChargeRefillTime());
+	GetPlayerWidget()->SetNbrOfCharge(m_GravitySwitchComponent->GetNbrOfCharge());
+}
+
+void AASCharacter::OnHitTargetChange(AActor* Target)
+{
+	GetPlayerWidget()->ManageCursor(Target);
+	
+	if (M_LockWidgetActor == nullptr) return;
+	
+	if (Target == nullptr) {
+		M_LockWidgetActor->SetActorHiddenInGame(true);
+	} else {
+		M_LockWidgetActor->SetActorLocation(Target->GetActorLocation());
+		M_LockWidgetActor->SetActorHiddenInGame(false);
+	}
+
+}
+
+void AASCharacter::OnDashValidate()
+{
+	GetPlayerWidget()->SetDashAbilityWidget(false);
+}
+
+void AASCharacter::OnDashAbilityCooldownEnd()
+{
+	GetPlayerWidget()->SetDashAbilityWidget(true);
+}
+
+void AASCharacter::OnDashRechargeTick(float percent)
+{
+	GetPlayerWidget()->SetDashChargeBarPercent(percent);
+}
+
+void AASCharacter::OnHealthChanged(float PreviousHealth, float CurrentHealth, float MaxHealth,AActor* DamageDealer)
+{
+	GetPlayerWidget()->SethealthBarPercent(CurrentHealth,MaxHealth);
+	if (CurrentHealth < PreviousHealth) {
+		CheckPlayScreenShake();
+		if(m_SoundHit) {
+			UGameplayStatics::PlaySoundAtLocation( GetWorld(), m_SoundHit,GetOwner()->GetActorLocation());
+		}
+	}
+}
+
+void AASCharacter::CheckPlayScreenShake()
+{
+	if (!bPlayShakeOntakingDamage || m_ShakeClass == nullptr) {
+		return;
+	}
+	
+	APlayerCameraManager* lCamMgr = UGameplayStatics::GetPlayerCameraManager(this->GetWorld(), 0);
+	if (lCamMgr != nullptr) {
+		lCamMgr->StartCameraShake(m_ShakeClass);
+	}
 }
 
 void AASCharacter::AddDefaultMappingContext()
@@ -219,6 +350,6 @@ void AASCharacter::RemoveDefaultMappingContext()
 		}
 	}
 }
-
+	
 
 

@@ -6,10 +6,6 @@
 #include "Blueprint/UserWidget.h"
 #include "ASGlobalWidget.generated.h"
 
-class UImage;
-class UCanvasPanel;
-class UProgressBar;
-
 /**
  *  Class for the Widget that will be displayed on the screen
  *  All The gameplay UI will be in this widget
@@ -19,28 +15,30 @@ class ARENASHOOTER_API UASGlobalWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	/* ---------------------------------- MEMBERS --------------------------------------*/
-protected:
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
-	TObjectPtr<UCanvasPanel> m_BaseCanvasPanel;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
-	TObjectPtr<UProgressBar> m_HealthBar;
-
-	UPROPERTY(editanywhere, BlueprintReadWrite, Category = "ASGlobalWidget", meta = (BindWidget))
-	TObjectPtr<UImage> m_CursorImage;
 	
-	/* ---------------------------------- FUNCTIOns --------------------------------------*/
+	/* ---------------------------------- FUNCTIONS --------------------------------------*/
 public:
-	UASGlobalWidget(const FObjectInitializer& ObjectInitializer);
+	UASGlobalWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void SethealthBarPercent(float Health, float MaxHealth);
 
-	virtual bool Initialize() override;
+	UFUNCTION(BlueprintImplementableEvent)
+	void ManageCursor(AActor* Target);
 
-	void UpdatehealthBar(float percent);
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetGravityAbilityWidget(bool visible);
 
-	void ChangeCursorVisibility(bool visible);
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetGravityChargeBarPercent(float percent);
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetNbrOfCharge(int NbrOfCharge);
 
-protected:
-	void SethealthBarPercent(float percent);
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetDashAbilityWidget(bool visible);
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetDashChargeBarPercent(float percent);
 };
 
