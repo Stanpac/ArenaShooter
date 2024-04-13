@@ -5,6 +5,7 @@
 #include "ArenaShooter/Components/ASHealthComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Math/UnitConversion.h"
 
 
 void AASWeapon_Turret::BeginPlay()
@@ -39,13 +40,14 @@ void AASWeapon_Turret::Fire(FVector fireOrigin, FVector fireDirection)
 	FHitResult OutHit;
 	TArray<AActor*> ActorsToIgnore {GetOwner()};
 	
-	ETraceTypeQuery TraceTypeQuery = UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel3);
+	ETraceTypeQuery TraceTypeQuery = UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel5);
+	ETraceTypeQuery TraceTypeQuery2 = UEngineTypes::ConvertToTraceType(ECC_Visibility);
 	
 	bool bHit = UKismetSystemLibrary::SphereTraceSingle(
 	GetWorld(),
 	fireOrigin,
 	fireOrigin + fireDirection * 1000000,
-	m_LaserRadius,
+	.1f,
 	TraceTypeQuery,
 	false,
 	ActorsToIgnore,
@@ -55,35 +57,40 @@ void AASWeapon_Turret::Fire(FVector fireOrigin, FVector fireDirection)
 	FColor::Black
 	);
 
-	bool bHit2 = UKismetSystemLibrary::SphereTraceSingle(
-GetWorld(),
-fireOrigin,
-fireOrigin + fireDirection * 1000000,
-15,
-TraceTypeQuery,
-false,
-ActorsToIgnore,
-EDrawDebugTrace::None,
-OutHit,
-true,
-FColor::Black
-);
-
+	TArray<FHitResult> OutHits;
+	
+	bool bHit2 = UKismetSystemLibrary::SphereTraceMulti(
+	GetWorld(),
+	fireOrigin,
+	OutHit.Location + (OutHit.Location - fireOrigin).GetSafeNormal() * 100,
+	m_LaserRadius,
+	TraceTypeQuery2,
+	false,
+	ActorsToIgnore,
+	EDrawDebugTrace::None,
+	OutHits,
+	true,
+	FColor::Black
+	);
+	
 	if(bHit)
 	{
 		OnFireEvent.Broadcast(OutHit.Location);
-		if(auto pawn = Cast<AASDronePawn>(OutHit.GetActor()))
-		{
-			UASHealthComponent::FindHealthComponent(pawn)->Damage(100, this);
-		}
-
 	}
 
 	if(bHit2)
 	{
-		if(OutHit.GetActor() == m_Character)
+		for (auto hit : OutHits)
 		{
-			UASHealthComponent::FindHealthComponent(m_Character)->Damage(m_Deltatime * m_DamageByBullet, this);
+			if(auto pawn = Cast<AASDronePawn>(hit.GetActor()))
+			{
+				UASHealthComponent::FindHealthComponent(pawn)->Damage(100, this);
+			}
+			
+			if(auto pawn = Cast<ACharacter>(hit.GetActor()))
+			{
+				UASHealthComponent::FindHealthComponent(pawn)->Damage(GetWorld()->DeltaTimeSeconds * 200, this);
+			}
 		}
 	}
 }
